@@ -1,0 +1,60 @@
+server:
+  port: ${PORT}
+spring:
+  app:
+    jwtCookie: refreshToken
+  application:
+    name: hrm-backend
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+      locations: classpath:db/migration
+
+security:
+  oauth2:
+    client:
+      registration:
+        strava:
+          client-id: ${STRAVA_CLIENT_ID}
+          client-secret: ${STRAVA_CLIENT_SECRET}
+          scope: read,activity:read_all
+          authorization-grant-type: authorization_code
+          redirect-uri: ${BACKEND_URL}/oauth2/callback
+      provider:
+        strava:
+          authorization-uri: https://www.strava.com/oauth/authorize
+          token-uri: https://www.strava.com/oauth/token
+          user-info-uri: https://www.strava.com/api/v3/athlete
+          user-name-attribute: id
+
+frontend:
+  url: ${FRONTEND_URL}
+
+jwt:
+  secret: ${SECRET_KEY}
+  access-token-validity-seconds: 3600
+  refresh-token-validity-seconds:  604800
+
+logging:
+  level:
+    org:
+      springframework:
+        security: INFO
+    com:
+      phong:
+        hrm_backend: INFO
