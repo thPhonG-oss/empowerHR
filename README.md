@@ -78,9 +78,9 @@ Point-based reward system to recognize and motivate employees.
 
 ## 📚 Documentation
 
-- [Requirements Specification](docs/requirements/) - User requirements and user stories
-- [System Design](docs/design/) - Database schema, architecture diagrams, UI mockups
-- [Project Plan](docs/project-plan/) - Sprint planning and milestones
+- [Requirements Specification](https://docs.google.com/document/d/1gfQlh6HJZzSMIT21piMV6d7CIAh2UuCNyPjMksjROuQ/edit?usp=sharing) - User requirements and user stories
+- [System Design](https://drive.google.com/file/d/1qnWIJuupPR9USQCmNB9Q1Qq1C_dsh7Pd/view?usp=sharing) - Database schema, architecture diagrams, UI mockups
+- [Project Plan](https://ngthanhphong0817.atlassian.net/jira/software/projects/EM/boards/34?atlOrigin=eyJpIjoiMTgwNzkyYzg3YTcxNDBkZjhlYjIzNzZmY2M0ZGUwMzQiLCJwIjoiaiJ9) - Sprint planning and milestones
 
 ---
 
