@@ -14,6 +14,9 @@ import DashboardManager from "../pages/manager/Dashboard";
 // Employee
 import DashboardEmployee from "../pages/employee/Dashboard";
 
+// Not Found Page
+import NotFoundPage from "../pages/auth/NotFoundPage";
+
 export default function AppRouter() {
   return (
     <Routes>
@@ -50,6 +53,9 @@ export default function AppRouter() {
           </RoleRoute>
         }
       />
+
+      {/* Not found */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

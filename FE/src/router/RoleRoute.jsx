@@ -1,25 +1,21 @@
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 function RoleRoute({ children, allowedRoles }) {
-  const token = sessionStorage.getItem("token");
-  let user = {};
+  const { isLoggedIn, role } = useContext(AuthContext);
 
-  try {
-    user = JSON.parse(sessionStorage.getItem("user")) || {};
-  } catch {
-    user = {};
-  }
-
-  // Không có thì điều về login
-  if (!token) {
+  // 1. Nếu chưa đăng nhập
+  if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
-  // Role không hợp lệ sẽ thông báo k có quyền truy cập
-  if (!user.role || !allowedRoles.includes(user.role)) {
-    // return <Navigate to="/unauthorized" replace />;
+  // 2. Nếu không có quyền truy cập
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
+  // 3. Có quyền -> Render component
   return children;
 }
 
