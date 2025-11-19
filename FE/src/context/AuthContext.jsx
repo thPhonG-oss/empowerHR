@@ -1,6 +1,5 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext();
 
@@ -30,7 +29,7 @@ export function AuthProvider({ children }) {
   // Fake login
   const login = (token, role) => {
     localStorage.setItem("token", token);
-    localStorage.setItem("role", JSON.stringify(role));
+    localStorage.setItem("role", role);
     setToken(token);
     setRole(role);
   };
@@ -47,7 +46,7 @@ export function AuthProvider({ children }) {
   const isLoggedIn = !!token;
 
   // Check role
-  const hasRole = (role) => role === role;
+  const hasRole = (r) => role === r;
 
   return (
     <AuthContext.Provider

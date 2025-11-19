@@ -25,7 +25,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // Tạm thơi chưa có API
+      // Tạm thời chưa có API
       // const res = await authApi.login({ email, password });
       // const token = res.data.result.token;
 
