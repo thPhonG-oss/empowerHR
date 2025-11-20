@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.mapper;
 
+import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.entity.Employee;
 import org.mapstruct.Mapper;
@@ -11,4 +12,7 @@ public interface EmployeeMapper {
     @Mapping(target = "position", ignore = true)
     @Mapping(target = "department", ignore = true)
     EmployeeResponseDTO ToEmployeeResponseDTO(Employee employee);
+
+
+    Employee ToEmployee(EmployeeUpdateRequestDTO employeeUpdateRequestDTO);
 }

@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hr_management.hr_management.entity.Bank;
 import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.entity.Position;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmployeeResponseDTO {
     private Integer employeeId;
     private String employeeCode;
