@@ -6,9 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 // Mock tài khoản user role đăng nhập
 const mockUsers = [
-  { email: "employee@example.com", password: "123", roles: ["EMPLOYEE"] },
-  { email: "admin@example.com", password: "123", roles: ["ADMIN"] },
-  { email: "manager@example.com", password: "123", roles: ["MANAGER"] },
+  { email: "employee", password: "123", roles: ["EMPLOYEE"] },
+  { email: "admin", password: "123", roles: ["ADMIN"] },
+  { email: "manager", password: "123", roles: ["MANAGER"] },
 ];
 
 function Login() {
@@ -40,8 +40,9 @@ function Login() {
       );
       if (user) {
         const fakeToken = "fake_token_123"; // có thể dùng uuid hoặc random string
-        console.log(user.roles[0]);
-        login(fakeToken, user.roles[0]); // truyền roles trực tiếp
+        const fakeUserName = "Trương Việt Công";
+
+        login(fakeToken, user.roles[0], fakeUserName);
 
         const roleString = user.roles[0].toLowerCase();
 
@@ -86,19 +87,19 @@ function Login() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Input */}
+          {/* Username Input */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Email
+              Tên tài khoản
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
                 setWrongInput(false);
               }}
-              placeholder="example@gmail.com"
+              placeholder="Tên tài khoản"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
             />

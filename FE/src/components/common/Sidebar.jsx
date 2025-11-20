@@ -4,7 +4,7 @@ import { useContext } from "react";
 
 import { Users, CircleUser, LogOut } from "lucide-react";
 function Sidebar() {
-  const { role, logout } = useContext(AuthContext);
+  const { role, logout, userName } = useContext(AuthContext);
   const navItems = getNavByRole(role.toLowerCase());
 
   const currentPath = window.location.pathname.split("/").pop();
@@ -42,7 +42,7 @@ function Sidebar() {
             <CircleUser size={32} />
           </div>
           <div>
-            <p className="font-bold">Tên người dùng</p>
+            <p className="font-bold">{userName}</p>
             <p>
               {role === "EMPLOYEE"
                 ? "Nhân viên"
