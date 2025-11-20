@@ -56,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @NonFinal
     @Value("${jwt.refresh-token-validity-seconds}")
     protected long REFRESHABLE_DURATION;
+
     @Override
     public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest) {
          Account account=accountRepository.findByUsername(authenticateRequest.getUserName())
