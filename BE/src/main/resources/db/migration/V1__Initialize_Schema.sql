@@ -406,9 +406,3 @@ CREATE TABLE DepartmentBudget (
     CONSTRAINT fk_department_budget_point_policy FOREIGN KEY (point_policy_id)
         REFERENCES PointPolicy(point_policy_id)
 );
-
-
-
-
-
-
