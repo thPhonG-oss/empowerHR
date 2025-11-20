@@ -1,11 +1,9 @@
-package com.hr_management.hr_management.dto;
+package com.hr_management.hr_management.dto.response;
 
-import com.hr_management.hr_management.entity.Account;
 import com.hr_management.hr_management.entity.Bank;
 import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.entity.Position;
 import com.hr_management.hr_management.enums.Gender;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
