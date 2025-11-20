@@ -69,7 +69,7 @@ CREATE TABLE Account_Role(
 -- ============================================
 -- Bảng Position
 -- ============================================
-CREATE TABLE Position (
+CREATE TABLE JobPosition (
     position_id INT PRIMARY KEY AUTO_INCREMENT,
     position_name VARCHAR(100) NOT NULL UNIQUE
 );
@@ -110,7 +110,7 @@ CREATE TABLE Employee (
     CONSTRAINT fk_employee_account FOREIGN KEY (account_id)
         REFERENCES Account(account_id) ON DELETE SET NULL,
     CONSTRAINT fk_employee_position FOREIGN KEY (position_id)
-        REFERENCES Position(position_id) ON DELETE SET NULL,
+        REFERENCES JobPosition(position_id) ON DELETE SET NULL,
     CONSTRAINT fk_employee_department FOREIGN KEY (department_id)
         REFERENCES Department(department_id) ON DELETE SET NULL,
     CONSTRAINT fk_employee_bank FOREIGN KEY (bank_id)
@@ -372,9 +372,9 @@ CREATE TABLE PointPolicy(
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    is_being_applied BOOLEAN DEFAULT true,
-   conversion_rule_id INT,
+   conversion_rule_id INT NOT NULL,
    CONSTRAINT fk_point_policy_conversion_rule FOREIGN KEY (conversion_rule_id)
-        REFERENCES ConversionRule(conversion_rule_id) ON DELETE SET NULL
+        REFERENCES ConversionRule(conversion_rule_id)
 );
 
 
@@ -387,7 +387,7 @@ CREATE TABLE MonthlyReward (
     monthly_points INT DEFAULT 0,
     PRIMARY KEY (position_id, point_policy_id),
     CONSTRAINT fk_monthly_budget_position FOREIGN KEY (position_id)
-        REFERENCES Position(position_id),
+        REFERENCES JobPosition(position_id),
     CONSTRAINT fk_monthly_budget_point_policy FOREIGN KEY (point_policy_id)
         REFERENCES PointPolicy(point_policy_id)
 );
@@ -406,9 +406,3 @@ CREATE TABLE DepartmentBudget (
     CONSTRAINT fk_department_budget_point_policy FOREIGN KEY (point_policy_id)
         REFERENCES PointPolicy(point_policy_id)
 );
-
-
-
-
-
-
