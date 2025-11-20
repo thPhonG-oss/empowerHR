@@ -2,6 +2,8 @@ import { useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const navSimple = [
+  { title: "Empower HR", path: "login" },
+
   { title: "Trang chủ", path: "dashboard" },
 
   // ADMIN ONLY

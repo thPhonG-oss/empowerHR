@@ -6,7 +6,9 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role") || "");
-
+  const [userName, setUserName] = useState(
+    localStorage.getItem("userName") || ""
+  );
   // Login đúng cách
   // // Login: lưu token + decode roles
   // const login = (token) => {
@@ -27,11 +29,13 @@ export function AuthProvider({ children }) {
   // };
 
   // Fake login
-  const login = (token, role) => {
+  const login = (token, role, userName) => {
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
+    localStorage.setItem("userName", userName);
     setToken(token);
     setRole(role);
+    setUserName(userName);
   };
 
   // Logout
@@ -40,6 +44,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("role");
     setToken(null);
     setRole("");
+    setUserName("");
   };
 
   // Check login status
@@ -50,7 +55,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, role, login, logout, isLoggedIn, hasRole }}
+      value={{ token, role, userName, login, logout, isLoggedIn, hasRole }}
     >
       {children}
     </AuthContext.Provider>

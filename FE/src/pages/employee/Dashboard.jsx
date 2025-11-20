@@ -12,7 +12,7 @@ function Dashboard() {
           {/* Stats Cards - 4 columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Stat Card 1 */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium ">Điểm thưởng hiện tại</h3>
                 <BarChart3 className="w-5 h-5 " />
@@ -21,7 +21,7 @@ function Dashboard() {
             </div>
 
             {/* Stat Card 2 */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium ">
                   Số ngày đi làm tháng này
@@ -32,7 +32,7 @@ function Dashboard() {
             </div>
 
             {/* Stat Card 3 */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium ">Ngày nghỉ phép còn lại</h3>
                 <Calendar className="w-5 h-5 " />
@@ -41,7 +41,7 @@ function Dashboard() {
             </div>
 
             {/* Stat Card 4 */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium ">Yêu cầu chờ duyệt</h3>
                 <AlertCircle className="w-5 h-5 " />
@@ -53,13 +53,13 @@ function Dashboard() {
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Left Column - My Requests */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <h2 className="text-lg font-semibold  mb-4">Yêu cầu của tôi</h2>
               <p className="text-sm  mb-4">Các yêu cầu gần đây</p>
 
               <div className="space-y-3">
                 {/* Request Card 1 */}
-                <div className="border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
+                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex gap-2">
                       <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
@@ -78,7 +78,7 @@ function Dashboard() {
                 </div>
 
                 {/* Request Card 2 */}
-                <div className="border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
+                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex gap-2">
                       <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-slate-700 text-white dark:bg-slate-600">
@@ -99,13 +99,13 @@ function Dashboard() {
             </div>
 
             {/* Right Column - My Activities */}
-            <div className=" border border-gray-300 rounded-lg p-6">
+            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
               <h2 className="text-lg font-semibold  mb-4">Hoạt động của tôi</h2>
               <p className="text-sm  mb-4">Các hoạt động gần đây</p>
 
               <div className="space-y-3">
                 {/* Activity Card 1 */}
-                <div className="border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
+                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="text-sm font-medium  mb-1">
@@ -123,7 +123,7 @@ function Dashboard() {
                 </div>
 
                 {/* Activity Card 2 */}
-                <div className="border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
+                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="text-sm font-medium  mb-1">
