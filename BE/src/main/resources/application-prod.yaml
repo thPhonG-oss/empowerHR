@@ -46,7 +46,7 @@ frontend:
   url: ${FRONTEND_URL}
 
 jwt:
-  secret: ${SECRET_KEY}
+  secret: "jG!DezE-vwI61o0pEP2kKcsk5SlX4Y!bnbNDa/z!A=1e2Pn4zDVkVhDnd5zYPH6j"
   access-token-validity-seconds: 3600
   refresh-token-validity-seconds:  604800
 
