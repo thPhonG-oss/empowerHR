@@ -1,11 +1,11 @@
 package com.hr_management.hr_management.service.Impl;
 
-import com.devteria.identity_service.dto.request.RoleRequest;
-import com.devteria.identity_service.dto.response.RoleResponse;
-import com.devteria.identity_service.mapper.RoleMapper;
-import com.devteria.identity_service.repository.PermissionRepository;
-import com.devteria.identity_service.repository.RoleRepository;
-import com.devteria.identity_service.service.RoleService;
+import com.hr_management.hr_management.dto.request.RoleRequest;
+import com.hr_management.hr_management.dto.response.RoleResponse;
+import com.hr_management.hr_management.mapper.RoleMapper;
+import com.hr_management.hr_management.repository.PermissionRepository;
+import com.hr_management.hr_management.repository.RoleRepository;
+import com.hr_management.hr_management.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

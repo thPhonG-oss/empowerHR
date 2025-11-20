@@ -11,6 +11,5 @@ import org.mapstruct.Mapper;
 @Mapper
 @Builder
 public class AuthenticationResponse {
-    String token;
-    boolean authenticated;
+    String acessToken;
 }

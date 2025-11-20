@@ -1,7 +1,9 @@
 package com.hr_management.hr_management.service;
 
-import com.devteria.identity_service.dto.request.PermissionRequest;
-import com.devteria.identity_service.dto.response.PermissionResponse;
+
+
+import com.hr_management.hr_management.dto.request.PermissionRequest;
+import com.hr_management.hr_management.dto.response.PermissionResponse;
 
 import java.util.List;
 

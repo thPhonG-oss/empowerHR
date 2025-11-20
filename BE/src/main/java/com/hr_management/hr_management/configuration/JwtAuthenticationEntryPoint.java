@@ -1,8 +1,9 @@
 package com.hr_management.hr_management.configuration;
 
-import com.devteria.identity_service.dto.request.ApiResponse;
-import com.devteria.identity_service.exception.ErrorCode;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hr_management.hr_management.dto.request.ApiResponse;
+import com.hr_management.hr_management.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

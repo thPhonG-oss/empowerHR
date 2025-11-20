@@ -239,7 +239,7 @@ CREATE TABLE StravaConnections (
     connection_at DATETIME,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_strava_connection_employee FOREIGN KEY (employee_id)
-        REFERENCES Employee(employee_id) ON DELETE CASCADE,
+        REFERENCES Employee(employee_id) ON DELETE CASCADE
 );
 -- ============================================
 -- Bảng RunningActivity
@@ -372,7 +372,7 @@ CREATE TABLE PointPolicy(
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    is_being_applied BOOLEAN DEFAULT true,
-   conversion_rule_id INT NOT NULL,
+   conversion_rule_id INT,
    CONSTRAINT fk_point_policy_conversion_rule FOREIGN KEY (conversion_rule_id)
         REFERENCES ConversionRule(conversion_rule_id) ON DELETE SET NULL
 );

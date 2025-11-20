@@ -1,5 +1,6 @@
 server:
-  port: ${PORT}
+  port: 8080
+
 
 spring:
   app:
@@ -7,10 +8,9 @@ spring:
   application:
     name: hrm-backend
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://localhost:3306/t7"
+    username: root
+    password: 112233
   jpa:
     hibernate:
       ddl-auto: update
@@ -42,7 +42,7 @@ security:
           user-name-attribute: id
 
 jwt:
-  secret: ${SECRET_KEY}
+  secret: "jG!DezE-vwI61o0pEP2kKcsk5SlX4Y!bnbNDa/z!A=1e2Pn4zDVkVhDnd5zYPH6j"
   access-token-validity-seconds: 3600
   refresh-token-validity-seconds:  604800
 

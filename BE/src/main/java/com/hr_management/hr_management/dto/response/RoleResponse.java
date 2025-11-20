@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,6 +12,5 @@ import java.util.Set;
 @Builder
 public class RoleResponse {
     String name;
-    String description;
     Set<PermissionResponse> permissions;
 }

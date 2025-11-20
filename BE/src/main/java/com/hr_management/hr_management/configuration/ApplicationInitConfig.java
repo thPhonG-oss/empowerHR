@@ -1,11 +1,12 @@
 package com.hr_management.hr_management.configuration;
 
-import com.devteria.identity_service.entity.Role;
-import com.devteria.identity_service.entity.User;
-import com.devteria.identity_service.enums.Roles;
-import com.devteria.identity_service.repository.PermissionRepository;
-import com.devteria.identity_service.repository.RoleRepository;
-import com.devteria.identity_service.repository.UserRepository;
+
+import com.hr_management.hr_management.entity.Account;
+import com.hr_management.hr_management.entity.Role;
+import com.hr_management.hr_management.enums.Roles;
+import com.hr_management.hr_management.repository.AccountRepository;
+import com.hr_management.hr_management.repository.PermissionRepository;
+import com.hr_management.hr_management.repository.RoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,22 +31,21 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
     PermissionRepository permissionRepository;
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository){
+    ApplicationRunner applicationRunner(AccountRepository accountRepository){
         return args -> {
-            if(userRepository.findByUsername("admin").isEmpty()){
+            if(accountRepository.findByUsername("admin").isEmpty()){
 
                 Role adminRole = roleRepository.save(Role.builder()
                         .name(Roles.ADMIN.toString())
-                        .description("ADMIN_ROLE")
                         .build());
                 var roles=new HashSet<Role>();
                 roles.add(adminRole);
-                User user= User.builder()
+                Account account= Account.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .roles(roles)
                         .build();
-                userRepository.save(user);
+                accountRepository.save(account);
             }
 
         };

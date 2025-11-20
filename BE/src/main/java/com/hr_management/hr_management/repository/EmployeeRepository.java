@@ -1,11 +1,11 @@
 package com.hr_management.hr_management.repository;
 
-import com.devteria.identity_service.entity.User;
+import com.hr_management.hr_management.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface EmployeeRepository extends JpaRepository<Employee,Long> {
     boolean existsByUsername(String username);
-    Optional<User> findByUsername(String username);
+    Optional<Employee> findByUsername(String username);
 }
