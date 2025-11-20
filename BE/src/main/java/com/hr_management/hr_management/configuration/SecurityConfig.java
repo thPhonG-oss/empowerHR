@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,6 +56,26 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
         return jwtAuthenticationConverter;
+    }
+
+    @Bean // it completely bypass from spring security
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (webSecurity -> {
+            webSecurity.ignoring().requestMatchers(
+                    "/v3/api-docs",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/configuration/ui",
+                    "/swagger-resources/**",
+                    "/swagger-resources",
+                    "/configuration/security",
+                    "/webjars/**",
+                    "/h2-console/**",
+                    "/favicon.ico",
+                    "/api/v1/admin/**"
+            );
+        });
     }
 
 
