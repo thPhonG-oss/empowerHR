@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     EmployeeService employeeService;
 
-    @GetMapping("/employees/{employeeId}")
-    public ResponseEntity<ApiResponse> getEmployee(@PathVariable Long employeeId) {
-        return ResponseEntity.ok().body(
-                ApiResponse.builder()
-                        .status(1000)
-                        .message("Success")
-                        .data(employeeService.getEmployeeById(employeeId))
-                        .build()
-        );
-    }
+//    @GetMapping("/employees/{employeeId}")
+//    public ResponseEntity<ApiResponse> getEmployee(@PathVariable Long employeeId) {
+//        return ResponseEntity.ok().body(
+//                ApiResponse.builder()
+//                        .status(1000)
+//                        .message("Success")
+//                        .data(employeeService.getEmployeeById(employeeId))
+//                        .build()
+//        );
+//    }
 }

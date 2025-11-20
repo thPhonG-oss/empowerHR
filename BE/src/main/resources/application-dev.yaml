@@ -1,6 +1,5 @@
 server:
   port: ${PORT}
-
 spring:
   app:
     jwtCookie: refreshToken
@@ -8,7 +7,7 @@ spring:
     name: hrm-backend
   datasource:
     url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
+    username:  ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
@@ -42,7 +41,7 @@ security:
           user-name-attribute: id
 
 jwt:
-  secret: ${SECRET_KEY}
+  secret:  ${SECRET_KEY}
   access-token-validity-seconds: 3600
   refresh-token-validity-seconds:  604800
 

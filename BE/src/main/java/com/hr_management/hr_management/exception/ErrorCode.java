@@ -1,31 +1,32 @@
 package com.hr_management.hr_management.exception;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public enum ErrorCode {
-    SUCCESS(1000, "Success", HttpStatus.OK),
-    UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_KEY(1001, "Invalid key provided", HttpStatus.BAD_REQUEST),
-    USER_EXISTED(1002, "User existed", HttpStatus.BAD_REQUEST),
-    USERNAME_INVALID(1003, "Username must be at least {min} characters long", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(1004, "Password must be at least {min} characters long", HttpStatus.BAD_REQUEST),
-    USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
-    UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
-    UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
-    USER_NOT_FOUND(1008, "User not found", HttpStatus.NOT_FOUND),
-    INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
-    USER_ALREADY_EXISTS(409, "User already exists", HttpStatus.CONFLICT),
+    USER_EXISTED("1001", "user existed", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGHT_CHARACTER_PASSWORD("1002","Your password is less than {min} characters. Your password must be longer than {min} characters.", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGHT_CHARACTER_USERNAME("1007","Your username is less than {min} characters. Your username must be longer than {min} characters.", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXITS("1003","user not exist", HttpStatus.BAD_REQUEST),
+    UNAUTHENTICATED ("1004","UNAUTHENTICATED", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED("1005", "You do not have permission", HttpStatus.FORBIDDEN),
+    INVALID_KEY("1006", "Uncategorized error", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGHT_YEAR_OLD ("1008","you are under {min} year old",HttpStatus.BAD_REQUEST),
+    ACCOUNT_EXISTED("1009", "Account existed", HttpStatus.BAD_REQUEST),
+    ACCOUNT_NOT_EXITS("1003","user not exist", HttpStatus.BAD_REQUEST)
     ;
-    private int code;
-    private HttpStatusCode httpStatusCode;
-    private String message;
 
-    ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
+    ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;
-        this.httpStatusCode = httpStatusCode;
+        this.httpStatusCode= httpStatusCode;
     }
+
+    private final String code;
+    private final String message;
+    private HttpStatusCode httpStatusCode;
 }
