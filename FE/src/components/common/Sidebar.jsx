@@ -5,14 +5,15 @@ import { useContext } from "react";
 import { Users, CircleUser, LogOut } from "lucide-react";
 function Sidebar() {
   const { role, logout } = useContext(AuthContext);
-
   const navItems = getNavByRole(role.toLowerCase());
 
+  const currentPath = window.location.pathname.split("/").pop();
+
   return (
-    <div className="h-full flex flex-col justify-between">
+    <div className="sticky top-0 w-full h-screen flex flex-col justify-between">
       <div>
         {/* Header */}
-        <div className="flex p-4 items-center gap-3 border-b border-gray-300">
+        <div className="max-h-20 flex p-4 items-center gap-3 border-b border-gray-300">
           <div className="text-white bg-black p-3 rounded-md">
             <Users />
           </div>
@@ -24,7 +25,9 @@ function Sidebar() {
             <a
               key={item.title}
               href={item.path}
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200"
+              className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
+                currentPath === item.path ? "bg-gray-400" : ""
+              }`}
             >
               {item.icon && <item.icon className="w-5 h-5" />}
               <span className="font-semibold">{item.title}</span>

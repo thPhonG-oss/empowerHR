@@ -17,6 +17,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [wrongInput, setWrongInput] = useState(false);
+
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -47,13 +49,14 @@ function Login() {
 
         navigate(`/${roleString}/dashboard`);
       } else {
-        alert("Đăng nhập thất bại!");
+        setWrongInput(true);
       }
 
       setIsLoading(false);
     } catch (err) {
       console.error(err);
       alert("Đăng nhập thất bại!");
+      setWrongInput(true);
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +94,10 @@ function Login() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setWrongInput(false);
+              }}
               placeholder="example@gmail.com"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
@@ -107,9 +113,12 @@ function Login() {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setWrongInput(false);
+                }}
                 placeholder={
-                  showPassword ? "your password" : "••••••••••••••••"
+                  showPassword ? "mật khẩu của bạn" : "••••••••••••••••"
                 }
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
@@ -123,6 +132,12 @@ function Login() {
               </button>
             </div>
           </div>
+
+          {/* Thông báo cáo thông tin đăng nhập */}
+
+          <p className="text-red-600 min-h-6">
+            {wrongInput && "Email hoặc mật khẩu không chính xác"}
+          </p>
 
           {/* Login Button */}
           <button

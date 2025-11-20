@@ -4,7 +4,7 @@ import { ArrowLeft, LogIn } from "lucide-react";
 
 export default function NotFoundPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800 text-slate-100 p-6">
+    <main className="min-h-screen flex items-center justify-center bg-linear-to-b from-slate-900 to-slate-800 text-slate-100 p-6">
       <div className="max-w-3xl w-full rounded-2xl bg-zinc-900/60 backdrop-blur-md border border-zinc-700 shadow-2xl p-12 text-center">
         <div className="flex flex-col items-center">
           <h1 className="text-7xl font-extrabold text-amber-400 drop-shadow mb-4">

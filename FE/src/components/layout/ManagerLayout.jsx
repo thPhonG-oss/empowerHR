@@ -10,7 +10,7 @@ export default function ManagerLayout() {
       </aside>
 
       {/* Content chiếm 9/12 cột */}
-      <main className="col-span-9 lg:col-span-10 bg-white p-4">
+      <main className="col-span-9 lg:col-span-10 bg-white">
         <Outlet />
       </main>
     </div>
