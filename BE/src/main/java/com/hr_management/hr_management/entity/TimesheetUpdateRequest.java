@@ -18,7 +18,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "request_id")
-@Builder
+//@Builder
 public class TimesheetUpdateRequest extends Request {
 
     @Column(name = "attendance_date", nullable = false)
