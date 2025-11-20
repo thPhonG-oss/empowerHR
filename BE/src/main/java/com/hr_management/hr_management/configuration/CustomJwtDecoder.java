@@ -1,7 +1,7 @@
 package com.hr_management.hr_management.configuration;
 
-import com.devteria.identity_service.dto.request.IntrospectRequest;
-import com.devteria.identity_service.service.AuthenticationService;
+import com.hr_management.hr_management.dto.request.IntrospectRequest;
+import com.hr_management.hr_management.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -15,8 +15,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Value("${jwt.secret}")
+    private String secret;
     @Autowired
     private AuthenticationService authenticationService;
     private  NimbusJwtDecoder nimbusJwtDecoder;
@@ -26,7 +26,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         var response=authenticationService.introspect(IntrospectRequest.builder().token(token).build());
         if (!response.isValid())
             throw new JwtException("Token invalid");
-        SecretKeySpec secretKeySpec=new SecretKeySpec(signerKey.getBytes(),"HmacSHA512");
+        SecretKeySpec secretKeySpec=new SecretKeySpec(secret.getBytes(),"HmacSHA512");
         nimbusJwtDecoder=NimbusJwtDecoder.withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();

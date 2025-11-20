@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "request_id")
-@Builder
 public class LeaveRequest extends Request {
 
     @Column(name = "start_date", nullable = false)

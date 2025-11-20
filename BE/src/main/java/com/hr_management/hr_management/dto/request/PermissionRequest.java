@@ -10,5 +10,4 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class PermissionRequest {
     String name;
-    String description;
 }

@@ -1,11 +1,12 @@
 package com.hr_management.hr_management.service.Impl;
 
-import com.devteria.identity_service.dto.request.PermissionRequest;
-import com.devteria.identity_service.dto.response.PermissionResponse;
-import com.devteria.identity_service.entity.Permission;
-import com.devteria.identity_service.mapper.PermissionMapper;
-import com.devteria.identity_service.repository.PermissionRepository;
-import com.devteria.identity_service.service.PermissionService;
+
+import com.hr_management.hr_management.dto.request.PermissionRequest;
+import com.hr_management.hr_management.dto.response.PermissionResponse;
+import com.hr_management.hr_management.entity.Permission;
+import com.hr_management.hr_management.mapper.PermissionMapper;
+import com.hr_management.hr_management.repository.PermissionRepository;
+import com.hr_management.hr_management.service.PermissionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

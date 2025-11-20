@@ -1,8 +1,9 @@
 package com.hr_management.hr_management.mapper;
 
-import com.devteria.identity_service.dto.request.PermissionRequest;
-import com.devteria.identity_service.dto.response.PermissionResponse;
-import com.devteria.identity_service.entity.Permission;
+
+import com.hr_management.hr_management.dto.request.PermissionRequest;
+import com.hr_management.hr_management.dto.response.PermissionResponse;
+import com.hr_management.hr_management.entity.Permission;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

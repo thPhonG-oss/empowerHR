@@ -1,13 +1,15 @@
 package com.hr_management.hr_management.service;
 
-import com.devteria.identity_service.dto.request.AuthenticateRequest;
-import com.devteria.identity_service.dto.request.IntrospectRequest;
-import com.devteria.identity_service.dto.request.LogoutRequest;
-import com.devteria.identity_service.dto.request.RefreshToken;
-import com.devteria.identity_service.dto.response.AuthenticationResponse;
-import com.devteria.identity_service.dto.response.IntrospectResponse;
+
+import com.hr_management.hr_management.dto.request.AuthenticateRequest;
+import com.hr_management.hr_management.dto.request.IntrospectRequest;
+import com.hr_management.hr_management.dto.request.LogoutRequest;
+import com.hr_management.hr_management.dto.request.RefreshToken;
+import com.hr_management.hr_management.dto.response.AuthenticationResponse;
+import com.hr_management.hr_management.dto.response.IntrospectResponse;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.SneakyThrows;
 
 import java.text.ParseException;
 
@@ -16,5 +18,6 @@ public interface AuthenticationService {
     IntrospectResponse introspect(IntrospectRequest introspectRequest);
     SignedJWT verifyToken(String token,boolean isRefresh) throws JOSEException, ParseException;
     void logout(LogoutRequest request) throws ParseException, JOSEException;
-    AuthenticationResponse refreshToken(RefreshToken refresgToken) throws ParseException, JOSEException;
+    AuthenticationResponse refreshToken(RefreshToken refreshToken) throws ParseException, JOSEException;
 }
+

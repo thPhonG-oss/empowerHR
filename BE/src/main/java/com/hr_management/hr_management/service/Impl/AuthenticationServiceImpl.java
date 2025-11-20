@@ -2,11 +2,17 @@ package com.hr_management.hr_management.service.Impl;
 
 
 import com.hr_management.hr_management.dto.request.AuthenticateRequest;
+import com.hr_management.hr_management.dto.request.IntrospectRequest;
+import com.hr_management.hr_management.dto.request.LogoutRequest;
+import com.hr_management.hr_management.dto.request.RefreshToken;
 import com.hr_management.hr_management.dto.response.AuthenticationResponse;
+import com.hr_management.hr_management.dto.response.IntrospectResponse;
+import com.hr_management.hr_management.entity.Account;
+import com.hr_management.hr_management.entity.InvalidatedToken;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
+import com.hr_management.hr_management.repository.AccountRepository;
 import com.hr_management.hr_management.repository.InvalidatedTokenRepository;
-import com.hr_management.hr_management.repository.UserRepository;
 import com.hr_management.hr_management.service.AuthenticationService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -38,43 +44,42 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationServiceImpl implements AuthenticationService {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
-    UserRepository userRepository;
+    AccountRepository accountRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.secret}")
     protected String key;
     @NonFinal
-    @Value("${jwt.valid-duration}")
+    @Value("${jwt.access-token-validity-seconds}")
     protected long VALID_DURATION;
 
     @NonFinal
-    @Value("${jwt.refreshable-duration}")
+    @Value("${jwt.refresh-token-validity-seconds}")
     protected long REFRESHABLE_DURATION;
     @Override
     public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest) {
-        User user=userRepository.findByUsername(authenticateRequest.getUserName())
-                .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXITS));
+        Account account=accountRepository.findByUsername(authenticateRequest.getUserName())
+                .orElseThrow(() ->new AppException(ErrorCode.NOT_ENOUGHT_CHARACTER_USERNAME));
         PasswordEncoder passwordEncoder= new BCryptPasswordEncoder(10);
-        boolean authenticated=passwordEncoder.matches(authenticateRequest.getPassword(),user.getPassword());
+        boolean authenticated=passwordEncoder.matches(authenticateRequest.getPassword(),account.getPassword());
         if(!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        String token=generalToken(user);
+        String token=generalToken(account);
         return AuthenticationResponse.builder()
-                .token(token)
-                .authenticated(authenticated)
+                .acessToken(token)
                 .build();
     }
 
-    public String generalToken(User user) {
+    public String generalToken(Account account) {
 
         JWSHeader header= new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet=new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(account.getUsername())
                 .issuer("cuong.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("scope",buildScope(user))
+                .claim("scope",buildScope(account))
                 .build();
         Payload payload=new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject= new JWSObject(header,payload);
@@ -85,18 +90,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException(e);
         }
     }
-    private String buildScope(User user) {
+    private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> {
+        if (!CollectionUtils.isEmpty(account.getRoles())) {
+            account.getRoles().forEach(role -> {
                 stringJoiner.add("ROLE_" + role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions())) {
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
                 }
             });
         }
-        System.out.println("Scope = " + user);
+        System.out.println("Scope = " +account);
         return stringJoiner.toString();
     }
     @SneakyThrows
@@ -147,7 +152,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             SignedJWT signedJWT=verifyToken(request.getToken(),true);
             String jit=signedJWT.getJWTClaimsSet().getJWTID();
             Date expiryTime=signedJWT.getJWTClaimsSet().getExpirationTime();
-            InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
+            InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expireTime(expiryTime).build();
             invalidatedTokenRepository.save(invalidatedToken);
         }catch(AppException e){
             log.info("Token already expire");
@@ -160,15 +165,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String jit=signedJWT.getJWTClaimsSet().getJWTID().toString();
         Date expiryTime=signedJWT.getJWTClaimsSet().getExpirationTime();
-        InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
+        InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expireTime(expiryTime).build();
         invalidatedTokenRepository.save(invalidatedToken);
         String nameUser=signedJWT.getJWTClaimsSet().getSubject();
-        User user=userRepository.findByUsername(nameUser).orElseThrow(()->new AppException(ErrorCode.USER_EXISTED));
-        String token=generalToken(user);
+        Account account=accountRepository.findByUsername(nameUser).orElseThrow(()->new AppException(ErrorCode.USER_EXISTED));
+        String token=generalToken(account);
 
         return AuthenticationResponse.builder()
-                .authenticated(true)
-                .token(token)
+                .acessToken(token)
                 .build();
 
     }
