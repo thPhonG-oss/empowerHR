@@ -1,6 +1,7 @@
 package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.controller.EmployeeController;
+import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.exception.AppException;
@@ -51,5 +52,16 @@ public class EmployeeServiceImpl implements EmployeeService {
                     return dto;
                 })
                 .toList();
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployeeProfile(Integer employeeId, UpdateEmployeeProfileRequest request) {
+        // Tìm employee
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
+
+        employeeMapper.updateEmployeeProfile(employee,request);
+        employeeRepository.save(employee);
+        return employeeMapper.ToEmployeeResponseDTO(employee);
     }
 }
