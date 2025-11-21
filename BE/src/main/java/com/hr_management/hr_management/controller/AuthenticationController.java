@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -45,9 +46,9 @@ public class AuthenticationController {
                 .build();
     }
     @PostMapping("/change-password")
-    ApiResponse<ChangePasswordResponse> changePassword (@RequestBody ChangePasswordRequest changePasswordRequest){
+    ApiResponse<ChangePasswordResponse> changePassword (@RequestBody ChangePasswordRequest changePasswordRequest, JwtAuthenticationToken jwtAuthenticationToken){
         return ApiResponse.<ChangePasswordResponse>builder()
-                .result(accountService.changePassword(changePasswordRequest))
+                .result(accountService.changePassword(changePasswordRequest,jwtAuthenticationToken))
                 .build();
     }
     @PostMapping("/confirm-account")

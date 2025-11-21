@@ -84,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private void setRefreshCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refresh_token", refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge((int) REFRESHABLE_DURATION);
         response.addCookie(cookie);

@@ -17,7 +17,9 @@ public enum ErrorCode {
     INVALID_KEY("1006", "Uncategorized error", HttpStatus.BAD_REQUEST),
     NOT_ENOUGHT_YEAR_OLD ("1008","you are under {min} year old",HttpStatus.BAD_REQUEST),
     ACCOUNT_EXISTED("1009", "Account existed", HttpStatus.BAD_REQUEST),
-    ACCOUNT_NOT_EXITS("1003","user not exist", HttpStatus.BAD_REQUEST)
+    ACCOUNT_NOT_EXITS("1011","user not exist", HttpStatus.BAD_REQUEST),
+    NOT_CHANGE_PASSWORD("1012","Do not change other people's passwords",HttpStatus.BAD_REQUEST),
+    NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
