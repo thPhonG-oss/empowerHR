@@ -12,17 +12,29 @@ import {
 } from "lucide-react";
 import Header from "../../components/common/Header";
 
-// Mock data for staff members
-const mockStaff = Array.from({ length: 300 }, (_, i) => ({
-  id: i + 1,
-  name: "Nguyễn Văn Nam",
-  position: "Senior Developer",
-  department: "Engineering",
-  email: "nvnam@gmail.com",
-  phone: "024543222",
-  avatar: "N",
-  status: "Hoạt động",
-}));
+const mockStaff = Array.from({ length: 300 }, (_, i) => {
+  const gender = i % 2 === 0 ? "Male" : "Female";
+  const isActive = i % 3 !== 0; // 2/3 active
+  return {
+    employeeId: i + 1,
+    employeeCode: `EMP${String(i + 1).padStart(3, "0")}`,
+    employeeName: `Nguyễn Văn ${
+      ["An", "Bình", "Cường", "Dũng", "Hùng"][i % 5]
+    }`,
+    identityCard: `00${Math.floor(100000000 + Math.random() * 900000000)}`,
+    address: `${100 + i} Nguyễn Huệ, Q1, TP.HCM`,
+    dateOfBirth: `198${i % 10}-0${(i % 9) + 1}-15`,
+    gender,
+    email: `nv${i + 1}@company.com`,
+    phoneNumber: `0901234${String(100 + i).slice(-3)}`,
+    startingDate: `2020-0${(i % 9) + 1}-15`,
+    isActive,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    taxCode: `TAX${String(i + 1).padStart(3, "0")}`,
+    pointBalance: Math.floor(Math.random() * 10000),
+  };
+});
 
 function StaffManagement() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -98,7 +110,7 @@ function StaffManagement() {
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md bg-white cursor-pointer
-               focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                 >
                   <option value="">Phòng Ban</option>
                   <option value="engineering">Engineering</option>
@@ -150,24 +162,22 @@ function StaffManagement() {
             <div className="space-y-4">
               {currentStaff.map((staff) => (
                 <div
-                  key={staff.id}
+                  key={staff.employeeId}
                   className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white"
                 >
                   <div className="flex items-center justify-between gap-4">
                     {/* Avatar and Info */}
                     <div className="flex items-center gap-4 flex-1">
                       <div className="size-12 rounded-full bg-gray-300 flex items-center justify-center font-semibold text-gray-700">
-                        {staff.avatar}
+                        {staff.employeeName.charAt(0)}
                       </div>
-
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">
-                          {staff.name}
+                          {staff.employeeName}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {staff.position} - {staff.department}
+                          {staff.employeeCode} - {staff.gender}
                         </p>
-
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Mail className="size-4" />
@@ -175,16 +185,21 @@ function StaffManagement() {
                           </div>
                           <div className="flex items-center gap-1">
                             <Phone className="size-4" />
-                            <span>{staff.phone}</span>
+                            <span>{staff.phoneNumber}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-
                     {/* Status and Actions */}
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                        {staff.status}
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          staff.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {staff.isActive ? "Hoạt động" : "Ngừng hoạt động"}
                       </span>
                       <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
                         <Edit2 className="size-4 text-gray-600" />
