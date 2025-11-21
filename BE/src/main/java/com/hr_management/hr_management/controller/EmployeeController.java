@@ -7,10 +7,7 @@ import com.hr_management.hr_management.service.AuthenticationService;
 import com.hr_management.hr_management.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
@@ -24,7 +21,7 @@ public class EmployeeController {
 
     // [ Admin ]
     // 1. Xem danh sách nhân viên
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/v1/admin/employees")
     public ApiResponse<List<EmployeeResponseDTO>> getAll() {
         return ApiResponse.<List<EmployeeResponseDTO>>builder()
@@ -34,6 +31,18 @@ public class EmployeeController {
 
     // [ MANGER ]
     // 1. Xem ho so chi tiet nhan vien
+    @PreAuthorize("hasRole('DEPARTMENT_MANAGER')")
+    @GetMapping("/api/v1/manager/employees/{employeeId}")
+    public ApiResponse<EmployeeResponseDTO> getEmployeeByIdByManager(
+            @PathVariable Integer employeeId){
+
+        EmployeeResponseDTO employee = employeeService.getEmployeeById(employeeId);
+
+        return ApiResponse.<EmployeeResponseDTO>builder()
+                .result(employee)
+                .message("Employee retrieved successfully")
+                .build();
+    }
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân

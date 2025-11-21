@@ -73,7 +73,8 @@ public class SecurityConfig {
                     "/webjars/**",
                     "/h2-console/**",
                     "/favicon.ico",
-                    "/api/v1/admin/**"
+                    "/api/v1/admin/**",
+                    "/api/v1/manager/**"
             );
         });
     }
