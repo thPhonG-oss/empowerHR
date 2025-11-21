@@ -11,5 +11,6 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface AccountMapper {
     @Mapping(source = "password",target = "newPassword")
+    @Mapping(source = "username",target = "useName")
     ChangePasswordResponse toChangePasswordResponse(Account account);
 }

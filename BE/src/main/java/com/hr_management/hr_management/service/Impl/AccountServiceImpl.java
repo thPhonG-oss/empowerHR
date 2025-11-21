@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,10 +27,11 @@ public class AccountServiceImpl implements AccountService {
     PasswordEncoder passwordEncoder;
     AccountMapper accountMapper;
     @Override
-    public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request, JwtAuthenticationToken jwtAuthenticationToken) {
         Optional<Account> account=accountRepository.findByUsername(request.getUserName());
         if(account.isEmpty()) throw new AppException(ErrorCode.ACCOUNT_NOT_EXITS);
-        account.get().setPassword(request.getNewpassword());
+        if(!(request.getUserName().equals(jwtAuthenticationToken.getName()))) throw new AppException(ErrorCode.NOT_CHANGE_PASSWORD);
+        account.get().setPassword(passwordEncoder.encode(request.getNewpassword()));
         return accountMapper.toChangePasswordResponse(accountRepository.save(account.get()));
     }
 
