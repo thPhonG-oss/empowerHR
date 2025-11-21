@@ -1,24 +1,25 @@
 server:
-  port: 8080
-
-
+  port: ${PORT}
 spring:
   app:
     jwtCookie: refreshToken
   application:
     name: hrm-backend
   datasource:
-    url: "jdbc:mysql://localhost:3306/t7"
-    username: root
-    password: 112233
+    url: ${DATABASE_URL}
+    username:  ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
-    show-sql: false
+    show-sql: true
     flyway:
       enabled: true
       baseline-on-migrate: true
@@ -42,7 +43,7 @@ security:
           user-name-attribute: id
 
 jwt:
-  secret: "jG!DezE-vwI61o0pEP2kKcsk5SlX4Y!bnbNDa/z!A=1e2Pn4zDVkVhDnd5zYPH6j"
+  secret:  ${SECRET_KEY}
   access-token-validity-seconds: 3600
   refresh-token-validity-seconds:  604800
 
