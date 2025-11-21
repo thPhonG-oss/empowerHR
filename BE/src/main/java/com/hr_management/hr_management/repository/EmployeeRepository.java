@@ -9,6 +9,13 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+    boolean findByEmployeeName(String employeeName);
+
+    boolean existsByEmployeeName(String employeeName);
+
+    boolean existsByIdentityCard(String identityCard);
+
+    boolean existsByEmail(String email);
     List<Employee> findAllByDepartment_DepartmentId(Long departmentId);
     Employee findAllByAccount_AccountId(Integer accountId);
 

@@ -1,5 +1,9 @@
 package com.hr_management.hr_management.mapper;
 
+import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
+import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
+import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
+import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.entity.Bank;
 import com.hr_management.hr_management.entity.Department;
@@ -8,15 +12,18 @@ import com.hr_management.hr_management.entity.Position;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {BankMapper.class, PositionMapper.class, DepartmentMapper.class, AccountMapper.class})
 public interface EmployeeMapper {
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "position", ignore = true)
     @Mapping(target = "department", ignore = true)
     EmployeeResponseDTO ToEmployeeResponseDTO(Employee employee);
 
+    Employee ToEmployee(EmployeeUpdateRequestDTO employeeUpdateRequestDTO);
+
+    Employee MapEmployeeCreationRequestDTOToEmployee(EmployeeProfileCreationRequestDTO employeeProfileCreationRequestDTO);
+
+    EmployeeCreationResponseDTO ToEmployeeProfileCreationRequestDTO(Employee employee);
     AllEmployeeResponse toEmployeeResponse(Employee employee);
     DepartmentResponse toDepartmentDTO(Department department);
     PositionResponse toPositionDTO(Position position);
