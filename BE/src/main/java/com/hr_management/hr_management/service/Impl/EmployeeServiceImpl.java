@@ -1,26 +1,29 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
+import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
-import com.hr_management.hr_management.entity.Department;
-import com.hr_management.hr_management.entity.Employee;
-import com.hr_management.hr_management.entity.Position;
+import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.EmployeeMapper;
-import com.hr_management.hr_management.repository.DepartmentRepository;
-import com.hr_management.hr_management.repository.EmployeeRepository;
-import com.hr_management.hr_management.repository.JobPositonRepository;
+import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.service.EmployeeService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,6 +33,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     DepartmentRepository departmentRepository;
     JobPositonRepository jobPositonRepository;
     EmployeeMapper employeeMapper;
+    BankRepository bankRepository;
+    AccountRepository accountRepository;
+    RoleRepository roleRepository;
 
 
     @Override
@@ -47,10 +53,34 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeResponseDTO;
     }
 
+    @Transactional
     @Override
-    public EmployeeResponseDTO updateEmloyeeProfileByEmployeeId(Integer employeeId, EmployeeUpdateRequestDTO employeeUpdateRequestDTO){
+    public EmployeeCreationResponseDTO updateEmloyeeProfileByEmployeeId(Integer employeeId, EmployeeUpdateRequestDTO employeeUpdateRequestDTO){
         Employee existingEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        if(employeeUpdateRequestDTO.getIdentityCard() != null){
+            if(employeeRepository.existsByIdentityCard(employeeUpdateRequestDTO.getIdentityCard()) || employeeRepository.existsByEmail(employeeUpdateRequestDTO.getEmail())){
+                throw new AppException(ErrorCode.EMPLOYEE_ALREADY_EXISTS);
+            }
+        }
+
+        Bank bank = existingEmployee.getBank();
+        if(!bankRepository.findById(bank.getBankId()).isPresent()){
+            throw new AppException(ErrorCode.BANK_ACCOUNT_NOT_FOUND);
+        }
+
+        if(bankRepository.existsByBankAccountNumber(employeeUpdateRequestDTO.getBankAccountNumber()) && bankRepository.existsByBankName(employeeUpdateRequestDTO.getBankName())){
+            throw new AppException(ErrorCode.BANK_ACCOUNT_ALREADY_EXISTS);
+        }
+
+        bank.setBankName(employeeUpdateRequestDTO.getBankName());
+        bank.setBranch(employeeUpdateRequestDTO.getBankBranch());
+        bank.setBankAccountNumber(employeeUpdateRequestDTO.getBankAccountNumber());
+        bank.setUpdatedAt(LocalDateTime.now());
+        Bank savedBank = bankRepository.save(bank);
+
+        existingEmployee.setBank(savedBank);
 
         Department existingDepartment = departmentRepository.findById(employeeUpdateRequestDTO.getDepartmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
@@ -58,7 +88,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Position existingPosition = jobPositonRepository.findById(employeeUpdateRequestDTO.getPositionId())
                 .orElseThrow(() -> new AppException(ErrorCode.JOB_POSITION_NOT_FOUND));
 
-        existingEmployee.setEmployeeCode(employeeUpdateRequestDTO.getEmployeeCode());
         existingEmployee.setEmployeeName(employeeUpdateRequestDTO.getEmployeeName());
         existingEmployee.setAddress(employeeUpdateRequestDTO.getAddress());
         existingEmployee.setEmail(employeeUpdateRequestDTO.getEmail());
@@ -70,6 +99,104 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setPosition(existingPosition);
 
 
-        return employeeMapper.ToEmployeeResponseDTO(employeeRepository.save(existingEmployee));
+        return employeeMapper.ToEmployeeProfileCreationRequestDTO(employeeRepository.save(existingEmployee));
+    }
+
+    @Transactional
+    @Override
+    public EmployeeCreationResponseDTO createNewEmployeeProfile(EmployeeProfileCreationRequestDTO request){
+
+        if(employeeRepository.existsByIdentityCard(request.getIdentityCard()) || employeeRepository.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_EXISTS);
+        }
+
+        if(bankRepository.existsByBankAccountNumber(request.getBankAccountNumber()) && bankRepository.existsByBankName(request.getBankName())){
+            throw new AppException(ErrorCode.BANK_ACCOUNT_ALREADY_EXISTS);
+        }
+
+        Department existingDepartment = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+        Position existingPosition = jobPositonRepository.findById(request.getPositionId())
+                .orElseThrow(() -> new AppException(ErrorCode.JOB_POSITION_NOT_FOUND));
+
+        Bank bank = Bank.builder()
+                .bankName(request.getBankName())
+                .branch(request.getBankBranch())
+                .bankAccountNumber(request.getBankAccountNumber())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Bank savedBank = bankRepository.save(bank);
+
+
+        Employee employee = Employee.builder()
+                .employeeName(request.getEmployeeName())
+                .identityCard(request.getIdentityCard())
+                .address(request.getAddress())
+                .email(request.getEmail())
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .startingDate(LocalDate.now())
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .taxCode(request.getTaxCode())
+                .position(existingPosition)
+                .department(existingDepartment)
+                .bank(savedBank)
+                .build();
+
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        String employeeCode = generateEmployeeCode(savedEmployee.getEmployeeId());
+
+        savedEmployee.setEmployeeCode(employeeCode);
+
+        if(accountRepository.existsByUsername(employeeCode)){
+            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_HAS_ACCOUNT);
+        }
+
+        Set<Role> roles = new HashSet<>();
+
+        Set<String> roleNames = request.getRoles();
+        if (roleNames != null && !roleNames.isEmpty()) {
+
+            log.info("Roles: {}", roleNames);
+
+            for (String roleName : roleNames) {
+                log.info("Role: {}", roleName);
+                if (!roleRepository.existsByName(roleName)) {
+                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+                } else {
+                    roles = roleNames.stream().map((role) -> {
+                        return roleRepository.findByName(role)
+                                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+                    }).collect(Collectors.toSet());
+                }
+            }
+        }
+
+        Account newAccount = Account.builder()
+                .username(employeeCode)
+                .password(employeeCode)
+                .roles(roles)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+
+        Account savedAccount = accountRepository.save(newAccount);
+        savedEmployee.setAccount(savedAccount);
+
+        return employeeMapper.ToEmployeeProfileCreationRequestDTO(employeeRepository.save(savedEmployee));
+    }
+
+
+    @Override
+    public String generateEmployeeCode(Integer employeeId){
+        return String.format("NV%05d", employeeId);
     }
 }

@@ -2,6 +2,7 @@ package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.AccountCreationRequestDTO;
+import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.service.AccountService;
@@ -44,13 +45,25 @@ public class AdminController {
         );
     }
 
-    @PostMapping("/accounts")
-    public ResponseEntity<ApiResponse<Object>> createNewEmployeeAccount(@RequestBody AccountCreationRequestDTO request) {
+//    @PostMapping("/accounts")
+//    public ResponseEntity<ApiResponse<Object>> createNewEmployeeAccount(@RequestBody AccountCreationRequestDTO request) {
+//        return new ResponseEntity<>(
+//                ApiResponse.builder()
+//                        .status(1000)
+//                        .message("Success")
+//                        .data(accountService.createNewAccount(request))
+//                        .build(),
+//                HttpStatus.CREATED
+//        );
+//    }
+
+    @PostMapping("/employees")
+    public ResponseEntity<ApiResponse<Object>> createNewEmployeeProfile(@RequestBody EmployeeProfileCreationRequestDTO request) {
         return new ResponseEntity<>(
                 ApiResponse.builder()
                         .status(1000)
                         .message("Success")
-                        .data(accountService.createNewAccount(request))
+                        .data(employeeService.createNewEmployeeProfile(request))
                         .build(),
                 HttpStatus.CREATED
         );

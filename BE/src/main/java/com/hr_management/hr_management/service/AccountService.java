@@ -10,5 +10,5 @@ import com.hr_management.hr_management.dto.response.ConfirmAccountResponse;
 public interface AccountService {
     ChangePasswordResponse changePassword (ChangePasswordRequest request);
     ConfirmAccountResponse confirmAccount(ConfimAccountRequest request);
-    AccountResponseDTO createNewAccount(AccountCreationRequestDTO accountCreationRequestDTO);
+//    AccountResponseDTO createNewAccount(AccountCreationRequestDTO accountCreationRequestDTO);
 }

@@ -67,53 +67,53 @@ public class AccountServiceImpl implements AccountService {
                 .isValid(passwordEncoder.matches(request.getPassword(), account.get().getPassword()))
                 .build();
     }
-    @Transactional
-    @Override
-    public AccountResponseDTO createNewAccount(AccountCreationRequestDTO accountCreationRequestDTO) {
-
-        Employee existingEmployee = employeeRepository.findById(accountCreationRequestDTO.getEmployeeId())
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        if (existingEmployee.getAccount().getAccountId() != null) {
-            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_HAS_ACCOUNT);
-        }
-
-        Set<Role> roles = new HashSet<>();
-
-        Set<String> roleNames = accountCreationRequestDTO.getRoles();
-        if (roleNames != null && !roleNames.isEmpty()) {
-
-            log.info("Roles: {}", roleNames);
-
-            for (String roleName : roleNames) {
-                log.info("Role: {}", roleName);
-                if (!roleRepository.existsByName(roleName)) {
-                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
-                } else {
-                    roles = roleNames.stream().map((role) -> {
-                        return roleRepository.findByName(role)
-                                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-                    }).collect(Collectors.toSet());
-                }
-            }
-        }
-
-        Account newAccount = new Account();
-        newAccount.setUsername(existingEmployee.getEmployeeCode());
-        newAccount.setPassword(passwordEncoder.encode(existingEmployee.getEmployeeCode()));
-        newAccount.setCreatedAt(LocalDateTime.now());
-        newAccount.setUpdatedAt(LocalDateTime.now());
-        newAccount.setRoles(roles);
-
-        existingEmployee.setAccount(newAccount);
-        employeeRepository.save(existingEmployee);
-
-        AccountResponseDTO response = accountMapper.toAccountResponseDTO(newAccount);
-        response.setEmployeeId(existingEmployee.getEmployeeId());
-
-        Account savedAccount = accountRepository.save(newAccount);
-        response.setAccountId(savedAccount.getAccountId());
-
-        return response;
-    }
+//    @Transactional
+//    @Override
+//    public AccountResponseDTO createNewAccount(AccountCreationRequestDTO accountCreationRequestDTO) {
+//
+//        Employee existingEmployee = employeeRepository.findById(accountCreationRequestDTO.getEmployeeId())
+//                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+//
+//        if (existingEmployee.getAccount().getAccountId() != null) {
+//            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_HAS_ACCOUNT);
+//        }
+//
+//        Set<Role> roles = new HashSet<>();
+//
+//        Set<String> roleNames = accountCreationRequestDTO.getRoles();
+//        if (roleNames != null && !roleNames.isEmpty()) {
+//
+//            log.info("Roles: {}", roleNames);
+//
+//            for (String roleName : roleNames) {
+//                log.info("Role: {}", roleName);
+//                if (!roleRepository.existsByName(roleName)) {
+//                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+//                } else {
+//                    roles = roleNames.stream().map((role) -> {
+//                        return roleRepository.findByName(role)
+//                                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+//                    }).collect(Collectors.toSet());
+//                }
+//            }
+//        }
+//
+//        Account newAccount = new Account();
+//        newAccount.setUsername(existingEmployee.getEmployeeCode());
+//        newAccount.setPassword(passwordEncoder.encode(existingEmployee.getEmployeeCode()));
+//        newAccount.setCreatedAt(LocalDateTime.now());
+//        newAccount.setUpdatedAt(LocalDateTime.now());
+//        newAccount.setRoles(roles);
+//
+//        existingEmployee.setAccount(newAccount);
+//        employeeRepository.save(existingEmployee);
+//
+//        AccountResponseDTO response = accountMapper.toAccountResponseDTO(newAccount);
+//        response.setEmployeeId(existingEmployee.getEmployeeId());
+//
+//        Account savedAccount = accountRepository.save(newAccount);
+//        response.setAccountId(savedAccount.getAccountId());
+//
+//        return response;
+//    }
 }

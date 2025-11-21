@@ -1,7 +1,6 @@
-package com.hr_management.hr_management.dto.request;
+package com.hr_management.hr_management.dto.response;
 
 import com.hr_management.hr_management.enums.Gender;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,29 +8,30 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmployeeProfileCreationRequestDTO {
-    @NotBlank
+public class EmployeeCreationResponseDTO {
+    private Integer employeeId;
+    private String employeeCode;
     private String employeeName;
-    @NotBlank
     private String identityCard;
-    @NotBlank
     private String address;
     private LocalDate dateOfBirth;
     private Gender gender;
     private String email;
     private String phoneNumber;
+    private LocalDate startingDate;
+    private Boolean isActive = true;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String taxCode;
-    private Integer positionId;
-    private Integer departmentId;
-    private String bankName;
-    private String bankBranch;
-    private String bankAccountNumber;
-    private Set<String> roles = new HashSet<>();
+    private Long pointBalance;
+    private PositionResponseDTO position;
+    private DepartmentResponseDTO department;
+    private BankResponseDTO bank;
+    private AccountResponseDTO account;
 }

@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 public interface AccountMapper {
     @Mapping(source = "password",target = "newPassword")
     ChangePasswordResponse toChangePasswordResponse(Account account);
-    @Mapping(target = "employeeId", ignore = true)
     AccountResponseDTO toAccountResponseDTO(Account account);
 }
 
