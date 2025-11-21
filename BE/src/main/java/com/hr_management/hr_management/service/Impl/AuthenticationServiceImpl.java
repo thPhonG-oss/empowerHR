@@ -66,6 +66,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() ->new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
         PasswordEncoder passwordEncoder= new BCryptPasswordEncoder(10);
         boolean authenticated=passwordEncoder.matches(authenticateRequest.getPassword(),account.getPassword());
+        log.warn("Raw pw = " + authenticateRequest.getPassword());
+        log.warn("Hash pw = " + account.getPassword());
+        log.warn("Matched = " + authenticated);
+
+
         if(!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         String accessToken=generalToken(account);
