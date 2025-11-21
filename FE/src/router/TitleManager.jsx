@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 const navSimple = [
   { title: "Empower HR", path: "login" },
+  { title: "Empower HR", path: "change-password" },
 
   { title: "Trang chủ", path: "dashboard" },
 

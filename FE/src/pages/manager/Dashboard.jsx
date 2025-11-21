@@ -5,7 +5,7 @@ import Header from "../../components/common/Header";
 function Dashboard() {
   return (
     <main className="p-0">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         {/* Header */}
         <Header title="Tổng quan" icon={Home} />
 
