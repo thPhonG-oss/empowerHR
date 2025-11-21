@@ -4,7 +4,11 @@ import com.hr_management.hr_management.dto.request.EmployeeProfileCreationReques
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.dto.response.*;
+import com.hr_management.hr_management.entity.Bank;
+import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.entity.Employee;
+import com.hr_management.hr_management.entity.Position;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -15,10 +19,13 @@ public interface EmployeeMapper {
     @Mapping(target = "department", ignore = true)
     EmployeeResponseDTO ToEmployeeResponseDTO(Employee employee);
 
-
     Employee ToEmployee(EmployeeUpdateRequestDTO employeeUpdateRequestDTO);
 
     Employee MapEmployeeCreationRequestDTOToEmployee(EmployeeProfileCreationRequestDTO employeeProfileCreationRequestDTO);
 
     EmployeeCreationResponseDTO ToEmployeeProfileCreationRequestDTO(Employee employee);
+    AllEmployeeResponse toEmployeeResponse(Employee employee);
+    DepartmentResponse toDepartmentDTO(Department department);
+    PositionResponse toPositionDTO(Position position);
+    BankResponse toBankDTO(Bank bank);
 }

@@ -2,8 +2,10 @@ package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
+import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
 import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
@@ -15,11 +17,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     BankRepository bankRepository;
     AccountRepository accountRepository;
     RoleRepository roleRepository;
+//    AccountRepository accountRepository;
 
 
     @Override
@@ -196,7 +202,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public String generateEmployeeCode(Integer employeeId){
+    public String generateEmployeeCode(Integer employeeId) {
         return String.format("NV%05d", employeeId);
+    }
+
+    @Override
+    public GetAllEmployeeDepartmentResponse getAllEmployeeDepartment(GetAllEmployeeDepartmentRequest request, JwtAuthenticationToken jwtAuthenticationToken) {
+        Optional<Account> account=accountRepository.findByUsername(jwtAuthenticationToken.getName());
+        Employee employee=employeeRepository.findAllByAccount_AccountId(account.get().getAccountId());
+        if(!(request.getDepartmentId().equals(employee.getDepartment().getDepartmentId())))
+                throw new AppException(ErrorCode.NOT_VIEW_OTHER_DEPARTMENT);
+        List<Employee> employees=employeeRepository.findAllByDepartment_DepartmentId(request.getDepartmentId());
+        return GetAllEmployeeDepartmentResponse.builder()
+                .allEmployee(employees.stream().map(employeeMapper::toEmployeeResponse).toList())
+                .build();
     }
 }

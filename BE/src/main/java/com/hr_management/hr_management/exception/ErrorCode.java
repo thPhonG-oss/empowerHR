@@ -27,6 +27,9 @@ public enum ErrorCode {
     EMPLOYEE_ALREADY_EXISTS("1016","Employee already exists", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_ALREADY_EXISTS("1017","Bank account already exists", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_NOT_FOUND("1018","Bank account not found", HttpStatus.BAD_REQUEST),
+//    ACCOUNT_NOT_EXITS("1011","user not exist", HttpStatus.BAD_REQUEST),
+    NOT_CHANGE_PASSWORD("1012","Do not change other people's passwords",HttpStatus.BAD_REQUEST),
+    NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
