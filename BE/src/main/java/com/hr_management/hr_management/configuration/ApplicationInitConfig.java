@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -34,12 +35,16 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(AccountRepository accountRepository){
         return args -> {
             if(accountRepository.findByUsername("admin").isEmpty()){
-
-                Role adminRole = roleRepository.save(Role.builder()
-                        .name(Roles.ADMIN.toString())
-                        .build());
                 var roles=new HashSet<Role>();
-                roles.add(adminRole);
+                Optional<Role> role=roleRepository.findByName(Roles.ADMIN.toString());
+                if((role.isEmpty())){
+                    Role adminRole = roleRepository.save(Role.builder()
+                            .name(Roles.ADMIN.toString())
+                            .build());
+                    roles.add(adminRole);
+                }else{
+                    roles.add(role.get());
+                }
                 Account account= Account.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
