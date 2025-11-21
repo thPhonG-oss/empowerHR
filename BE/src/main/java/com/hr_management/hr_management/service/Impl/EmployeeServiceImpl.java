@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,5 +37,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeResponseDTO.setPosition(existingEmployee.getPosition().getPositionName());
 
         return employeeResponseDTO;
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getAll() {
+        var employee = employeeRepository.findAll();
+        return employee.stream()
+                .map(emp -> {
+                    var dto = employeeMapper.ToEmployeeResponseDTO(emp);
+                    dto.setBank(emp.getBank().getBankName());
+                    dto.setDepartment(emp.getDepartment().getDepartmentName());
+                    dto.setPosition(emp.getPosition().getPositionName());
+                    return dto;
+                })
+                .toList();
     }
 }
