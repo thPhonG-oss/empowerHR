@@ -4,6 +4,7 @@ import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.AccountCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
+import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.service.AccountService;
 import com.hr_management.hr_management.service.EmployeeService;
@@ -12,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,5 +71,16 @@ public class AdminController {
                         .build(),
                 HttpStatus.CREATED
         );
+    }
+
+
+    // [ Admin ]
+    // 1. Xem danh sách nhân viên
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/api/v1/admin/employees")
+    public com.hr_management.hr_management.dto.request.ApiResponse<List<EmployeeResponseDTO>> getAll() {
+        return com.hr_management.hr_management.dto.request.ApiResponse.<List<EmployeeResponseDTO>>builder()
+                .result(employeeService.getAll())
+                .build();
     }
 }
