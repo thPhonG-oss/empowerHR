@@ -52,7 +52,6 @@ public class ApplicationInitConfig {
                         .build();
                 accountRepository.save(account);
             }
-
         };
     }
 }
