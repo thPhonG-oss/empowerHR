@@ -98,9 +98,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findByAccount_Username(username)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
 
-        employeeMapper.updateEmployeeProfile(employee,request);
+        employeeMapper.updateEmployeeProfile(employee, request);
         employeeRepository.save(employee);
         return employeeMapper.ToEmployeeResponseDTO(employee);
+    }
+
     @Transactional
     @Override
     public EmployeeCreationResponseDTO updateEmloyeeProfileByEmployeeId(Integer employeeId, EmployeeUpdateRequestDTO employeeUpdateRequestDTO){
