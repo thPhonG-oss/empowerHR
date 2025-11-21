@@ -213,7 +213,7 @@ CREATE TABLE Attendance (
 -- Bảng InvalidateToken
 -- ============================================
 CREATE TABLE InvalidatedToken (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(255) PRIMARY KEY,
     token VARCHAR(500) NOT NULL UNIQUE,
     expire_time DATETIME NOT NULL,
     account_id INT NOT NULL,

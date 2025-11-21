@@ -32,7 +32,7 @@ public class EmployeeResponseDTO {
     private LocalDateTime updatedAt;
     private String taxCode;
     private Long pointBalance;
-    private Position position;
-    private Department department;
-    private Bank bank;
+    private String position;
+    private String department;
+    private String bank;
 }
