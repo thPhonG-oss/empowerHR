@@ -19,6 +19,9 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -59,17 +62,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     protected long REFRESHABLE_DURATION;
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest) {
+    public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest,HttpServletResponse response) {
          Account account=accountRepository.findByUsername(authenticateRequest.getUserName())
                 .orElseThrow(() ->new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
         PasswordEncoder passwordEncoder= new BCryptPasswordEncoder(10);
         boolean authenticated=passwordEncoder.matches(authenticateRequest.getPassword(),account.getPassword());
+        log.warn("Raw pw = " + authenticateRequest.getPassword());
+        log.warn("Hash pw = " + account.getPassword());
+        log.warn("Matched = " + authenticated);
+
+
         if(!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        String token=generalToken(account);
+        String accessToken=generalToken(account);
+        String refreshToken=generateRefreshToken(account);
+        setRefreshCookie(response,refreshToken);
         return AuthenticationResponse.builder()
-                .acessToken(token)
+                .acessToken(accessToken)
                 .build();
+    }
+    private void setRefreshCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) REFRESHABLE_DURATION);
+        response.addCookie(cookie);
+    }
+
+    private void clearRefreshCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refresh_token", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals("refresh_token")) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 
     public String generalToken(Account account) {
@@ -92,6 +130,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+    public String generateRefreshToken(Account account) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(account.getUsername())
+                .issuer("cuong.com")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("type", "refresh")
+                .build();
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+        try {
+            jwsObject.sign(new MACSigner(key.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
@@ -124,21 +183,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public SignedJWT verifyToken(String token,boolean isRefresh) throws JOSEException, ParseException {
+    public SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         JWSVerifier jwsVerifier=new MACVerifier(key.getBytes());
 
         SignedJWT signedJWT= SignedJWT.parse(token);
+        if(isRefresh){
+            String type = signedJWT.getJWTClaimsSet().getStringClaim("type");
+            if (!"refresh".equals(type))
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
 
+        }
         var verify=signedJWT.verify(jwsVerifier);
 
-        Date expiryTime=(isRefresh)
-                ?new Date(signedJWT
-                .getJWTClaimsSet()
-                .getIssueTime()
-                .toInstant()
-                .plus(REFRESHABLE_DURATION,ChronoUnit.SECONDS)
-                .toEpochMilli())
-                :signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expiryTime= signedJWT.getJWTClaimsSet().getExpirationTime();
 
         if (!(verify&&expiryTime.after(new Date())))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -149,32 +206,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+    public void logout(HttpServletRequest request,HttpServletResponse response) throws ParseException, JOSEException {
         try{
-            SignedJWT signedJWT=verifyToken(request.getToken(),true);
+            String refreshToken=extractRefreshToken(request);
+            SignedJWT signedJWT=verifyToken(refreshToken,true);
             String jit=signedJWT.getJWTClaimsSet().getJWTID();
             Date expiryTime=signedJWT.getJWTClaimsSet().getExpirationTime();
             InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expireTime(expiryTime).build();
             invalidatedTokenRepository.save(invalidatedToken);
+            clearRefreshCookie(response);
         }catch(AppException e){
             log.info("Token already expire");
         }
     }
 
     @Override
-    public AuthenticationResponse refreshToken(RefreshToken refreshToken) throws ParseException, JOSEException {
-        SignedJWT signedJWT=verifyToken(refreshToken.getToken(),true);
+    public AuthenticationResponse refreshToken(HttpServletRequest request,HttpServletResponse response) throws ParseException, JOSEException {
+        String refreshToken=extractRefreshToken(request);
+        if (refreshToken == null)
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        SignedJWT signedJWT=verifyToken(refreshToken,true);
 
         String jit=signedJWT.getJWTClaimsSet().getJWTID().toString();
         Date expiryTime=signedJWT.getJWTClaimsSet().getExpirationTime();
-        InvalidatedToken invalidatedToken=InvalidatedToken.builder().id(jit).expireTime(expiryTime).build();
-        invalidatedTokenRepository.save(invalidatedToken);
         String nameUser=signedJWT.getJWTClaimsSet().getSubject();
-        Account account=accountRepository.findByUsername(nameUser).orElseThrow(()->new AppException(ErrorCode.USER_EXISTED));
-        String token=generalToken(account);
+        Account account=accountRepository.findByUsername(nameUser).orElseThrow(()->new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
+        InvalidatedToken invalidatedToken=InvalidatedToken.builder()
+                .id(jit)
+                .expireTime(expiryTime)
+                .token(refreshToken)
+                .account(account)
+                .build();
+        invalidatedTokenRepository.save(invalidatedToken);
+
+
+        String newAccessToken=generalToken(account);
+        String newRefreshToken=generateRefreshToken(account);
+        setRefreshCookie(response,newRefreshToken);
 
         return AuthenticationResponse.builder()
-                .acessToken(token)
+                .acessToken(newAccessToken)
                 .build();
 
     }
