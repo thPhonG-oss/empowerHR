@@ -1,6 +1,5 @@
 package com.hr_management.hr_management.repository.Impl;
 
-
 import com.hr_management.hr_management.dto.response.AccountResponseDTO;
 import com.hr_management.hr_management.repository.AccountRepository;
 import com.hr_management.hr_management.service.AccountService;
@@ -15,5 +14,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AccountRepositoryImpl {
+public class AccountRepositoryImpl{
 }

@@ -1,5 +1,8 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.controller.EmployeeController;
+import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
+
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
@@ -19,6 +22,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+
+
+import java.util.List;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,6 +65,42 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeResponseDTO;
     }
 
+    @Override
+    public EmployeeResponseDTO getEmployeeByUserName(String username) {
+        Employee existingEmployee = employeeRepository.findByAccount_Username(username)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
+
+        EmployeeResponseDTO employeeResponseDTO = employeeMapper.ToEmployeeResponseDTO(existingEmployee);
+        employeeResponseDTO.setBank(existingEmployee.getBank().getBankName());
+        employeeResponseDTO.setDepartment(existingEmployee.getDepartment().getDepartmentName());
+        employeeResponseDTO.setPosition(existingEmployee.getPosition().getPositionName());
+
+        return employeeResponseDTO;
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getAll() {
+        var employee = employeeRepository.findAll();
+        return employee.stream()
+                .map(emp -> {
+                    var dto = employeeMapper.ToEmployeeResponseDTO(emp);
+                    dto.setBank(emp.getBank().getBankName());
+                    dto.setDepartment(emp.getDepartment().getDepartmentName());
+                    dto.setPosition(emp.getPosition().getPositionName());
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployeeProfileByUsername(String username, UpdateEmployeeProfileRequest request) {
+        // Tìm employee
+        Employee employee = employeeRepository.findByAccount_Username(username)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
+
+        employeeMapper.updateEmployeeProfile(employee,request);
+        employeeRepository.save(employee);
+        return employeeMapper.ToEmployeeResponseDTO(employee);
     @Transactional
     @Override
     public EmployeeCreationResponseDTO updateEmloyeeProfileByEmployeeId(Integer employeeId, EmployeeUpdateRequestDTO employeeUpdateRequestDTO){
