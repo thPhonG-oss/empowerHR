@@ -1,4 +1,4 @@
-package com.hr_management.hr_management.dto.request;
+package com.hr_management.hr_management.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,7 +10,6 @@ import org.mapstruct.Mapper;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Mapper
 @Builder
-public class ChangePasswordRequest {
-    String userName;
-    String newpassword;
+public class ConfirmAccountResponse {
+    boolean isValid;
 }

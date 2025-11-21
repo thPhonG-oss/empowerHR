@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Mapper
 @Builder
-public class ChangePasswordRequest {
+public class ConfimAccountRequest {
     String userName;
-    String newpassword;
+    String password;
 }
