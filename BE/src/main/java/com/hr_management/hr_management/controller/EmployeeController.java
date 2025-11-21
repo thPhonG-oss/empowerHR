@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -31,13 +32,16 @@ public class EmployeeController {
                 .build();
     }
 
+    // [ MANGER ]
+    // 1. Xem ho so chi tiet nhan vien
+
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
 
     @GetMapping("/api/v1/employee/profile")
     public ApiResponse<EmployeeResponseDTO> getMyProfile(JwtAuthenticationToken jwtToken){
-        Integer employeeId = ((Number) jwtToken.getTokenAttributes().get("employeeId")).intValue();
-        EmployeeResponseDTO profile = employeeService.getEmployeeById(employeeId);
+        String username = jwtToken.getName();
+        EmployeeResponseDTO profile = employeeService.getEmployeeByUserName(username);
         return ApiResponse.<EmployeeResponseDTO>builder()
                 .result(profile)
                 .message("Profile retrieved successfully")
@@ -45,9 +49,9 @@ public class EmployeeController {
     }
     // 2. Cập nhật thông tin cá nhân
     @PutMapping("/api/v1/employee/profile")
-    public ApiResponse<EmployeeResponseDTO> updateMyProfile(JwtAuthenticationToken jwtToken, UpdateEmployeeProfileRequest request){
-        Integer employeeId = ((Number) jwtToken.getTokenAttributes().get("employeeId")).intValue();
-        EmployeeResponseDTO updatedProfile = employeeService.updateEmployeeProfile(employeeId, request);
+    public ApiResponse<EmployeeResponseDTO> updateMyProfile(JwtAuthenticationToken jwtToken, @RequestBody UpdateEmployeeProfileRequest request){
+        String username = jwtToken.getName();
+        EmployeeResponseDTO updatedProfile = employeeService.updateEmployeeProfileByUsername(username, request) ;
 
         return ApiResponse.<EmployeeResponseDTO>builder()
                 .result(updatedProfile)

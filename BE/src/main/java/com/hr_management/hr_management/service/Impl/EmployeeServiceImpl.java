@@ -41,6 +41,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public EmployeeResponseDTO getEmployeeByUserName(String username) {
+        Employee existingEmployee = employeeRepository.findByAccount_Username(username)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
+
+        EmployeeResponseDTO employeeResponseDTO = employeeMapper.ToEmployeeResponseDTO(existingEmployee);
+        employeeResponseDTO.setBank(existingEmployee.getBank().getBankName());
+        employeeResponseDTO.setDepartment(existingEmployee.getDepartment().getDepartmentName());
+        employeeResponseDTO.setPosition(existingEmployee.getPosition().getPositionName());
+
+        return employeeResponseDTO;
+    }
+
+    @Override
     public List<EmployeeResponseDTO> getAll() {
         var employee = employeeRepository.findAll();
         return employee.stream()
@@ -55,9 +68,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponseDTO updateEmployeeProfile(Integer employeeId, UpdateEmployeeProfileRequest request) {
+    public EmployeeResponseDTO updateEmployeeProfileByUsername(String username, UpdateEmployeeProfileRequest request) {
         // Tìm employee
-        Employee employee = employeeRepository.findById(employeeId)
+        Employee employee = employeeRepository.findByAccount_Username(username)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITS));
 
         employeeMapper.updateEmployeeProfile(employee,request);
