@@ -1,0 +1,2 @@
+ALTER TABLE InvalidatedToken
+MODIFY COLUMN id VARCHAR(255);
