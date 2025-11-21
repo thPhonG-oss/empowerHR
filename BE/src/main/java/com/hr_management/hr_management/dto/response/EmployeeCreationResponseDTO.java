@@ -1,9 +1,5 @@
 package com.hr_management.hr_management.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.hr_management.hr_management.entity.Bank;
-import com.hr_management.hr_management.entity.Department;
-import com.hr_management.hr_management.entity.Position;
 import com.hr_management.hr_management.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class EmployeeResponseDTO {
+public class EmployeeCreationResponseDTO {
     private Integer employeeId;
     private String employeeCode;
     private String employeeName;
@@ -34,7 +30,8 @@ public class EmployeeResponseDTO {
     private LocalDateTime updatedAt;
     private String taxCode;
     private Long pointBalance;
-    private String position;
-    private String department;
-    private String bank;
+    private PositionResponseDTO position;
+    private DepartmentResponseDTO department;
+    private BankResponseDTO bank;
+    private AccountResponseDTO account;
 }

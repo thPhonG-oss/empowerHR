@@ -44,8 +44,8 @@ security:
 
 jwt:
   secret:  ${SECRET_KEY}
-  access-token-validity-seconds: 3600
-  refresh-token-validity-seconds:  604800
+  access-token-validity-seconds: 300
+  refresh-token-validity-seconds: 500
 
 logging:
   level:

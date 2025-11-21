@@ -9,5 +9,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AccountRepositoryImpl  {
+public class AccountRepositoryImpl implements AccountService {
 }
