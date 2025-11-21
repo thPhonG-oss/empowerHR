@@ -1,6 +1,8 @@
 import AdminLayout from "../../components/layout/AdminLayout";
 import DashboardAdmin from "../../pages/admin/Dashboard";
 import EmployeeManagement from "../../pages/admin/EmployeeManagement";
+import DetailProfile from "../../pages/common/DetailProfile";
+import EditProfile from "../../pages/common/EditProfile";
 
 import RoleRoute from "../RoleRoute";
 
@@ -15,7 +17,9 @@ const adminRoutes = [
     children: [
       { path: "dashboard", element: <DashboardAdmin /> },
       { path: "employee-management", element: <EmployeeManagement /> },
-
+      { path: "employee-management/:employeeId", element: <DetailProfile /> },
+      { path: "employee-management/:employeeId/edit", element: <EditProfile /> },
+      
       // thêm các route admin khác ở đây
     ],
   },
