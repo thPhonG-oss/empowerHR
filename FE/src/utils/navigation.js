@@ -42,13 +42,13 @@ const navConfig = [
   },
   {
     title: "Quản lý nhân viên",
-    path: "staff-management",
+    path: "employee-management",
     icon: Users,
     roles: ["admin"],
   },
   {
     title: "Tài khoản nhân viên",
-    path: "staff-accounts",
+    path: "employee-accounts",
     icon: IdCard,
     roles: ["admin"],
   },

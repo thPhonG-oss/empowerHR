@@ -10,15 +10,16 @@ export function AuthProvider({ children }) {
     localStorage.getItem("userName") || ""
   );
   // Login đúng cách
-  // // Login: lưu token + decode roles
+  // Login: lưu token + decode roles
   // const login = (token) => {
   //   localStorage.setItem("token", token);
+  //   console.log(token);
   //   setToken(token);
 
   //   try {
   //     // jwt(token) là cách gọi với phiên bản mới
   //     const decoded = jwtDecode(token);
-
+  //     console.log(decoded);
   //     const rolesFromToken = decoded.roles || [];
   //     localStorage.setItem("roles", JSON.stringify(rolesFromToken));
   //     setRole(rolesFromToken);
