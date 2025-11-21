@@ -1,6 +1,6 @@
 import AdminLayout from "../../components/layout/AdminLayout";
 import DashboardAdmin from "../../pages/admin/Dashboard";
-import StaffManagement from "../../pages/admin/StaffManagement";
+import EmployeeManagement from "../../pages/admin/EmployeeManagement";
 
 import RoleRoute from "../RoleRoute";
 
@@ -14,7 +14,7 @@ const adminRoutes = [
     ),
     children: [
       { path: "dashboard", element: <DashboardAdmin /> },
-      { path: "staff-management", element: <StaffManagement /> },
+      { path: "employee-management", element: <EmployeeManagement /> },
 
       // thêm các route admin khác ở đây
     ],

@@ -2,6 +2,8 @@ import { getNavByRole } from "../../utils/navigation";
 import { AuthContext } from "../../context/AuthContext";
 import { useContext } from "react";
 
+import { Link } from "react-router-dom";
+
 import { Users, CircleUser, LogOut } from "lucide-react";
 function Sidebar() {
   const { role, logout, userName } = useContext(AuthContext);
@@ -22,16 +24,16 @@ function Sidebar() {
         {/* Content */}
         <div className="flex flex-col px-2 py-4">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.title}
-              href={item.path}
+              to={item.path}
               className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
                 currentPath === item.path ? "bg-gray-400" : ""
               }`}
             >
               {item.icon && <item.icon className="w-5 h-5" />}
               <span className="font-semibold">{item.title}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

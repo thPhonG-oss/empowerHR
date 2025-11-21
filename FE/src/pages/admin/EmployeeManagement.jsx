@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import Header from "../../components/common/Header";
 
+import AddEmployeeCard from "../../components/admin/AddEmployeeCard";
+
 // =============== Mock dữ liệu ================
 const mockStaff = Array.from({ length: 300 }, (_, i) => {
   const gender = i % 2 === 0 ? "Male" : "Female";
@@ -85,6 +87,7 @@ function StaffManagement() {
   const [department, setDepartment] = useState("");
   const [position, setPosition] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddCardOpen, setIsAddCardOpen] = useState(false);
 
   const itemsPerPage = 10;
   const totalItems = mockStaff.length;
@@ -123,7 +126,7 @@ function StaffManagement() {
   };
 
   return (
-    <main className="p-0">
+    <main className="p-0 relative">
       <div className=" mx-auto">
         {/* Header */}
         <Header title="Quản lý nhân viên" icon={Contact} />
@@ -200,7 +203,10 @@ function StaffManagement() {
                   Cập nhật danh sách sinh viên
                 </p>
               </div>
-              <button className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+              <button
+                onClick={() => setIsAddCardOpen(true)}
+                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+              >
                 Thêm nhân viên
               </button>
             </div>
@@ -314,6 +320,15 @@ function StaffManagement() {
           </div>
         </div>
       </div>
+      {/* Add Employee Card */}
+      {isAddCardOpen && (
+        <AddEmployeeCard
+          positions={positions}
+          departments={departments}
+          isOpen={isAddCardOpen}
+          onClose={() => setIsAddCardOpen(false)}
+        />
+      )}
     </main>
   );
 }

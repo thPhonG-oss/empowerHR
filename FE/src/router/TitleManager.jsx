@@ -10,8 +10,8 @@ const navSimple = [
   // ADMIN ONLY
   { title: "Quản lý gian hàng", path: "store-management" },
   { title: "Điểm thưởng", path: "rewards" },
-  { title: "Quản lý nhân viên", path: "staff-management" },
-  { title: "Tài khoản nhân viên", path: "staff-accounts" },
+  { title: "Quản lý nhân viên", path: "employee-management" },
+  { title: "Tài khoản nhân viên", path: "employee-accounts" },
   { title: "Quản lý hoạt động", path: "activity-management" },
   { title: "Chính sách công ty", path: "company-policy" },
 
