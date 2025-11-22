@@ -35,6 +35,9 @@ public class Account {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "account_status")
+    private boolean accountStatus;
+
     @ManyToMany
     @JoinTable(
             name = "Account_Role",
