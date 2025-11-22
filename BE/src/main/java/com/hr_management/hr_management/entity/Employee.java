@@ -66,19 +66,27 @@ public class Employee {
     @Column(name = "point_balance", precision = 10, scale = 2)
     private Long pointBalance;
 
-    @OneToOne(fetch = FetchType.LAZY)
+//    @OneToOne(fetch = FetchType.LAZY)
+    // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", unique = true)
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @ManyToOne
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+// Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update: thành OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "bank_id")
     private Bank bank;
 }
