@@ -46,7 +46,9 @@ public class Request {
     @Column(name = "response_reason", columnDefinition = "TEXT")
     private String responseReason;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update xóa fetch type, mặc định ManyToOne là EAGER
+    @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 }
