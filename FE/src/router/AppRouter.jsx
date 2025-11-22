@@ -10,6 +10,7 @@ import employeeRoutes from "./roles/employeeRoutes";
 export default function AppRouter() {
   return (
     <Routes>
+      <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/change-password" element={<ChangePassword />} />
 
