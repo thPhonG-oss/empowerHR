@@ -6,7 +6,7 @@ import {
   Phone,
   Edit2,
   Trash2,
-  MoreVertical,
+  View,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -14,7 +14,7 @@ import {
 import Header from "../../components/common/Header";
 
 import AddEmployeeCard from "../../components/admin/AddEmployeeCard";
-
+import ConfirmPopup from "../../components/common/ComfirmPopup";
 // =============== Mock dữ liệu ================
 const mockStaff = Array.from({ length: 300 }, (_, i) => {
   const gender = i % 2 === 0 ? "Male" : "Female";
@@ -90,12 +90,22 @@ function StaffManagement() {
   const [position, setPosition] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+
+  // Thêm Staff vào danh sách cục bộ
+  const [employeeList, setEmployeeList] = useState(mockStaff);
+
+  localStorage.setItem("employeeList", JSON.stringify(mockStaff));
 
   const itemsPerPage = 10;
-  const totalItems = mockStaff.length;
+  const totalItems = employeeList.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentStaff = mockStaff.slice(startIndex, startIndex + itemsPerPage);
+  const currentStaff = employeeList.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const generatePaginationPages = () => {
     const pages = [];
@@ -125,6 +135,15 @@ function StaffManagement() {
       pages.push(totalPages);
     }
     return pages;
+  };
+
+  const handleDeleteEmployee = () => {
+    // Xóa giả
+    setEmployeeList((prev) =>
+      prev.filter((emp) => emp.employeeId !== employeeToDelete)
+    );
+    // Gọi API xóa ở đây
+    setIsConfirmPopupOpen(false);
   };
 
   return (
@@ -219,7 +238,6 @@ function StaffManagement() {
                 <div
                   key={staff.employeeId}
                   className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white"
-                  onClick={() => navigate(`/admin/employee-management/${staff.employeeId}`)}
                 >
                   <div className="flex items-center justify-between gap-4">
                     {/* Avatar and Info */}
@@ -257,14 +275,34 @@ function StaffManagement() {
                       >
                         {staff.isActive ? "Hoạt động" : "Ngừng hoạt động"}
                       </span>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/employee-management/${staff.employeeId}`
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
                         <Edit2 className="size-4 text-gray-600" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <Trash2 className="size-4 text-red-500" />
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/employee-management/${staff.employeeId}`
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
+                        <View className="size-4 text-gray-600" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <MoreVertical className="size-4 text-gray-600" />
+                      <button
+                        onClick={() => {
+                          setEmployeeToDelete(staff.employeeId);
+                          setIsConfirmPopupOpen(true);
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
+                        <Trash2 className="size-4 text-red-500" />
                       </button>
                     </div>
                   </div>
@@ -330,6 +368,14 @@ function StaffManagement() {
           departments={departments}
           isOpen={isAddCardOpen}
           onClose={() => setIsAddCardOpen(false)}
+        />
+      )}
+      {isConfirmPopupOpen && (
+        <ConfirmPopup
+          isOpen={isConfirmPopupOpen}
+          onClose={() => setIsConfirmPopupOpen(false)}
+          message="Bạn có chắc chắn muốn xóa nhân viên này?"
+          onConfirm={handleDeleteEmployee}
         />
       )}
     </main>

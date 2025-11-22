@@ -38,7 +38,13 @@ export default function TitleManager() {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    const normalize = (p) => p.replace(/^\/+|\/+$/g, "");
+    // Return only the last segment of the path (endpoint)
+    const normalize = (p) => {
+      const cleaned = (p || "").replace(/^\/+|\/+$/g, "");
+      if (!cleaned) return "";
+      const parts = cleaned.split("/");
+      return parts[parts.length - 1];
+    };
 
     const current = normalize(pathname);
 

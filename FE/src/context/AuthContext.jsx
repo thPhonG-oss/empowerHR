@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useState } from "react";
-
+import { jwtDecode } from "jwt-decode";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -11,32 +11,22 @@ export function AuthProvider({ children }) {
   );
   // Login đúng cách
   // Login: lưu token + decode roles
-  // const login = (token) => {
-  //   localStorage.setItem("token", token);
-  //   console.log(token);
-  //   setToken(token);
-
-  //   try {
-  //     // jwt(token) là cách gọi với phiên bản mới
-  //     const decoded = jwtDecode(token);
-  //     console.log(decoded);
-  //     const rolesFromToken = decoded.roles || [];
-  //     localStorage.setItem("roles", JSON.stringify(rolesFromToken));
-  //     setRole(rolesFromToken);
-  //   } catch (err) {
-  //     console.error("Invalid token", err);
-  //     setRole([]);
-  //   }
-  // };
-
-  // Fake login
-  const login = (token, role, userName) => {
+  const login = (token) => {
     localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-    localStorage.setItem("userName", userName);
+    console.log(token);
     setToken(token);
-    setRole(role);
-    setUserName(userName);
+
+    try {
+      // jwt(token) là cách gọi với phiên bản mới
+      const decoded = jwtDecode(token);
+      console.log(decoded);
+      const rolesFromToken = decoded.scope || [];
+      const role = rolesFromToken.split(" ")[0];
+      console.log(role); // ROLE_ADMIN
+    } catch (err) {
+      console.error("Invalid token", err);
+      setRole([]);
+    }
   };
 
   // Logout

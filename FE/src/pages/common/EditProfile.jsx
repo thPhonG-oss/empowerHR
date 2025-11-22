@@ -1,8 +1,12 @@
 import { useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Mail, MapPin, PenLine, Phone } from "lucide-react";
+import { Mail, MapPin, PenLine, Phone, Contact } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
+import Header from "../../components/common/Header";
+import FormField from "../../components/common/FormField";
+import ContactFormField from "../../components/common/ContactFormField";
 
+import GoBackLink from "../../components/common/GoBackLink";
 // Mock data cho dropdowns
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
@@ -161,239 +165,167 @@ function EditProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Chỉnh sửa hồ sơ</h1>
+        <Header title={"Quản lý nhân viên"} icon={Contact} />
+        <div className="px-8">
+          <GoBackLink />
+          <div className="flex items-center justify-center mb-4">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Chỉnh sửa hồ sơ
+            </h1>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Card 1: Thông tin cơ bản */}
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Thông tin cơ bản
+                  </h2>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    label="Họ và tên"
+                    value={formData.employee_name}
+                    onChange={(value) => handleChange("employee_name", value)}
+                    disabled={!canEditField("employee_name")}
+                  />
+                  <FormField
+                    label="Mã nhân viên"
+                    value={formData.employee_code}
+                    disabled={true}
+                  />
+                  <FormField
+                    label="Tên phòng ban"
+                    value={formData.department_name}
+                    onChange={(value) => {
+                      handleChange("department_name", value);
+                      // Cập nhật department_id nếu cần
+                      const dept = departments.find((d) => d.name === value);
+                      if (dept) {
+                        handleChange("department_id", dept.id);
+                      }
+                    }}
+                    disabled={!canEditField("department_name")}
+                    type="select"
+                    options={departments.map((d) => d.name)}
+                  />
+                  <FormField
+                    label="Vị trí"
+                    value={formData.position_name}
+                    onChange={(value) => {
+                      handleChange("position_name", value);
+                      // Cập nhật position_id nếu cần
+                      const pos = positions.find((p) => p.name === value);
+                      if (pos) {
+                        handleChange("position_id", pos.id);
+                      }
+                    }}
+                    disabled={!canEditField("position_name")}
+                    type="select"
+                    options={positions.map((p) => p.name)}
+                  />
+                  <FormField
+                    label="Số tài khoản"
+                    value={formData.bank_account}
+                    onChange={(value) => handleChange("bank_account", value)}
+                    disabled={!canEditField("bank_account")}
+                  />
+                  <FormField
+                    label="Tên ngân hàng"
+                    value={formData.bank_name}
+                    onChange={(value) => handleChange("bank_name", value)}
+                    disabled={!canEditField("bank_name")}
+                    type="select"
+                    options={banks}
+                  />
+                  <FormField
+                    label="Ngày vào làm"
+                    type="date"
+                    value={formatDateForInput(formData.starting_date)}
+                    disabled={true}
+                  />
+                  <FormField
+                    label="CCCD"
+                    value={formData.identity_card}
+                    onChange={(value) => handleChange("identity_card", value)}
+                    disabled={!canEditField("identity_card")}
+                  />
+                  <FormField
+                    label="Ngày sinh"
+                    type="date"
+                    value={formatDateForInput(formData.date_of_birth)}
+                    onChange={(value) => handleChange("date_of_birth", value)}
+                    disabled={!canEditField("date_of_birth")}
+                  />
+                  <FormField
+                    label="Giới tính"
+                    value={formData.gender}
+                    onChange={(value) => handleChange("gender", value)}
+                    disabled={!canEditField("gender")}
+                    type="select"
+                    options={["Nam", "Nữ", "Khác"]}
+                  />
+                </div>
+              </div>
+
+              {/* Card 2: Thông tin liên hệ */}
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Thông tin liên hệ
+                    </h2>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <ContactFormField
+                    label="Địa chỉ"
+                    value={formData.address}
+                    onChange={(value) => handleChange("address", value)}
+                    disabled={!canEditField("address")}
+                  />
+                  <ContactFormField
+                    label="Email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(value) => handleChange("email", value)}
+                    disabled={!canEditField("email")}
+                  />
+                  <ContactFormField
+                    label="Số điện thoại"
+                    value={formData.phone_number}
+                    onChange={(value) => handleChange("phone_number", value)}
+                    disabled={!canEditField("phone_number")}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="rounded-md bg-black px-6 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
+              >
+                {saving ? "Đang lưu..." : "Lưu"}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Card 1: Thông tin cơ bản */}
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Thông tin cơ bản
-              </h2>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                label="Họ và tên"
-                value={formData.employee_name}
-                onChange={(value) => handleChange("employee_name", value)}
-                disabled={!canEditField("employee_name")}
-              />
-              <FormField
-                label="Mã nhân viên"
-                value={formData.employee_code}
-                disabled={true}
-              />
-              <FormField
-                label="Tên phòng ban"
-                value={formData.department_name}
-                onChange={(value) => {
-                  handleChange("department_name", value);
-                  // Cập nhật department_id nếu cần
-                  const dept = departments.find((d) => d.name === value);
-                  if (dept) {
-                    handleChange("department_id", dept.id);
-                  }
-                }}
-                disabled={!canEditField("department_name")}
-                type="select"
-                options={departments.map((d) => d.name)}
-              />
-              <FormField
-                label="Vị trí"
-                value={formData.position_name}
-                onChange={(value) => {
-                  handleChange("position_name", value);
-                  // Cập nhật position_id nếu cần
-                  const pos = positions.find((p) => p.name === value);
-                  if (pos) {
-                    handleChange("position_id", pos.id);
-                  }
-                }}
-                disabled={!canEditField("position_name")}
-                type="select"
-                options={positions.map((p) => p.name)}
-              />
-              <FormField
-                label="Số tài khoản"
-                value={formData.bank_account}
-                onChange={(value) => handleChange("bank_account", value)}
-                disabled={!canEditField("bank_account")}
-              />
-              <FormField
-                label="Tên ngân hàng"
-                value={formData.bank_name}
-                onChange={(value) => handleChange("bank_name", value)}
-                disabled={!canEditField("bank_name")}
-                type="select"
-                options={banks}
-              />
-              <FormField
-                label="Ngày vào làm"
-                type="date"
-                value={formatDateForInput(formData.starting_date)}
-                disabled={true}
-              />
-              <FormField
-                label="CCCD"
-                value={formData.identity_card}
-                onChange={(value) => handleChange("identity_card", value)}
-                disabled={!canEditField("identity_card")}
-              />
-              <FormField
-                label="Ngày sinh"
-                type="date"
-                value={formatDateForInput(formData.date_of_birth)}
-                onChange={(value) => handleChange("date_of_birth", value)}
-                disabled={!canEditField("date_of_birth")}
-              />
-              <FormField
-                label="Giới tính"
-                value={formData.gender}
-                onChange={(value) => handleChange("gender", value)}
-                disabled={!canEditField("gender")}
-                type="select"
-                options={["Nam", "Nữ", "Khác"]}
-              />
-            </div>
-          </div>
-
-          {/* Card 2: Thông tin liên hệ */}
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Thông tin liên hệ
-                </h2>
-               
-              </div>
-              <div className="flex items-center gap-2 text-gray-400">
-                <PenLine className="h-5 w-5" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <ContactFormField
-                icon={MapPin}
-                label="Địa chỉ"
-                value={formData.address}
-                onChange={(value) => handleChange("address", value)}
-                disabled={!canEditField("address")}
-              />
-              <ContactFormField
-                icon={Mail}
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(value) => handleChange("email", value)}
-                disabled={!canEditField("email")}
-              />
-              <ContactFormField
-                icon={Phone}
-                label="Số điện thoại"
-                value={formData.phone_number}
-                onChange={(value) => handleChange("phone_number", value)}
-                disabled={!canEditField("phone_number")}
-              />
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-md bg-black px-6 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
-            >
-              {saving ? "Đang lưu..." : "Lưu"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  value,
-  onChange,
-  disabled = false,
-  type = "text",
-  options = [],
-}) {
-  if (type === "select") {
-    return (
-      <div>
-        <label className="block text-sm font-medium text-gray-500">
-          {label}
-        </label>
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-500">{label}</label>
-      <input
-        type={type}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
-      />
-    </div>
-  );
-}
-
-function ContactFormField({
-  icon: Icon,
-  label,
-  value,
-  onChange,
-  disabled = false,
-  type = "text",
-}) {
-  return (
-    <div className="flex items-start gap-3">
-      <Icon className="mt-2 h-5 w-5 text-gray-400" />
-      <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-500">
-          {label}
-        </label>
-        <input
-          type={type}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
-        />
       </div>
     </div>
   );
 }
 
 export default EditProfile;
-

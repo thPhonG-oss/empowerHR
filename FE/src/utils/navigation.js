@@ -48,7 +48,7 @@ const navConfig = [
   },
   {
     title: "Tài khoản nhân viên",
-    path: "staff-accounts",
+    path: "employee-accounts",
     icon: IdCard,
     roles: ["admin"],
   },

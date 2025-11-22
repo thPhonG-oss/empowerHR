@@ -1,7 +1,12 @@
-import { useContext } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Mail, MapPin, PenLine, Phone } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Mail, MapPin, PenLine, Phone, Contact } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
+import Header from "../../components/common/Header";
+import InfoField from "../../components/common/InfoField";
+import ContactField from "../../components/common/ContactField";
+
+import GoBackLink from "../../components/common/GoBackLink";
 
 // Mock data theo schema Employee
 const mockProfile = {
@@ -31,14 +36,30 @@ function DetailProfile() {
   const { role } = useContext(AuthContext);
   const { employeeId } = useParams();
   const safeRole = typeof role === "string" ? role.toUpperCase() : "";
-  
+
+  const [profile, setProfile] = useState(null);
+
+  const navigate = useNavigate();
+
+  // Lấy thông tin profile từ LocalStorage
+  useEffect(() => {
+    const storedProfiles = localStorage.getItem("employeeList");
+    if (storedProfiles) {
+      const profiles = JSON.parse(storedProfiles);
+      const foundProfile = profiles.find(
+        (p) => String(p.employeeId) === String(employeeId)
+      );
+      setProfile(foundProfile || null);
+    }
+  }, [employeeId]);
+
   // Manager có thể chỉnh sửa profile của chính mình (khi không có employeeId)
   // Manager không thể chỉnh sửa profile của nhân viên khác (khi có employeeId)
-  const canEdit = 
-    safeRole === "ADMIN" || 
+  const canEdit =
+    safeRole === "ADMIN" ||
     safeRole === "EMPLOYEE" ||
     (safeRole === "MANAGER" && !employeeId);
-  
+
   // Xác định edit path dựa trên role và context
   let editPath = "";
   if (safeRole === "ADMIN") {
@@ -74,110 +95,99 @@ function DetailProfile() {
       : "Hồ sơ của tôi";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto space-y-6">
+        {/* Header */}
+        <Header title="Quản lý nhân viên" icon={Contact} />
         {/* Header với nút chỉnh sửa nổi bật */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
-          {canEdit && editPath && (
-            <Link
-              to={editPath}
-              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 shadow-md"
-              title="Chỉnh sửa"
-            >
-              <PenLine className="h-4 w-4" />
-              Chỉnh sửa
-            </Link>
-          )}
-        </div>
+        <div className="px-8">
+          <GoBackLink />
 
-        {/* Card 1: Thông tin cơ bản - Không thể sửa */}
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Thông tin cơ bản
-              </h2>
-             
+          <div className="mb-4 flex items-center justify-between rounded-lg bg-white p-6 shadow-sm">
+            <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
+            {canEdit && editPath && (
+              <Link
+                to={editPath}
+                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 shadow-md"
+                title="Chỉnh sửa"
+              >
+                <PenLine className="h-4 w-4" />
+                Chỉnh sửa
+              </Link>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Card 1: Thông tin cơ bản - Không thể sửa */}
+            <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Thông tin cơ bản
+                  </h2>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <InfoField
+                  label="Họ và tên"
+                  value={mockProfile.employee_name}
+                />
+                <InfoField
+                  label="Mã nhân viên"
+                  value={mockProfile.employee_code}
+                />
+                <InfoField
+                  label="Tên phòng ban"
+                  value={mockProfile.department_name}
+                />
+                <InfoField label="Vị trí" value={mockProfile.position_name} />
+                <InfoField
+                  label="Tài khoản ngân hàng"
+                  value={`${mockProfile.bank_account} - ${mockProfile.bank_name}`}
+                />
+                <InfoField
+                  label="Ngày vào làm"
+                  value={formatDate(mockProfile.starting_date)}
+                />
+                <InfoField label="CCCD" value={mockProfile.identity_card} />
+                <InfoField
+                  label="Ngày sinh"
+                  value={formatDate(mockProfile.date_of_birth)}
+                />
+                <InfoField label="Giới tính" value={mockProfile.gender} />
+              </div>
+            </div>
+            {/* Card 2: Thông tin liên hệ - Có thể sửa */}
+            <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Thông tin liên hệ
+                  </h2>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <ContactField
+                  icon={MapPin}
+                  label="Địa chỉ"
+                  value={mockProfile.address}
+                />
+                <ContactField
+                  icon={Mail}
+                  label="Email"
+                  value={mockProfile.email}
+                />
+                <ContactField
+                  icon={Phone}
+                  label="Số điện thoại"
+                  value={mockProfile.phone_number}
+                />
+              </div>
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InfoField label="Họ và tên" value={mockProfile.employee_name} />
-            <InfoField label="Mã nhân viên" value={mockProfile.employee_code} />
-            <InfoField label="Tên phòng ban" value={mockProfile.department_name} />
-            <InfoField label="Vị trí" value={mockProfile.position_name} />
-            <InfoField
-              label="Tài khoản ngân hàng"
-              value={`${mockProfile.bank_account} - ${mockProfile.bank_name}`}
-            />
-            <InfoField
-              label="Ngày vào làm"
-              value={formatDate(mockProfile.starting_date)}
-            />
-            <InfoField label="CCCD" value={mockProfile.identity_card} />
-            <InfoField
-              label="Ngày sinh"
-              value={formatDate(mockProfile.date_of_birth)}
-            />
-            <InfoField label="Giới tính" value={mockProfile.gender} />
-          </div>
         </div>
-
-        {/* Card 2: Thông tin liên hệ - Có thể sửa */}
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <div className="mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Thông tin liên hệ
-              </h2>
-             
-            </div>
-          </div>
-          <div className="space-y-4">
-            <ContactField
-              icon={MapPin}
-              label="Địa chỉ"
-              value={mockProfile.address}
-            />
-            <ContactField
-              icon={Mail}
-              label="Email"
-              value={mockProfile.email}
-            />
-            <ContactField
-              icon={Phone}
-              label="Số điện thoại"
-              value={mockProfile.phone_number}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InfoField({ label, value }) {
-  return (
-    <div>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
-      <p className="mt-1 text-base font-semibold text-gray-900">{value || "-"}</p>
-    </div>
-  );
-}
-
-function ContactField({ icon: Icon, label, value }) {
-  return (
-    <div className="flex items-start gap-3">
-      <Icon className="mt-1 h-5 w-5 text-gray-400" />
-      <div className="flex-1">
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <p className="mt-1 text-base font-semibold text-gray-900">
-          {value || "-"}
-        </p>
       </div>
     </div>
   );
 }
 
 export default DetailProfile;
-

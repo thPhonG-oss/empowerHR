@@ -27,31 +27,14 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // // Tạm thời chưa có API
-      // const res = await authApi.login({ userName, password });
-      // const token = res.data.result.token;
+      // Tạm thời chưa có API
+      const res = await authApi.login({ userName, password });
+      const token = res.result.acessToken;
 
-      // // Lưu token + roles vào context
-      // login(token);
-
-      // Mock login
-      const user = mockUsers.find(
-        (user) => user.userName === userName && user.password === password
-      );
-      if (user) {
-        const fakeToken = "fake_token_123"; // có thể dùng uuid hoặc random string
-        const fakeUserName = "Trương Việt Công";
-
-        login(fakeToken, user.roles[0], fakeUserName);
-
-        const roleString = user.roles[0].toLowerCase();
-
-        console.log(localStorage.getItem("token"));
-
-        navigate(`/${roleString}/dashboard`);
-      } else {
-        setWrongInput(true);
-      }
+      // Lưu token + roles vào context
+      login(token);
+      console.log(token);
+      // navigate(`/${roleString}/dashboard`);
 
       setIsLoading(false);
     } catch (err) {
