@@ -3,6 +3,7 @@ import DashboardAdmin from "../../pages/admin/Dashboard";
 import EmployeeManagement from "../../pages/admin/EmployeeManagement";
 import DetailProfile from "../../pages/common/DetailProfile";
 import EditProfile from "../../pages/common/EditProfile";
+import AccountManagement from "../../pages/admin/AccountManagement";
 
 import RoleRoute from "../RoleRoute";
 
@@ -19,7 +20,8 @@ const adminRoutes = [
       { path: "employee-management", element: <EmployeeManagement /> },
       { path: "employee-management/:employeeId", element: <DetailProfile /> },
       { path: "employee-management/:employeeId/edit", element: <EditProfile /> },
-      
+      { path: "employee-accounts", element: <AccountManagement /> },
+
       // thêm các route admin khác ở đây
     ],
   },

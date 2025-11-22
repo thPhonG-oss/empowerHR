@@ -1,15 +1,18 @@
 import { getNavByRole } from "../../utils/navigation";
 import { AuthContext } from "../../context/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { Users, CircleUser, LogOut } from "lucide-react";
 function Sidebar() {
   const { role, logout, userName } = useContext(AuthContext);
   const navItems = getNavByRole(role.toLowerCase());
-
-  const currentPath = window.location.pathname.split("/").pop();
+  const [currentPath, setCurrentPath] = useState("");
+  const location = useLocation();
+  useEffect(() => {
+    setCurrentPath(location.pathname.split("/").pop());
+  }, [location]);
 
   return (
     <div className="sticky top-0 w-full h-screen flex flex-col justify-between">
