@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "request_id")
+// Thêm @SuperBuilder
+@SuperBuilder
 public class LeaveRequest extends Request {
 
     @Column(name = "start_date", nullable = false)

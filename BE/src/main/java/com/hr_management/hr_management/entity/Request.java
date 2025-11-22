@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Inheritance(strategy = InheritanceType.JOINED)
-@Builder
+//@Builder
+// update: xóa @Builder, thêm @SuperBuilder => sử dụng builder cho cả class cha và class con
+@SuperBuilder
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
