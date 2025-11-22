@@ -4,41 +4,15 @@ import {
   Contact,
   Mail,
   Phone,
-  Edit2,
-  Trash2,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
 import Header from "../../components/common/Header";
 
-import AddEmployeeCard from "../../components/admin/AddEmployeeCard";
-
 // =============== Mock dữ liệu ================
-const mockStaff = Array.from({ length: 300 }, (_, i) => {
-  const gender = i % 2 === 0 ? "Male" : "Female";
-  const isActive = i % 3 !== 0; // 2/3 active
-  return {
-    employeeId: i + 1,
-    employeeCode: `EMP${String(i + 1).padStart(3, "0")}`,
-    employeeName: `Nguyễn Văn ${
-      ["An", "Bình", "Cường", "Dũng", "Hùng"][i % 5]
-    }`,
-    identityCard: `00${Math.floor(100000000 + Math.random() * 900000000)}`,
-    address: `${100 + i} Nguyễn Huệ, Q1, TP.HCM`,
-    dateOfBirth: `198${i % 10}-0${(i % 9) + 1}-15`,
-    gender,
-    email: `nv${i + 1}@company.com`,
-    phoneNumber: `0901234${String(100 + i).slice(-3)}`,
-    startingDate: `2020-0${(i % 9) + 1}-15`,
-    isActive,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    taxCode: `TAX${String(i + 1).padStart(3, "0")}`,
-    pointBalance: Math.floor(Math.random() * 10000),
-  };
-});
+// Phòng ban cố định của manager (mock: Phòng Nhân Sự)
+const MANAGER_DEPARTMENT = "Phòng Nhân Sự";
 
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
@@ -81,21 +55,76 @@ const positions = [
   { id: 28, name: "Intern" },
 ];
 
+const mockStaff = Array.from({ length: 300 }, (_, i) => {
+  const gender = i % 2 === 0 ? "Male" : "Female";
+  const isActive = i % 3 !== 0; // 2/3 active
+  // Gán phòng ban ngẫu nhiên, nhưng sẽ filter theo MANAGER_DEPARTMENT
+  const departmentNames = [
+    "Ban Giám Đốc",
+    "Phòng Nhân Sự",
+    "Phòng Kỹ Thuật",
+    "Phòng Kinh Doanh",
+    "Phòng Marketing",
+    "Phòng Kế Toán",
+    "Phòng Hành Chính",
+  ];
+  return {
+    employeeId: i + 1,
+    employeeCode: `EMP${String(i + 1).padStart(3, "0")}`,
+    employeeName: `Nguyễn Văn ${
+      ["An", "Bình", "Cường", "Dũng", "Hùng"][i % 5]
+    }`,
+    identityCard: `00${Math.floor(100000000 + Math.random() * 900000000)}`,
+    address: `${100 + i} Nguyễn Huệ, Q1, TP.HCM`,
+    dateOfBirth: `198${i % 10}-0${(i % 9) + 1}-15`,
+    gender,
+    email: `nv${i + 1}@company.com`,
+    phoneNumber: `0901234${String(100 + i).slice(-3)}`,
+    startingDate: `2020-0${(i % 9) + 1}-15`,
+    isActive,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    taxCode: `TAX${String(i + 1).padStart(3, "0")}`,
+    pointBalance: Math.floor(Math.random() * 10000),
+    departmentName: departmentNames[i % departmentNames.length],
+    positionName: positions[i % positions.length].name,
+  };
+});
+
 // ==========================================
 
-function StaffManagement() {
+function ManagerEmployeeList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [department, setDepartment] = useState("");
   const [position, setPosition] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+
+  // Lọc nhân viên theo phòng ban cố định của manager
+  const filteredStaff = mockStaff.filter(
+    (staff) => staff.departmentName === MANAGER_DEPARTMENT
+  );
+
+  // Áp dụng filter theo position và search term
+  let displayStaff = filteredStaff;
+  if (position) {
+    displayStaff = displayStaff.filter((staff) =>
+      staff.positionName?.includes(position)
+    );
+  }
+  if (searchTerm) {
+    displayStaff = displayStaff.filter(
+      (staff) =>
+        staff.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        staff.employeeCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        staff.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
   const itemsPerPage = 10;
-  const totalItems = mockStaff.length;
+  const totalItems = displayStaff.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentStaff = mockStaff.slice(startIndex, startIndex + itemsPerPage);
+  const currentStaff = displayStaff.slice(startIndex, startIndex + itemsPerPage);
 
   const generatePaginationPages = () => {
     const pages = [];
@@ -131,15 +160,20 @@ function StaffManagement() {
     <main className="p-0 relative">
       <div className=" mx-auto">
         {/* Header */}
-        <Header title="Quản lý nhân viên" icon={Contact} />
+        <Header title="Quản lý nhóm" icon={Contact} />
 
         {/* Content */}
         <div className="p-6 space-y-6 ">
           {/* Search Section */}
           <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Tìm kiếm nhân viên
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Tìm kiếm nhân viên
+              </h2>
+              <div className="text-sm text-gray-600">
+                Phòng ban: <span className="font-semibold">{MANAGER_DEPARTMENT}</span>
+              </div>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-4 z-10">
               {/* Search Input */}
@@ -151,26 +185,6 @@ function StaffManagement() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 />
-              </div>
-
-              {/* Department Dropdown */}
-              <div className="relative w-full md:w-48">
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md bg-white cursor-pointer
-                focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
-                >
-                  <option value="">Chọn phòng ban</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.name}>
-                      {dept.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Mũi tên */}
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 pointer-events-none" />
               </div>
 
               {/* Position Dropdown */}
@@ -202,15 +216,9 @@ function StaffManagement() {
                   Danh sách nhân viên ({totalItems})
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Cập nhật danh sách sinh viên
+                  Danh sách nhân viên thuộc {MANAGER_DEPARTMENT}
                 </p>
               </div>
-              <button
-                onClick={() => setIsAddCardOpen(true)}
-                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Thêm nhân viên
-              </button>
             </div>
 
             {/* Staff Cards */}
@@ -218,8 +226,11 @@ function StaffManagement() {
               {currentStaff.map((staff) => (
                 <div
                   key={staff.employeeId}
-                  className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white"
-                  onClick={() => navigate(`/admin/employee-management/${staff.employeeId}`)}
+                  className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white cursor-pointer"
+                  onClick={() => {
+                    // Manager có thể xem chi tiết nhưng không chỉnh sửa
+                    navigate(`/manager/team-management/${staff.employeeId}`);
+                  }}
                 >
                   <div className="flex items-center justify-between gap-4">
                     {/* Avatar and Info */}
@@ -246,7 +257,7 @@ function StaffManagement() {
                         </div>
                       </div>
                     </div>
-                    {/* Status and Actions */}
+                    {/* Status */}
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -257,15 +268,6 @@ function StaffManagement() {
                       >
                         {staff.isActive ? "Hoạt động" : "Ngừng hoạt động"}
                       </span>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <Edit2 className="size-4 text-gray-600" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <Trash2 className="size-4 text-red-500" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <MoreVertical className="size-4 text-gray-600" />
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -323,17 +325,9 @@ function StaffManagement() {
           </div>
         </div>
       </div>
-      {/* Add Employee Card */}
-      {isAddCardOpen && (
-        <AddEmployeeCard
-          positions={positions}
-          departments={departments}
-          isOpen={isAddCardOpen}
-          onClose={() => setIsAddCardOpen(false)}
-        />
-      )}
     </main>
   );
 }
 
-export default StaffManagement;
+export default ManagerEmployeeList;
+
