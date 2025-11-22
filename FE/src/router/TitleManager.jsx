@@ -2,6 +2,7 @@ import { useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const navSimple = [
+  { title: "Empower HR", path: "" },
   { title: "Empower HR", path: "login" },
   { title: "Empower HR", path: "change-password" },
 
@@ -30,16 +31,26 @@ const navSimple = [
   { title: "Quản lý nhóm", path: "team-management" },
   { title: "Quản lý yêu cầu", path: "request-management" },
   { title: "Tặng điểm nhân viên", path: "give-rewards" },
-  { title: "404 Not Found", path: "" },
+  // { title: "404 Not Found", path: "" },
 ];
 
 export default function TitleManager() {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    document.title =
-      navSimple.find((item) => pathname.includes(item.path))?.title ||
-      "Empower HR";
+    const normalize = (p) => p.replace(/^\/+|\/+$/g, "");
+
+    const current = normalize(pathname);
+
+    const matched = navSimple.find((item) => {
+      const itemPath = normalize(item.path || "");
+
+      if (itemPath === "") return current === "";
+
+      return current === itemPath || current.startsWith(itemPath + "/");
+    });
+
+    document.title = matched?.title ?? "404 Not Found";
   }, [pathname]);
 
   return null;
