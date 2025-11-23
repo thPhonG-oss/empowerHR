@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @PrimaryKeyJoinColumn(name = "request_id")
 // Thêm @SuperBuilder
 @SuperBuilder
+@DiscriminatorValue("Leave")
 public class LeaveRequest extends Request {
 
     @Column(name = "start_date", nullable = false)
