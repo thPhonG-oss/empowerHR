@@ -1,388 +1,321 @@
 import { useState } from "react";
 
-function AddEmployeeCard({ isOpen, onClose, positions, departments }) {
+import InputField from "./InputField";
+import adminApi from "../../api/adminApi";
+
+const AddEmployeeCard = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
-    fullName: "",
-    dateOfBirth: "",
-    idCard: "",
-    email: "",
+    employeeName: "",
+    identityCard: "",
     address: "",
-    position: "",
-    department: "",
-    bank: "",
-    accountNumber: "",
-    taxId: "",
-    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    email: "",
+    phoneNumber: "",
+    taxCode: "",
+    positionId: "",
+    departmentId: "",
+    bankName: "",
+    bankBranch: "",
+    bankAccountNumber: "",
+    roles: [],
   });
 
-  const [errors, setErrors] = useState({});
+  const inputClasses =
+    "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500";
 
-  const handleInputChange = (e) => {
+  const btnPrimary =
+    "px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition";
+
+  const btnOutline =
+    "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition";
+
+  const departments = [
+    { id: 1, name: "Ban Giám Đốc" },
+    { id: 2, name: "Phòng Nhân Sự" },
+    { id: 3, name: "Phòng Kỹ Thuật" },
+    { id: 4, name: "Phòng Kinh Doanh" },
+    { id: 5, name: "Phòng Marketing" },
+    { id: 6, name: "Phòng Kế Toán" },
+    { id: 7, name: "Phòng Hành Chính" },
+  ];
+
+  const positions = [
+    { id: 1, name: "CEO" },
+    { id: 2, name: "CTO" },
+    { id: 3, name: "CFO" },
+    { id: 4, name: "HR Manager" },
+    { id: 5, name: "Department Manager" },
+    { id: 6, name: "Team Leader" },
+    { id: 7, name: "Senior Software Engineer" },
+    { id: 8, name: "Software Engineer" },
+    { id: 9, name: "Junior Software Engineer" },
+    { id: 10, name: "Senior Business Analyst" },
+    { id: 11, name: "Business Analyst" },
+    { id: 12, name: "Junior Business Analyst" },
+    { id: 13, name: "Senior QA Engineer" },
+    { id: 14, name: "QA Engineer" },
+    { id: 15, name: "Junior QA Engineer" },
+    { id: 16, name: "Senior Designer" },
+    { id: 17, name: "Designer" },
+    { id: 18, name: "Junior Designer" },
+    { id: 19, name: "DevOps Engineer" },
+    { id: 20, name: "Data Analyst" },
+    { id: 21, name: "Product Manager" },
+    { id: 22, name: "Project Manager" },
+    { id: 23, name: "Marketing Manager" },
+    { id: 24, name: "Sales Manager" },
+    { id: 25, name: "Accountant" },
+    { id: 26, name: "HR Specialist" },
+    { id: 27, name: "Receptionist" },
+    { id: 28, name: "Intern" },
+  ];
+
+  const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
+  };
+
+  const handleRoleToggle = (role) => {
+    setFormData((prev) => ({
+      ...prev,
+      roles: prev.roles.includes(role)
+        ? prev.roles.filter((r) => r !== role)
+        : [...prev.roles, role],
+    }));
+  };
+
+  const handleSubmit = async () => {
+    console.log("Form Data Submitted:", formData);
+
+    try {
+      const response = await adminApi.addUser(formData);
+      console.log("API Response:", response);
+
+      alert("Tạo nhân viên thành công!");
+      onClose(); // Đóng modal sau khi submit thành công
+    } catch (error) {
+      console.error("Lỗi khi tạo nhân viên:", error);
+      alert("Tạo nhân viên thất bại. Vui lòng thử lại!");
     }
   };
-
-  const validatePersonalTab = () => {
-    const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Họ và tên là bắt buộc";
-    if (!formData.dateOfBirth.trim())
-      newErrors.dateOfBirth = "Ngày sinh là bắt buộc";
-    if (!formData.idCard.trim()) newErrors.idCard = "CCCD là bắt buộc";
-    if (!formData.email.trim()) newErrors.email = "Email là bắt buộc";
-    if (!formData.taxId.trim()) newErrors.taxId = "Mã số thuế là bắt buộc";
-    if (!formData.phone.trim()) newErrors.phone = "SDT là bắt buộc";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateWorkTab = () => {
-    const newErrors = {};
-    if (!formData.bank.trim()) newErrors.bank = "Ngân hàng là bắt buộc";
-    if (!formData.accountNumber.trim())
-      newErrors.accountNumber = "Số tài khoản là bắt buộc";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleNext = () => {
-    if (validatePersonalTab()) {
-      setActiveTab("work");
-    }
-  };
-
-  const handleConfirm = () => {
-    console.log(1);
-    if (validateWorkTab()) {
-      console.log(2);
-      console.log("Form submitted:", formData);
-      onClose();
-      handleCancel();
-    }
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      fullName: "",
-      dateOfBirth: "",
-      idCard: "",
-      email: "",
-      address: "",
-      position: "",
-      department: "",
-      bank: "",
-      accountNumber: "",
-      taxId: "",
-      phone: "",
-    });
-    setErrors({});
-    setActiveTab("personal");
-    onClose();
-  };
-
-  if (!isOpen) return null;
 
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/20 bg-opacity-20 backdrop-blur-[1px] z-50"
-        onClick={() => onClose()}
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
+        onClick={onClose}
       />
 
-      <div className="fixed inset-0 flex items-start justify-center p-4 z-60">
-        <div className="w-full max-w-2xl bg-white rounded-2xl p-8 shadow-lg mt-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Tạo hộ số nhân viên
-            </h1>
-            <p className="text-gray-600 text-sm">
-              Điền đầy đủ thông tin nhân viên
-            </p>
-          </div>
+      <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 max-h-[90vh] overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Tạo Hồ Sơ Nhân Viên
+          </h2>
 
-          <div className="flex gap-2 mb-8">
+          <div className="flex gap-2 mb-6 border-b">
             <button
               onClick={() => setActiveTab("personal")}
-              className={`px-4 py-2 rounded border font-medium transition-colors ${
+              className={`px-4 py-2 font-medium border-b-2 transition ${
                 activeTab === "personal"
-                  ? "bg-gray-200 text-gray-900 border-gray-300 hover:cursor-not-allowed"
-                  : "bg-white text-gray-900 border-gray-300 hover:cursor-pointer hover:bg-gray-100"
+                  ? "border-green-600 text-green-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              Cá nhân
+              Thông tin cá nhân
             </button>
             <button
               onClick={() => setActiveTab("work")}
-              className={`px-4 py-2 rounded border font-medium transition-colors ${
+              className={`px-4 py-2 font-medium border-b-2 transition ${
                 activeTab === "work"
-                  ? "bg-gray-200 text-gray-900 border-gray-300 hover:cursor-not-allowed"
-                  : "bg-white text-gray-900 border-gray-300 hover:cursor-pointer hover:bg-gray-100"
+                  ? "border-green-600 text-green-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              Công việc, tài chính
+              Công việc & Tài chính
             </button>
           </div>
 
           {activeTab === "personal" && (
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Họ và tên <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.fullName ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.fullName && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.fullName}
-                    </p>
-                  )}
-                </div>
+            <div>
+              <div className="space-y-4 grid grid-cols-2 gap-4">
+                <InputField
+                  label="Họ và tên"
+                  name="employeeName"
+                  value={formData.employeeName}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="CMND/CCCD"
+                  name="identityCard"
+                  value={formData.identityCard}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  type="email"
+                />
+
+                <InputField
+                  label="Số điện thoại"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="Địa chỉ"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                />
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Ngày sinh <span className="text-red-500">*</span>
-                  </label>
+                  <label className="block text-gray-700 mb-1">Ngày sinh</label>
                   <input
                     type="date"
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.dateOfBirth ? "border-red-500" : "border-gray-300"
-                    }`}
+                    onChange={handleChange}
+                    className={inputClasses}
                   />
-                  {errors.dateOfBirth && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.dateOfBirth}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    CCCD <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="idCard"
-                    value={formData.idCard}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.idCard ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.idCard && (
-                    <p className="text-red-500 text-xs mt-1">{errors.idCard}</p>
-                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Mã số thuế <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="taxId"
-                    value={formData.taxId}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.taxId ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.taxId && (
-                    <p className="text-red-500 text-xs mt-1">{errors.taxId}</p>
-                  )}
+                  <label className="block text-gray-700 mb-1">Giới tính</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className={inputClasses}
+                  >
+                    <option value="">-- Chọn giới tính --</option>
+                    <option value="Male">Nam</option>
+                    <option value="Female">Nữ</option>
+                    <option value="Other">Khác</option>
+                  </select>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    SDT <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.phone ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.phone && (
-                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">
-                  Địa chỉ
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  onClick={handleCancel}
-                  className="px-6 py-2 border border-gray-300 rounded text-gray-900 font-medium hover:cursor-pointer hover:bg-gray-50 transition-colors"
-                >
+              <div className="flex justify-end gap-2 mt-6">
+                <button onClick={onClose} className={btnOutline}>
                   Hủy
                 </button>
                 <button
-                  onClick={handleNext}
-                  className="px-6 py-2 bg-green-600 text-white rounded font-medium hover:cursor-pointer hover:bg-green-700 transition-colors"
+                  onClick={() => setActiveTab("work")}
+                  className={btnPrimary}
                 >
-                  Tiếp theo
+                  Tiếp tục
                 </button>
               </div>
             </div>
           )}
 
           {activeTab === "work" && (
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="space-y-4  grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Chức vụ <span className="text-red-500">*</span>
-                  </label>
+                  <label className="block text-gray-700 mb-1">Phòng ban</label>
                   <select
-                    name="position"
-                    value={formData.position}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 "
+                    name="departmentId"
+                    value={formData.departmentId}
+                    onChange={handleChange}
+                    className={inputClasses}
                   >
-                    <option value="" disabled>
-                      Chọn chức vụ
-                    </option>
-                    {positions.map((pos) => (
-                      <option key={pos.id} value={pos.id}>
-                        {pos.name}
+                    <option value="">-- Chọn phòng ban --</option>
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Ngân hàng <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="bank"
-                    value={formData.bank}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.bank ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.bank && (
-                    <p className="text-red-500 text-xs mt-1">{errors.bank}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Phòng ban <span className="text-red-500">*</span>
-                  </label>
+                  <label className="block text-gray-700 mb-1">Chức vụ</label>
                   <select
-                    name="department"
-                    value={formData.position}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 "
+                    name="positionId"
+                    value={formData.positionId}
+                    onChange={handleChange}
+                    className={inputClasses}
                   >
-                    <option value="" disabled>
-                      Chọn phòng ban
-                    </option>
-                    {departments.map((dert) => (
-                      <option key={dert.id} value={dert.id}>
-                        {dert.name}
+                    <option value="">-- Chọn chức vụ --</option>
+                    {positions.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
+                <InputField
+                  label="Mã số thuế"
+                  name="taxCode"
+                  value={formData.taxCode}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="Tên ngân hàng"
+                  name="bankName"
+                  value={formData.bankName}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="Chi nhánh ngân hàng"
+                  name="bankBranch"
+                  value={formData.bankBranch}
+                  onChange={handleChange}
+                />
+
+                <InputField
+                  label="Số tài khoản ngân hàng"
+                  name="bankAccountNumber"
+                  value={formData.bankAccountNumber}
+                  onChange={handleChange}
+                />
+
                 <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">
-                    Số tài khoản <span className="text-red-500">*</span>
+                  <label className="block text-gray-700 mb-2">
+                    Roles (vai trò)
                   </label>
-                  <input
-                    type="text"
-                    name="accountNumber"
-                    value={formData.accountNumber}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                      errors.accountNumber
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
-                  />
-                  {errors.accountNumber && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.accountNumber}
-                    </p>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {roleOptions.map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => handleRoleToggle(role)}
+                        className={`px-4 py-2 border rounded-lg cursor-pointer font-medium transition ${
+                          formData.roles.includes(role)
+                            ? "bg-green-600 text-white border-green-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-green-600"
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex justify-end gap-4 mt-6">
                 <button
                   onClick={() => setActiveTab("personal")}
-                  className="px-6 py-2 border border-gray-300 rounded text-gray-900 font-medium hover:cursor-pointer hover:bg-gray-50 transition-colors"
+                  className={btnOutline}
                 >
                   Quay lại
                 </button>
-                <button
-                  onClick={handleConfirm}
-                  className="px-6 py-2 bg-green-600 text-white rounded font-medium hover:cursor-pointer hover:bg-green-700 transition-colors"
-                >
+                <button onClick={handleSubmit} className={btnPrimary}>
                   Xác nhận
                 </button>
               </div>
@@ -392,6 +325,6 @@ function AddEmployeeCard({ isOpen, onClose, positions, departments }) {
       </div>
     </>
   );
-}
+};
 
 export default AddEmployeeCard;

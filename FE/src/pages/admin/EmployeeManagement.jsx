@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -77,10 +79,29 @@ function StaffManagement() {
   const [employeeList, setEmployeeList] = useState([]);
 
   const itemsPerPage = 10;
-  const totalItems = employeeList.length;
+
+  const filteredEmployees = employeeList.filter((emp) => {
+    // Search by name, employeeCode, or email
+    const matchesSearch =
+      searchTerm === "" ||
+      emp.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.employeeCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Filter by department
+    const matchesDepartment =
+      department == "" || emp.departmentName == department;
+
+    // Filter by position
+    const matchesPosition = position === "" || emp.positionName == position;
+
+    return matchesSearch && matchesDepartment && matchesPosition;
+  });
+
+  const totalItems = filteredEmployees.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentStaff = employeeList.slice(
+  const currentStaff = filteredEmployees.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -131,6 +152,7 @@ function StaffManagement() {
         const res = await adminApi.getAllUsers();
 
         setEmployeeList(res.result);
+        console.log(res.result);
         localStorage.setItem("employeeList", JSON.stringify(res.result));
       } catch (err) {
         console.error("Lỗi khi load danh sách nhân viên:", err);
@@ -139,6 +161,10 @@ function StaffManagement() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, department, position]);
 
   return (
     <main className="p-0 relative">
