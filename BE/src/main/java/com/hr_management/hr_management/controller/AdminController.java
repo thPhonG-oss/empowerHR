@@ -84,4 +84,12 @@ public class AdminController {
                 .result(employeeService.getAll())
                 .build();
     }
+
+    //[Admin] Block employee account
+    @PatchMapping("/accounts/block/{employeeId}")
+    public ResponseEntity<ApiResponse<Object>> blockEmployeeAccount(@PathVariable Integer employeeId) {
+        accountService.blockAccountByEmployeeId(employeeId);
+        return ResponseEntity.ok()
+                .body(ApiResponse.builder().status(1000).message("Success").build());
+    }
 }
