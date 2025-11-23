@@ -6,9 +6,7 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role") || "");
-  const [userName, setUserName] = useState(
-    localStorage.getItem("userName") || ""
-  );
+
   // Login đúng cách
   // Login: lưu token + decode roles
   const login = (token) => {
@@ -17,12 +15,16 @@ export function AuthProvider({ children }) {
     setToken(token);
 
     try {
-      // jwt(token) là cách gọi với phiên bản mới
       const decoded = jwtDecode(token);
       console.log(decoded);
       const rolesFromToken = decoded.scope || [];
       const role = rolesFromToken.split(" ")[0];
-      console.log(role); // ROLE_ADMIN
+      console.log(role);
+      // Cắt bỏ ký tự ROLE_
+      const roleString = role.replace("ROLE_", "");
+
+      localStorage.setItem("role", roleString);
+      setRole(roleString);
     } catch (err) {
       console.error("Invalid token", err);
       setRole([]);
@@ -35,7 +37,6 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("role");
     setToken(null);
     setRole("");
-    setUserName("");
   };
 
   // Check login status
@@ -46,7 +47,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, role, userName, login, logout, isLoggedIn, hasRole }}
+      value={{ token, role, login, logout, isLoggedIn, hasRole }}
     >
       {children}
     </AuthContext.Provider>

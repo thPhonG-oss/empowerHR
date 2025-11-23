@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Contact,
@@ -15,30 +15,10 @@ import Header from "../../components/common/Header";
 
 import AddEmployeeCard from "../../components/admin/AddEmployeeCard";
 import ConfirmPopup from "../../components/common/ComfirmPopup";
+
+import adminApi from "../../api/adminApi";
+
 // =============== Mock dữ liệu ================
-const mockStaff = Array.from({ length: 300 }, (_, i) => {
-  const gender = i % 2 === 0 ? "Male" : "Female";
-  const isActive = i % 3 !== 0; // 2/3 active
-  return {
-    employeeId: i + 1,
-    employeeCode: `EMP${String(i + 1).padStart(3, "0")}`,
-    employeeName: `Nguyễn Văn ${
-      ["An", "Bình", "Cường", "Dũng", "Hùng"][i % 5]
-    }`,
-    identityCard: `00${Math.floor(100000000 + Math.random() * 900000000)}`,
-    address: `${100 + i} Nguyễn Huệ, Q1, TP.HCM`,
-    dateOfBirth: `198${i % 10}-0${(i % 9) + 1}-15`,
-    gender,
-    email: `nv${i + 1}@company.com`,
-    phoneNumber: `0901234${String(100 + i).slice(-3)}`,
-    startingDate: `2020-0${(i % 9) + 1}-15`,
-    isActive,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    taxCode: `TAX${String(i + 1).padStart(3, "0")}`,
-    pointBalance: Math.floor(Math.random() * 10000),
-  };
-});
 
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
@@ -94,9 +74,7 @@ function StaffManagement() {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
   // Thêm Staff vào danh sách cục bộ
-  const [employeeList, setEmployeeList] = useState(mockStaff);
-
-  localStorage.setItem("employeeList", JSON.stringify(mockStaff));
+  const [employeeList, setEmployeeList] = useState([]);
 
   const itemsPerPage = 10;
   const totalItems = employeeList.length;
@@ -145,6 +123,22 @@ function StaffManagement() {
     // Gọi API xóa ở đây
     setIsConfirmPopupOpen(false);
   };
+
+  // Load danh sách nhân viên từ API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await adminApi.getAllUsers();
+
+        setEmployeeList(res.result);
+        localStorage.setItem("employeeList", JSON.stringify(res.result));
+      } catch (err) {
+        console.error("Lỗi khi load danh sách nhân viên:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <main className="p-0 relative">

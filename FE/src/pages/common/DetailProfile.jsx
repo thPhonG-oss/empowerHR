@@ -5,53 +5,35 @@ import { AuthContext } from "../../context/AuthContext";
 import Header from "../../components/common/Header";
 import InfoField from "../../components/common/InfoField";
 import ContactField from "../../components/common/ContactField";
-
 import GoBackLink from "../../components/common/GoBackLink";
 
-// Mock data theo schema Employee
-const mockProfile = {
-  employee_id: 1,
-  employee_code: "22120042",
-  employee_name: "Đỗ Ngọc Cường",
-  identity_card: "079123456789",
-  address: "TP Hồ Chí Minh",
-  date_of_birth: "1995-05-15",
-  gender: "Nam",
-  email: "cuonghandsome@gmail.com",
-  phone_number: "0342339167",
-  starting_date: "2023-01-01",
-  is_active: true,
-  tax_code: "1234567890",
-  department_id: 1,
-  position_id: 1,
-  point_balance: 500,
-  // Thông tin bổ sung (có thể từ join với bảng khác)
-  department_name: "Phòng Nhân sự",
-  position_name: "Nhân viên",
-  bank_account: "1234567890",
-  bank_name: "Vietcombank",
-};
+import adminApi from "../../api/adminApi";
 
-function DetailProfile() {
+function DetailProfile({}) {
   const { role } = useContext(AuthContext);
   const { employeeId } = useParams();
   const safeRole = typeof role === "string" ? role.toUpperCase() : "";
 
   const [profile, setProfile] = useState(null);
 
-  const navigate = useNavigate();
+  // Nếu là admin  xem hồ sơ nhân viên khác
+  if (safeRole === "ADMIN") {
+    // Lấy thông tin nhân viên từ API theo employeeId từ params
+    useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const res = await adminApi.getUserById(employeeId);
+          console.log(res.data);
+          setProfile(res.data);
+        } catch (err) {
+          console.error("Lỗi khi load thông tin nhân viên:", err);
+        }
+      };
+      fetchProfile();
+    }, [employeeId]);
+  }
 
-  // Lấy thông tin profile từ LocalStorage
-  useEffect(() => {
-    const storedProfiles = localStorage.getItem("employeeList");
-    if (storedProfiles) {
-      const profiles = JSON.parse(storedProfiles);
-      const foundProfile = profiles.find(
-        (p) => String(p.employeeId) === String(employeeId)
-      );
-      setProfile(foundProfile || null);
-    }
-  }, [employeeId]);
+  // Nếu là Employee xem hồ sơ nhân viên của mình
 
   // Manager có thể chỉnh sửa profile của chính mình (khi không có employeeId)
   // Manager không thể chỉnh sửa profile của nhân viên khác (khi có employeeId)
@@ -81,17 +63,12 @@ function DetailProfile() {
     });
   };
 
-  // TODO: Fetch profile data by employeeId
-  // useEffect(() => {
-  //   axiosClient.get(`/employees/${employeeId}`).then(setProfile);
-  // }, [employeeId]);
-
   // Xác định tiêu đề dựa trên role
   const pageTitle =
     safeRole === "ADMIN"
-      ? `Hồ sơ của ${mockProfile.employee_code}`
+      ? `Hồ sơ của ${profile?.employeeCode}`
       : safeRole === "MANAGER" && employeeId
-      ? `Hồ sơ của ${mockProfile.employee_code}`
+      ? `Hồ sơ của ${profile?.employeeCode}`
       : "Hồ sơ của tôi";
 
   return (
@@ -127,33 +104,33 @@ function DetailProfile() {
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <InfoField
-                  label="Họ và tên"
-                  value={mockProfile.employee_name}
-                />
-                <InfoField
-                  label="Mã nhân viên"
-                  value={mockProfile.employee_code}
-                />
+                <InfoField label="Họ và tên" value={profile?.employeeName} />
+                <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField
                   label="Tên phòng ban"
-                  value={mockProfile.department_name}
+                  // value={profile?.department_name}
                 />
-                <InfoField label="Vị trí" value={mockProfile.position_name} />
+                <InfoField
+                  label="Vị trí"
+                  // value={profile?.position_name}
+                />
                 <InfoField
                   label="Tài khoản ngân hàng"
-                  value={`${mockProfile.bank_account} - ${mockProfile.bank_name}`}
+                  // value={`${profile?.bank_account} - ${profile?.bank_name}`}
                 />
                 <InfoField
                   label="Ngày vào làm"
-                  value={formatDate(mockProfile.starting_date)}
+                  value={formatDate(profile?.startingDate)}
                 />
-                <InfoField label="CCCD" value={mockProfile.identity_card} />
+                <InfoField label="CCCD" value={profile?.identityCard} />
                 <InfoField
                   label="Ngày sinh"
-                  value={formatDate(mockProfile.date_of_birth)}
+                  value={formatDate(profile?.dateOfBirth)}
                 />
-                <InfoField label="Giới tính" value={mockProfile.gender} />
+                <InfoField
+                  label="Giới tính"
+                  value={profile?.gender == "Male" ? "Nam" : "Nữ"}
+                />
               </div>
             </div>
             {/* Card 2: Thông tin liên hệ - Có thể sửa */}
@@ -169,17 +146,17 @@ function DetailProfile() {
                 <ContactField
                   icon={MapPin}
                   label="Địa chỉ"
-                  value={mockProfile.address}
+                  value={profile?.address}
                 />
                 <ContactField
                   icon={Mail}
                   label="Email"
-                  value={mockProfile.email}
+                  value={profile?.email}
                 />
                 <ContactField
                   icon={Phone}
                   label="Số điện thoại"
-                  value={mockProfile.phone_number}
+                  value={profile?.phoneNumber}
                 />
               </div>
             </div>
