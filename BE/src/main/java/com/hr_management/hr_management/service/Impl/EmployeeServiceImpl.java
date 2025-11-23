@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     AccountRepository accountRepository;
     RoleRepository roleRepository;
 //    AccountRepository accountRepository;
+    PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -229,7 +231,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Account newAccount = Account.builder()
                 .username(employeeCode)
-                .password(employeeCode)
+                .password(passwordEncoder.encode(employeeCode))
                 .roles(roles)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
