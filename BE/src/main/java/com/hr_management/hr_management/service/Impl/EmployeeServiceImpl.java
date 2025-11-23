@@ -1,6 +1,5 @@
 package com.hr_management.hr_management.service.Impl;
 
-import com.hr_management.hr_management.controller.EmployeeController;
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -149,7 +147,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setPosition(existingPosition);
 
 
-        return employeeMapper.ToEmployeeProfileCreationRequestDTO(employeeRepository.save(existingEmployee));
+        return employeeMapper.toEmployeeCreationResponseDTO(employeeRepository.save(existingEmployee));
     }
 
     @Transactional
@@ -241,7 +239,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Account savedAccount = accountRepository.save(newAccount);
         savedEmployee.setAccount(savedAccount);
 
-        return employeeMapper.ToEmployeeProfileCreationRequestDTO(employeeRepository.save(savedEmployee));
+        return employeeMapper.toEmployeeCreationResponseDTO(employeeRepository.save(savedEmployee));
     }
 
 
@@ -260,5 +258,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         return GetAllEmployeeDepartmentResponse.builder()
                 .allEmployee(employees.stream().map(employeeMapper::toEmployeeResponse).toList())
                 .build();
+    }
+
+    // update thêm function lấy tất cả thông tin của employee (bao gồm cả thông tin bank, account, department, position)
+    @Override
+    public EmployeeCreationResponseDTO getFullEmployeeInfo(Integer employeeId){
+        Employee existingEmployee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        return employeeMapper.toEmployeeCreationResponseDTO(existingEmployee);
     }
 }
