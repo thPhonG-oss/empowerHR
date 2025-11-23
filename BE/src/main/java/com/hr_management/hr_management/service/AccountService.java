@@ -11,5 +11,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 public interface AccountService {
     ChangePasswordResponse changePassword (ChangePasswordRequest request, JwtAuthenticationToken jwtAuthenticationToken);
     ConfirmAccountResponse confirmAccount(ConfimAccountRequest request);
+
+    void blockAccountByEmployeeId(Integer employeeId);
 //    AccountResponseDTO createNewAccount(AccountCreationRequestDTO accountCreationRequestDTO);
 }

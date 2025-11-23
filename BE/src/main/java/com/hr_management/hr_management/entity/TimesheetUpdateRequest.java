@@ -1,9 +1,6 @@
 package com.hr_management.hr_management.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +18,7 @@ import java.time.LocalTime;
 @PrimaryKeyJoinColumn(name = "request_id")
 // Thêm @SuperBuilder
 @SuperBuilder
+@DiscriminatorValue("TimesheetUpdate")
 public class TimesheetUpdateRequest extends Request {
 
     @Column(name = "attendance_date", nullable = false)

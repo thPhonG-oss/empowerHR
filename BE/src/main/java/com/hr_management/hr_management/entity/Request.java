@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 //@Builder
 // update: xóa @Builder, thêm @SuperBuilder => sử dụng builder cho cả class cha và class con
 @SuperBuilder
+@DiscriminatorColumn(name = "request_type", discriminatorType = DiscriminatorType.STRING)
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +36,6 @@ public class Request {
 
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "request_type", nullable = false)
-    private RequestType requestType;
 
     @Column(name = "handle_at")
     private LocalDateTime handleAt;
