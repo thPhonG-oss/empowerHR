@@ -23,8 +23,9 @@ function DetailProfile({}) {
       const fetchProfile = async () => {
         try {
           const res = await adminApi.getUserById(employeeId);
-          console.log(res.data);
+          // Lưu nhân viên vào session
           setProfile(res.data);
+          sessionStorage.setItem("profile", JSON.stringify(res.data));
         } catch (err) {
           console.error("Lỗi khi load thông tin nhân viên:", err);
         }
@@ -108,15 +109,15 @@ function DetailProfile({}) {
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField
                   label="Tên phòng ban"
-                  // value={profile?.department_name}
+                  value={profile?.department.departmentName}
                 />
                 <InfoField
                   label="Vị trí"
-                  // value={profile?.position_name}
+                  value={profile?.position.positionName}
                 />
                 <InfoField
                   label="Tài khoản ngân hàng"
-                  // value={`${profile?.bank_account} - ${profile?.bank_name}`}
+                  value={`${profile?.bank.bankAccountNumber} - ${profile?.bank.bankName}`}
                 />
                 <InfoField
                   label="Ngày vào làm"

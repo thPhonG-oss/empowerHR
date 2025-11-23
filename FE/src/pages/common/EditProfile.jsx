@@ -1,13 +1,15 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Mail, MapPin, PenLine, Phone, Contact } from "lucide-react";
+import { Contact, RefreshCcw } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import Header from "../../components/common/Header";
 import FormField from "../../components/common/FormField";
 import ContactFormField from "../../components/common/ContactFormField";
-
 import GoBackLink from "../../components/common/GoBackLink";
-// Mock data cho dropdowns
+
+import adminApi from "../../api/adminApi";
+
+// Mock dropdowns
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
   { id: 2, name: "Phòng Nhân Sự" },
@@ -68,42 +70,36 @@ const banks = [
   "MSB",
 ];
 
-// Mock data theo schema Employee
-const initialProfile = {
-  employee_id: 1,
-  employee_code: "22120042",
-  employee_name: "Đỗ Ngọc Cường",
-  identity_card: "079123456789",
-  address: "TP Hồ Chí Minh",
-  date_of_birth: "1995-05-15",
-  gender: "Nam",
-  email: "cuonghandsome@gmail.com",
-  phone_number: "0342339167",
-  starting_date: "2023-01-01",
-  is_active: true,
-  tax_code: "1234567890",
-  department_id: 2,
-  position_id: 29,
-  point_balance: 500,
-  // Thông tin bổ sung
-  department_name: "Phòng Nhân Sự",
-  position_name: "Nhân viên",
-  bank_account: "1234567890",
-  bank_name: "Vietcombank",
-};
-
 function EditProfile() {
   const { role } = useContext(AuthContext);
   const { employeeId } = useParams();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState(null);
+  const [saving, setSaving] = useState(false);
+
   const safeRole = typeof role === "string" ? role.toUpperCase() : "";
   const isAdmin = safeRole === "ADMIN";
   const isManager = safeRole === "MANAGER";
-  const navigate = useNavigate();
 
-  const [formData, setFormData] = useState(initialProfile);
-  const [saving, setSaving] = useState(false);
+  // Load initial profile
+  useEffect(() => {
+    const stored = JSON.parse(sessionStorage.getItem("profile"));
+    console.log(stored);
+    if (stored) {
+      setFormData({
+        ...stored,
+        departmentId: stored.department?.departmentId,
+        departmentName: stored.department?.departmentName,
+        positionId: stored.position?.positionId,
+        positionName: stored.position?.positionName,
+        bankName: stored.bank?.bankName ?? "",
+        bankAccountNumber: stored.bank?.bankAccountNumber ?? "",
+      });
+    }
+  }, []);
 
-  // Xác định path quay lại
+  // Back path
   const backPath =
     safeRole === "ADMIN"
       ? `/admin/employee-management/${employeeId}`
@@ -111,67 +107,104 @@ function EditProfile() {
       ? "/manager/profile"
       : "/employee/profile";
 
-  // Employee và Manager chỉ sửa được: address, email, phone_number
-  // Admin sửa được tất cả (trừ employee_id, employee_code, starting_date, is_active, create_at, update_at)
+  // Permission logic
+  const adminLocked = [
+    "employeeId",
+    "employeeCode",
+    "startingDate",
+    "createAt",
+    "updateAt",
+    "isActive",
+  ];
+
+  const employeeEditable = ["address", "email", "phoneNumber"];
+
   const canEditField = (field) => {
-    if (isAdmin) {
-      // Admin không sửa được các field hệ thống
-      const systemFields = [
-        "employee_id",
-        "employee_code",
-        "starting_date",
-        "is_active",
-        "create_at",
-        "update_at",
-      ];
-      return !systemFields.includes(field);
-    } else {
-      // Employee và Manager chỉ sửa được thông tin liên hệ
-      return ["address", "email", "phone_number"].includes(field);
-    }
+    if (isAdmin) return !adminLocked.includes(field);
+    if (isManager) return ["phoneNumber", "address"].includes(field);
+    return employeeEditable.includes(field);
   };
 
-  const handleChange = (field, value) => {
+  const handleChange = (key, value) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [key]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+
     try {
-      // TODO: Gọi API để lưu thay đổi
-      // await axiosClient.put(`/employees/${employeeId || formData.employee_id}`, formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Payload gửi lên:", formData);
+      const genderMap = {
+        Nam: "MALE",
+        Nữ: "FEMALE",
+        Khác: "OTHER",
+      };
+
+      const payload = {
+        employeeName: formData.employeeName,
+        identityCard: formData.identityCard,
+        address: formData.address,
+        dateOfBirth: formData.dateOfBirth,
+        gender: genderMap[formData.gender], // Map Vietnamese to English
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        isActive: formData.isActive,
+        taxCode: formData.taxCode,
+
+        positionId: formData.positionId ?? 0,
+        departmentId: formData.departmentId ?? 0,
+
+        bankName: formData.bankName ?? "",
+        bankBranch: formData.bankBranch ?? "", // Added missing field
+        bankAccountNumber: formData.bankAccountNumber ?? "",
+
+        roles: formData.account?.roles?.map((r) => r.name) ?? ["EMPLOYEE"],
+      };
+
+      console.log("Payload gửi:", JSON.stringify(payload, null, 2));
+
+      const res = await adminApi.updateUserById(employeeId, payload);
+      console.log("Update response:", res.data);
+
       navigate(backPath);
-    } catch (error) {
-      console.error("Lỗi khi lưu:", error);
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleCancel = () => {
-    navigate(backPath);
+  const handleResetForm = () => {
+    const stored = JSON.parse(sessionStorage.getItem("profile"));
+    if (stored) {
+      setFormData({
+        ...stored,
+        departmentId: stored.department?.departmentId,
+        departmentName: stored.department?.departmentName,
+        positionId: stored.position?.positionId,
+        positionName: stored.position?.positionName,
+        bankName: stored.bank?.bankName ?? "",
+        bankAccountNumber: stored.bank?.bankAccountNumber ?? "",
+      });
+    }
   };
 
-  // Format date cho input type="date"
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return "";
-    return dateString.split("T")[0];
-  };
+  const formatDateForInput = (date) => (date ? date.split("T")[0] : "");
+
+  if (!formData) return <div className="p-8">Đang tải...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
-        {/* Header */}
         <Header title={"Quản lý nhân viên"} icon={Contact} />
+
         <div className="px-8">
-          <GoBackLink />
-          <div className="flex items-center justify-center mb-4">
+          <GoBackLink destination={backPath} />
+
+          <div className="flex justify-center mb-4">
             <h1 className="text-2xl font-bold text-gray-900">
               Chỉnh sửa hồ sơ
             </h1>
@@ -179,147 +212,159 @@ function EditProfile() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              {/* Card 1: Thông tin cơ bản */}
+              {/* BASIC INFO */}
               <div className="rounded-lg bg-white p-6 shadow-sm">
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Thông tin cơ bản
-                  </h2>
-                </div>
+                <h2 className="text-lg font-semibold mb-4">Thông tin cơ bản</h2>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     label="Họ và tên"
-                    value={formData.employee_name}
-                    onChange={(value) => handleChange("employee_name", value)}
-                    disabled={!canEditField("employee_name")}
+                    value={formData.employeeName}
+                    disabled={!canEditField("employeeName")}
+                    onChange={(v) => handleChange("employeeName", v)}
                   />
+
                   <FormField
                     label="Mã nhân viên"
-                    value={formData.employee_code}
+                    value={formData.employeeCode}
                     disabled={true}
                   />
+
                   <FormField
                     label="Tên phòng ban"
-                    value={formData.department_name}
-                    onChange={(value) => {
-                      handleChange("department_name", value);
-                      // Cập nhật department_id nếu cần
-                      const dept = departments.find((d) => d.name === value);
-                      if (dept) {
-                        handleChange("department_id", dept.id);
-                      }
-                    }}
-                    disabled={!canEditField("department_name")}
+                    value={formData.departmentName}
                     type="select"
                     options={departments.map((d) => d.name)}
+                    disabled={!canEditField("departmentId")}
+                    onChange={(v) => {
+                      const dept = departments.find((d) => d.name === v);
+                      handleChange("departmentName", v);
+                      handleChange("departmentId", dept?.id);
+                    }}
                   />
+
                   <FormField
                     label="Vị trí"
-                    value={formData.position_name}
-                    onChange={(value) => {
-                      handleChange("position_name", value);
-                      // Cập nhật position_id nếu cần
-                      const pos = positions.find((p) => p.name === value);
-                      if (pos) {
-                        handleChange("position_id", pos.id);
-                      }
-                    }}
-                    disabled={!canEditField("position_name")}
+                    value={formData.positionName}
                     type="select"
                     options={positions.map((p) => p.name)}
+                    disabled={!canEditField("positionId")}
+                    onChange={(v) => {
+                      const pos = positions.find((p) => p.name === v);
+                      handleChange("positionName", v);
+                      handleChange("positionId", pos?.id);
+                    }}
                   />
+
                   <FormField
                     label="Số tài khoản"
-                    value={formData.bank_account}
-                    onChange={(value) => handleChange("bank_account", value)}
-                    disabled={!canEditField("bank_account")}
+                    value={formData.bankAccountNumber}
+                    disabled={!canEditField("bankAccountNumber")}
+                    onChange={(v) => handleChange("bankAccountNumber", v)}
+                    onlyNumber={true}
                   />
+
                   <FormField
                     label="Tên ngân hàng"
-                    value={formData.bank_name}
-                    onChange={(value) => handleChange("bank_name", value)}
-                    disabled={!canEditField("bank_name")}
+                    value={formData.bankName}
                     type="select"
                     options={banks}
+                    disabled={!canEditField("bankName")}
+                    onChange={(v) => handleChange("bankName", v)}
                   />
+
                   <FormField
                     label="Ngày vào làm"
                     type="date"
-                    value={formatDateForInput(formData.starting_date)}
+                    value={formatDateForInput(formData.startingDate)}
                     disabled={true}
                   />
+
                   <FormField
                     label="CCCD"
-                    value={formData.identity_card}
-                    onChange={(value) => handleChange("identity_card", value)}
-                    disabled={!canEditField("identity_card")}
+                    value={formData.identityCard}
+                    disabled={!canEditField("identityCard")}
+                    onChange={(v) => handleChange("identityCard", v)}
+                    onlyNumber={true}
                   />
+
                   <FormField
                     label="Ngày sinh"
                     type="date"
-                    value={formatDateForInput(formData.date_of_birth)}
-                    onChange={(value) => handleChange("date_of_birth", value)}
-                    disabled={!canEditField("date_of_birth")}
+                    value={formatDateForInput(formData.dateOfBirth)}
+                    disabled={!canEditField("dateOfBirth")}
+                    onChange={(v) => handleChange("dateOfBirth", v)}
                   />
+
                   <FormField
                     label="Giới tính"
                     value={formData.gender}
-                    onChange={(value) => handleChange("gender", value)}
-                    disabled={!canEditField("gender")}
                     type="select"
                     options={["Nam", "Nữ", "Khác"]}
+                    disabled={!canEditField("gender")}
+                    onChange={(v) => handleChange("gender", v)}
                   />
                 </div>
               </div>
 
-              {/* Card 2: Thông tin liên hệ */}
+              {/* CONTACT INFO */}
               <div className="rounded-lg bg-white p-6 shadow-sm">
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Thông tin liên hệ
-                    </h2>
-                  </div>
-                </div>
+                <h2 className="text-lg font-semibold mb-4">
+                  Thông tin liên hệ
+                </h2>
+
                 <div className="space-y-4">
                   <ContactFormField
                     label="Địa chỉ"
                     value={formData.address}
-                    onChange={(value) => handleChange("address", value)}
                     disabled={!canEditField("address")}
+                    onChange={(v) => handleChange("address", v)}
                   />
+
                   <ContactFormField
                     label="Email"
                     type="email"
                     value={formData.email}
-                    onChange={(value) => handleChange("email", value)}
                     disabled={!canEditField("email")}
+                    onChange={(v) => handleChange("email", v)}
                   />
+
                   <ContactFormField
                     label="Số điện thoại"
-                    value={formData.phone_number}
-                    onChange={(value) => handleChange("phone_number", value)}
-                    disabled={!canEditField("phone_number")}
+                    value={formData.phoneNumber}
+                    disabled={!canEditField("phoneNumber")}
+                    onChange={(v) => handleChange("phoneNumber", v)}
+                    onlyNumber={true}
                   />
                 </div>
               </div>
             </div>
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-between">
               <button
                 type="button"
-                onClick={handleCancel}
-                className="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                onClick={() => handleResetForm()}
+                className="rounded-md border  px-6 py-2 text-sm flex gap-2 hover:bg-gray-200 duration-200 cursor-pointer"
               >
-                Hủy
+                <RefreshCcw size={20} />
+                <span>Thiết lập lại</span>
               </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-md bg-black px-6 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
-              >
-                {saving ? "Đang lưu..." : "Lưu"}
-              </button>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate(backPath)}
+                  className="rounded-md border  px-6 py-2 text-sm hover:bg-gray-200 duration-200 cursor-pointer"
+                >
+                  Hủy
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-md bg-black px-6 py-2 text-sm text-white disabled:opacity-50 hover:bg-black/80 duration-200 cursor-pointer"
+                >
+                  {saving ? "Đang lưu..." : "Lưu"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
