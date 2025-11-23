@@ -70,7 +70,7 @@ public class Employee {
 
 //    @OneToOne(fetch = FetchType.LAZY)
     // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "account_id", unique = true)
     private Account account;
 
@@ -95,7 +95,6 @@ public class Employee {
     //Update thêm Request
     @OneToMany(
             mappedBy = "employee",
-            cascade = {CascadeType.PERSIST,CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<Request> requests = new ArrayList<>();
@@ -103,7 +102,6 @@ public class Employee {
     // Update thêm Attendence, đặt orphanRemove=true => khi xóa employee, các attendence liên quan cũng sẽ được xóa
     @OneToMany(
             mappedBy = "employee",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<Attendance> attendances = new ArrayList<>();
@@ -111,7 +109,6 @@ public class Employee {
     // Thêm LeaveBalance
     @OneToMany(
             mappedBy = "employee",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<LeaveBalance> leaveBalances = new ArrayList<>();
