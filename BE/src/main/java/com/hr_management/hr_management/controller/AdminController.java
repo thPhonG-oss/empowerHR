@@ -8,6 +8,7 @@ import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.service.AccountService;
 import com.hr_management.hr_management.service.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,7 +40,7 @@ public class AdminController {
     }
 
     @PutMapping("/employees/{employeeId}")
-    public ResponseEntity<ApiResponse<Object>> updateEmployee(@PathVariable Integer employeeId, @RequestBody EmployeeUpdateRequestDTO request) {
+    public ResponseEntity<ApiResponse<Object>> updateEmployee(@PathVariable Integer employeeId, @RequestBody @Valid EmployeeUpdateRequestDTO request) {
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .status(1000)
@@ -62,7 +63,7 @@ public class AdminController {
 //    }
 
     @PostMapping("/employees")
-    public ResponseEntity<ApiResponse<Object>> createNewEmployeeProfile(@RequestBody EmployeeProfileCreationRequestDTO request) {
+    public ResponseEntity<ApiResponse<Object>> createNewEmployeeProfile(@RequestBody @Valid EmployeeProfileCreationRequestDTO request) {
         return new ResponseEntity<>(
                 ApiResponse.builder()
                         .status(1000)
