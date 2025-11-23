@@ -19,4 +19,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     List<Employee> findAllByDepartment_DepartmentId(Long departmentId);
     Employee findAllByAccount_AccountId(Integer accountId);
 
+    boolean findEmployeeByEmail(String email);
+
+
+    boolean existsByIdentityCardAndEmployeeIdNot(String identityCard, Integer employeeId);
+
+    boolean existsByEmailAndEmployeeIdNot(String email, Integer employeeId);
 }
