@@ -2,10 +2,13 @@ package com.hr_management.hr_management.service;
 
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.entity.Role;
 import com.hr_management.hr_management.repository.EmployeeRepository;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
+import java.util.Set;
+
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
@@ -42,4 +45,6 @@ public interface EmployeeService {
 
     // update thêm function lấy tất cả thông tin của employee (bao gồm cả thông tin bank, account, department, position)
     EmployeeCreationResponseDTO getFullEmployeeInfo(Integer employeeId);
+
+    Set<Role> transformRole(Set<String> roleNames);
 }

@@ -199,20 +199,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                     Set<String> roleNames = employeeUpdateRequestDTO.getRoles();
                     if (roleNames != null && !roleNames.isEmpty()) {
-
-                        log.info("Roles: {}", roleNames);
-
-                        for (String roleName : roleNames) {
-                            log.info("Role: {}", roleName);
-                            if (!roleRepository.existsByName(roleName)) {
-                                throw new AppException(ErrorCode.ROLE_NOT_FOUND);
-                            } else {
-                                roles = roleNames.stream().map((role) -> {
-                                    return roleRepository.findByName(role)
-                                            .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-                                }).collect(Collectors.toSet());
-                            }
-                        }
+                        roles = transformRole(roleNames);
                     }
                     acct.setRoles(roles);
                     acct.setUpdatedAt(LocalDateTime.now());
@@ -287,20 +274,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Set<String> roleNames = request.getRoles();
         if (roleNames != null && !roleNames.isEmpty()) {
-
-            log.info("Roles: {}", roleNames);
-
-            for (String roleName : roleNames) {
-                log.info("Role: {}", roleName);
-                if (!roleRepository.existsByName(roleName)) {
-                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
-                } else {
-                    roles = roleNames.stream().map((role) -> {
-                        return roleRepository.findByName(role)
-                                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-                    }).collect(Collectors.toSet());
-                }
-            }
+            roles = transformRole(roleNames);
         }
 
         Account newAccount = Account.builder()
@@ -343,5 +317,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         return employeeMapper.toEmployeeCreationResponseDTO(existingEmployee);
+    }
+
+    @Override
+    public Set<Role> transformRole(Set<String> roleNames){
+        Set<Role> roles = new HashSet<>();
+        for(String roleName:roleNames){
+            log.info("Role: {}", roleName);
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            roles.add(role);
+        }
+        return roles;
     }
 }
