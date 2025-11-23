@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,6 +19,8 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "request_id")
+// Thêm @SuperBuilder
+@SuperBuilder
 public class TimesheetUpdateRequest extends Request {
 
     @Column(name = "attendance_date", nullable = false)

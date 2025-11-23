@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Employee")
@@ -66,19 +68,51 @@ public class Employee {
     @Column(name = "point_balance", precision = 10, scale = 2)
     private Long pointBalance;
 
-    @OneToOne(fetch = FetchType.LAZY)
+//    @OneToOne(fetch = FetchType.LAZY)
+    // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", unique = true)
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @ManyToOne
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+// Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
+    @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update: thành OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "bank_id")
     private Bank bank;
+
+    //Update thêm Request
+    @OneToMany(
+            mappedBy = "employee",
+            cascade = {CascadeType.PERSIST,CascadeType.MERGE},
+            orphanRemoval = true
+    )
+    private List<Request> requests = new ArrayList<>();
+
+    // Update thêm Attendence, đặt orphanRemove=true => khi xóa employee, các attendence liên quan cũng sẽ được xóa
+    @OneToMany(
+            mappedBy = "employee",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true
+    )
+    private List<Attendance> attendances = new ArrayList<>();
+
+    // Thêm LeaveBalance
+    @OneToMany(
+            mappedBy = "employee",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true
+    )
+    private List<LeaveBalance> leaveBalances = new ArrayList<>();
 }

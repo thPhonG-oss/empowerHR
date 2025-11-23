@@ -35,11 +35,15 @@ public class LeaveBalance {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    //Update: Giữ fetch type mặc định
+    @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    // Update: giữa fetch type mặc định
+    @ManyToOne
     @JoinColumn(name = "leave_type_id", nullable = false)
     private LeaveType leaveType;
 }

@@ -35,7 +35,16 @@ public class Account {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToMany
+    @Column(name = "account_status")
+    private boolean accountStatus;
+
+
+//    @ManyToMany
+    // Update: thêm fetch type, cascasdetype
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
     @JoinTable(
             name = "Account_Role",
             joinColumns = @JoinColumn(name = "account_id"),

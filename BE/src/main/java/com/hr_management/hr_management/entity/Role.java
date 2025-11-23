@@ -23,7 +23,12 @@ public class Role {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    @ManyToMany
+//    @ManyToMany
+    // Udpate: thêm fetch type, cascade
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
     @JoinTable(
             name = "Role_Permission",
             joinColumns = @JoinColumn(name = "role_id"),
