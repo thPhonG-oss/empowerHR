@@ -46,7 +46,7 @@ public interface EmployeeMapper {
 
     Employee MapEmployeeCreationRequestDTOToEmployee(EmployeeProfileCreationRequestDTO employeeProfileCreationRequestDTO);
 
-    EmployeeCreationResponseDTO ToEmployeeProfileCreationRequestDTO(Employee employee);
+    EmployeeCreationResponseDTO toEmployeeCreationResponseDTO(Employee employee);
     AllEmployeeResponse toEmployeeResponse(Employee employee);
     DepartmentResponse toDepartmentDTO(Department department);
     PositionResponse toPositionDTO(Position position);

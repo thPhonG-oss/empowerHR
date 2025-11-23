@@ -33,7 +33,7 @@ public class AdminController {
                 ApiResponse.builder()
                         .status(1000)
                         .message("Success")
-                        .data(employeeService.getEmployeeById(employeeId))
+                        .data(employeeService.getFullEmployeeInfo(employeeId))
                         .build()
         );
     }

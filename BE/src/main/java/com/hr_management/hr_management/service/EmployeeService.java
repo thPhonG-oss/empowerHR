@@ -39,4 +39,7 @@ public interface EmployeeService {
 
     String generateEmployeeCode(Integer employeeId);
     GetAllEmployeeDepartmentResponse getAllEmployeeDepartment(GetAllEmployeeDepartmentRequest request, JwtAuthenticationToken jwtAuthenticationToken);
+
+    // update thêm function lấy tất cả thông tin của employee (bao gồm cả thông tin bank, account, department, position)
+    EmployeeCreationResponseDTO getFullEmployeeInfo(Integer employeeId);
 }
