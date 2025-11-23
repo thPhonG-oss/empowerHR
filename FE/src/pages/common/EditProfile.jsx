@@ -137,30 +137,20 @@ function EditProfile() {
     setSaving(true);
 
     try {
-      const genderMap = {
-        Nam: "MALE",
-        Nữ: "FEMALE",
-        Khác: "OTHER",
-      };
-
       const payload = {
-        employeeName: formData.employeeName,
-        identityCard: formData.identityCard,
-        address: formData.address,
-        dateOfBirth: formData.dateOfBirth,
-        gender: genderMap[formData.gender], // Map Vietnamese to English
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        isActive: formData.isActive,
-        taxCode: formData.taxCode,
-
+        employeeName: formData.employeeName ?? "",
+        identityCard: formData.identityCard ?? "",
+        address: formData.address ?? "",
+        dateOfBirth: formData.dateOfBirth ?? "",
+        gender: formData.gender, // Male/Female/Other
+        email: formData.email ?? "",
+        phoneNumber: formData.phoneNumber ?? "",
+        taxCode: formData.taxCode ?? "",
         positionId: formData.positionId ?? 0,
         departmentId: formData.departmentId ?? 0,
-
         bankName: formData.bankName ?? "",
-        bankBranch: formData.bankBranch ?? "", // Added missing field
+        bankBranch: formData.bankBranch ?? "",
         bankAccountNumber: formData.bankAccountNumber ?? "",
-
         roles: formData.account?.roles?.map((r) => r.name) ?? ["EMPLOYEE"],
       };
 
