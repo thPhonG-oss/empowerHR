@@ -4,13 +4,6 @@ import authApi from "../../api/authApi";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 
-// Mock tài khoản user role đăng nhập
-const mockUsers = [
-  { userName: "employee", password: "123", roles: ["EMPLOYEE"] },
-  { userName: "admin", password: "123", roles: ["ADMIN"] },
-  { userName: "manager", password: "123", roles: ["MANAGER"] },
-];
-
 function Login() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -27,31 +20,16 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // // Tạm thời chưa có API
-      // const res = await authApi.login({ userName, password });
-      // const token = res.data.result.token;
+      const res = await authApi.login({ userName, password });
+      const token = res.result.acessToken;
 
-      // // Lưu token + roles vào context
-      // login(token);
+      // Lưu token + roles vào context
+      login(token);
+      // Lấy role từ token
+      const role = localStorage.getItem("role");
 
-      // Mock login
-      const user = mockUsers.find(
-        (user) => user.userName === userName && user.password === password
-      );
-      if (user) {
-        const fakeToken = "fake_token_123"; // có thể dùng uuid hoặc random string
-        const fakeUserName = "Trương Việt Công";
-
-        login(fakeToken, user.roles[0], fakeUserName);
-
-        const roleString = user.roles[0].toLowerCase();
-
-        console.log(localStorage.getItem("token"));
-
-        navigate(`/${roleString}/dashboard`);
-      } else {
-        setWrongInput(true);
-      }
+      localStorage.setItem("userName", userName);
+      navigate(`/${role}/dashboard`);
 
       setIsLoading(false);
     } catch (err) {
@@ -101,6 +79,7 @@ function Login() {
               }}
               placeholder="Tên tài khoản"
               required
+              autoComplete="username"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
             />
           </div>
@@ -122,6 +101,7 @@ function Login() {
                   showPassword ? "mật khẩu của bạn" : "••••••••••••••••"
                 }
                 required
+                autoComplete="new-password"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
               />
               <button

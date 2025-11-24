@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Contact,
@@ -6,7 +8,7 @@ import {
   Phone,
   Edit2,
   Trash2,
-  MoreVertical,
+  View,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -14,31 +16,11 @@ import {
 import Header from "../../components/common/Header";
 
 import AddEmployeeCard from "../../components/admin/AddEmployeeCard";
+import ConfirmPopup from "../../components/common/ComfirmPopup";
+
+import adminApi from "../../api/adminApi";
 
 // =============== Mock dữ liệu ================
-const mockStaff = Array.from({ length: 300 }, (_, i) => {
-  const gender = i % 2 === 0 ? "Male" : "Female";
-  const isActive = i % 3 !== 0; // 2/3 active
-  return {
-    employeeId: i + 1,
-    employeeCode: `EMP${String(i + 1).padStart(3, "0")}`,
-    employeeName: `Nguyễn Văn ${
-      ["An", "Bình", "Cường", "Dũng", "Hùng"][i % 5]
-    }`,
-    identityCard: `00${Math.floor(100000000 + Math.random() * 900000000)}`,
-    address: `${100 + i} Nguyễn Huệ, Q1, TP.HCM`,
-    dateOfBirth: `198${i % 10}-0${(i % 9) + 1}-15`,
-    gender,
-    email: `nv${i + 1}@company.com`,
-    phoneNumber: `0901234${String(100 + i).slice(-3)}`,
-    startingDate: `2020-0${(i % 9) + 1}-15`,
-    isActive,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    taxCode: `TAX${String(i + 1).padStart(3, "0")}`,
-    pointBalance: Math.floor(Math.random() * 10000),
-  };
-});
 
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
@@ -90,12 +72,38 @@ function StaffManagement() {
   const [position, setPosition] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+
+  // Thêm Staff vào danh sách cục bộ
+  const [employeeList, setEmployeeList] = useState([]);
 
   const itemsPerPage = 10;
-  const totalItems = mockStaff.length;
+
+  const filteredEmployees = employeeList.filter((emp) => {
+    // Search by name, employeeCode, or email
+    const matchesSearch =
+      searchTerm === "" ||
+      emp.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.employeeCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Filter by department
+    const matchesDepartment = department == "" || emp.department == department;
+
+    // Filter by position
+    const matchesPosition = position === "" || emp.position == position;
+
+    return matchesSearch && matchesDepartment && matchesPosition;
+  });
+
+  const totalItems = filteredEmployees.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentStaff = mockStaff.slice(startIndex, startIndex + itemsPerPage);
+  const currentStaff = filteredEmployees.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const generatePaginationPages = () => {
     const pages = [];
@@ -126,6 +134,36 @@ function StaffManagement() {
     }
     return pages;
   };
+
+  const handleDeleteEmployee = () => {
+    // Xóa giả
+    setEmployeeList((prev) =>
+      prev.filter((emp) => emp.employeeId !== employeeToDelete)
+    );
+    // Gọi API xóa ở đây
+    setIsConfirmPopupOpen(false);
+  };
+
+  // Load danh sách nhân viên từ API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await adminApi.getAllUsers();
+
+        setEmployeeList(res.result);
+        console.log(res.result);
+        localStorage.setItem("employeeList", JSON.stringify(res.result));
+      } catch (err) {
+        console.error("Lỗi khi load danh sách nhân viên:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, department, position]);
 
   return (
     <main className="p-0 relative">
@@ -219,7 +257,6 @@ function StaffManagement() {
                 <div
                   key={staff.employeeId}
                   className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white"
-                  onClick={() => navigate(`/admin/employee-management/${staff.employeeId}`)}
                 >
                   <div className="flex items-center justify-between gap-4">
                     {/* Avatar and Info */}
@@ -232,7 +269,12 @@ function StaffManagement() {
                           {staff.employeeName}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {staff.employeeCode} - {staff.gender}
+                          {staff.employeeCode} -{" "}
+                          {staff.gender === "Male"
+                            ? "Nam"
+                            : staff.gender === "Female"
+                            ? "Nữ"
+                            : "Khác"}
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
@@ -257,15 +299,36 @@ function StaffManagement() {
                       >
                         {staff.isActive ? "Hoạt động" : "Ngừng hoạt động"}
                       </span>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/employee-management/${staff.employeeId}`
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
                         <Edit2 className="size-4 text-gray-600" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/employee-management/${staff.employeeId}`
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
+                        <View className="size-4 text-gray-600" />
+                      </button>
+                      {/*<button
+                        onClick={() => {
+                          setEmployeeToDelete(staff.employeeId);
+                          setIsConfirmPopupOpen(true);
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
                         <Trash2 className="size-4 text-red-500" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <MoreVertical className="size-4 text-gray-600" />
-                      </button>
+                      */}
                     </div>
                   </div>
                 </div>
@@ -330,6 +393,14 @@ function StaffManagement() {
           departments={departments}
           isOpen={isAddCardOpen}
           onClose={() => setIsAddCardOpen(false)}
+        />
+      )}
+      {isConfirmPopupOpen && (
+        <ConfirmPopup
+          isOpen={isConfirmPopupOpen}
+          onClose={() => setIsConfirmPopupOpen(false)}
+          message="Bạn có chắc chắn muốn xóa nhân viên này?"
+          onConfirm={handleDeleteEmployee}
         />
       )}
     </main>

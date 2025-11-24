@@ -19,7 +19,10 @@ const adminRoutes = [
       { path: "dashboard", element: <DashboardAdmin /> },
       { path: "employee-management", element: <EmployeeManagement /> },
       { path: "employee-management/:employeeId", element: <DetailProfile /> },
-      { path: "employee-management/:employeeId/edit", element: <EditProfile /> },
+      {
+        path: "employee-management/:employeeId/edit",
+        element: <EditProfile />,
+      },
       { path: "employee-accounts", element: <AccountManagement /> },
 
       // thêm các route admin khác ở đây
