@@ -8,6 +8,7 @@ import ContactField from "../../components/common/ContactField";
 import GoBackLink from "../../components/common/GoBackLink";
 
 import adminApi from "../../api/adminApi";
+import employeeApi from "../../api/employeeApi";
 
 function DetailProfile({}) {
   const { role } = useContext(AuthContext);
@@ -35,6 +36,20 @@ function DetailProfile({}) {
   }
 
   // Nếu là Employee xem hồ sơ nhân viên của mình
+  if (safeRole === "EMPLOYEE") {
+    useEffect(() => {
+      const fetchMyProfile = async () => {
+        try {
+          const res = await employeeApi.getMyProfile();
+          setProfile(res.result);
+          sessionStorage.setItem("profile", JSON.stringify(res.result));
+        } catch (err) {
+          console.error("Không thể lấy profile của mình", err);
+        }
+      };
+      fetchMyProfile();
+    }, []);
+  }
 
   // Manager có thể chỉnh sửa profile của chính mình (khi không có employeeId)
   // Manager không thể chỉnh sửa profile của nhân viên khác (khi có employeeId)
@@ -76,7 +91,7 @@ function DetailProfile({}) {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
         {/* Header */}
-        <Header title="Quản lý nhân viên" icon={Contact} />
+        <Header title="Hồ sơ nhân viên" icon={Contact} />
         {/* Header với nút chỉnh sửa nổi bật */}
         <div className="px-8">
           <GoBackLink />
@@ -109,11 +124,23 @@ function DetailProfile({}) {
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField
                   label="Tên phòng ban"
-                  value={profile?.department.departmentName}
+                  value={
+                    safeRole === "ADMIN"
+                      ? profile?.department?.departmentName
+                      : safeRole === "EMPLOYEE"
+                      ? profile?.department
+                      : ""
+                  }
                 />
                 <InfoField
                   label="Vị trí"
-                  value={profile?.position.positionName}
+                  value={
+                    safeRole === "ADMIN"
+                      ? profile?.position.positionName
+                      : safeRole === "EMPLOYEE"
+                      ? profile?.position
+                      : ""
+                  }
                 />
                 <InfoField
                   label="Tài khoản ngân hàng"

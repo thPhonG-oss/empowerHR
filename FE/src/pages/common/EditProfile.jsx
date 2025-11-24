@@ -8,6 +8,7 @@ import ContactFormField from "../../components/common/ContactFormField";
 import GoBackLink from "../../components/common/GoBackLink";
 
 import adminApi from "../../api/adminApi";
+import employeeApi from "../../api/employeeApi";
 
 // Mock dropdowns
 const departments = [
@@ -137,28 +138,41 @@ function EditProfile() {
     setSaving(true);
 
     try {
-      const payload = {
-        employeeName: formData.employeeName ?? "",
-        identityCard: formData.identityCard ?? "",
-        address: formData.address ?? "",
-        dateOfBirth: formData.dateOfBirth ?? "",
-        gender: formData.gender,
-        email: formData.email ?? "",
-        phoneNumber: formData.phoneNumber ?? "",
-        taxCode: formData.taxCode ?? "",
-        positionId: formData.positionId ?? 0,
-        departmentId: formData.departmentId ?? 0,
-        bankName: formData.bankName ?? "",
-        bankBranch: formData.bankBranch ?? "",
-        bankAccountNumber: formData.bankAccountNumber ?? "",
-        roles: formData.account?.roles?.map((r) => r.name) ?? ["EMPLOYEE"],
-      };
+      if (safeRole === "ADMIN") {
+        const payload = {
+          employeeName: formData.employeeName ?? "",
+          identityCard: formData.identityCard ?? "",
+          address: formData.address ?? "",
+          dateOfBirth: formData.dateOfBirth ?? "",
+          gender: formData.gender,
+          email: formData.email ?? "",
+          phoneNumber: formData.phoneNumber ?? "",
+          taxCode: formData.taxCode ?? "",
+          positionId: formData.positionId ?? 0,
+          departmentId: formData.departmentId ?? 0,
+          bankName: formData.bankName ?? "",
+          bankBranch: formData.bankBranch ?? "",
+          bankAccountNumber: formData.bankAccountNumber ?? "",
+          roles: formData.account?.roles?.map((r) => r.name) ?? ["EMPLOYEE"],
+        };
 
-      console.log("Payload gửi:", JSON.stringify(payload, null, 2));
+        const res = await adminApi.updateUserById(employeeId, payload);
+        console.log("Update response:", res.data);
+        alert(`Cập nhật thông tin ${res.data.employeeCode} thành công!`);
+      }
 
-      const res = await adminApi.updateUserById(employeeId, payload);
-      console.log("Update response:", res.data);
-      alert(`Cập nhật thông tin ${res.data.employeeCode} thành công!`);
+      if (safeRole === "EMPLOYEE") {
+        console.log("Nhân viên");
+        const payload = {
+          address: formData.address ?? "",
+          email: formData.email ?? "",
+          phoneNumber: formData.phoneNumber ?? "",
+        };
+        console.log(JSON.stringify(payload));
+        const res = employeeApi.updateMyProfile(payload);
+        console.log(res);
+        alert("Cập nhật thông tin liên hệ của bạn thành công");
+      }
       navigate(backPath);
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);
@@ -189,7 +203,7 @@ function EditProfile() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
-        <Header title={"Quản lý nhân viên"} icon={Contact} />
+        <Header title={"Hồ sơ nhân viên"} icon={Contact} />
 
         <div className="px-8">
           <GoBackLink destination={backPath} />
