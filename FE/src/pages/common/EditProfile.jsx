@@ -142,7 +142,7 @@ function EditProfile() {
         identityCard: formData.identityCard ?? "",
         address: formData.address ?? "",
         dateOfBirth: formData.dateOfBirth ?? "",
-        gender: formData.gender, // Male/Female/Other
+        gender: formData.gender,
         email: formData.email ?? "",
         phoneNumber: formData.phoneNumber ?? "",
         taxCode: formData.taxCode ?? "",
@@ -158,7 +158,7 @@ function EditProfile() {
 
       const res = await adminApi.updateUserById(employeeId, payload);
       console.log("Update response:", res.data);
-
+      alert(`Cập nhật thông tin ${res.data.employeeCode} thành công!`);
       navigate(backPath);
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);
