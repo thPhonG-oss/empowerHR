@@ -17,39 +17,79 @@ function DetailProfile({}) {
 
   const [profile, setProfile] = useState(null);
 
-  // Nếu là admin  xem hồ sơ nhân viên khác
-  if (safeRole === "ADMIN" || (safeRole === "MANAGER" && employeeId)) {
-    // Lấy thông tin nhân viên từ API theo employeeId từ params
-    useEffect(() => {
-      const fetchProfile = async () => {
-        try {
+  // // Nếu là admin  xem hồ sơ nhân viên khác
+  // if (safeRole === "ADMIN" || (safeRole === "MANAGER" && employeeId)) {
+  //   // Lấy thông tin nhân viên từ API theo employeeId từ params
+  //   useEffect(() => {
+  //     const fetchProfile = async () => {
+  //       try {
+  //         const res = await adminApi.getUserById(employeeId);
+  //         // Lưu nhân viên vào session
+  //         setProfile(res.data);
+  //         sessionStorage.setItem("profile", JSON.stringify(res.data));
+  //       } catch (err) {
+  //         console.error("Lỗi khi load thông tin nhân viên:", err);
+  //       }
+  //     };
+  //     fetchProfile();
+  //   }, [employeeId]);
+  // }
+
+  // // Nếu là Employee/Manager xem hồ sơ nhân viên của mình
+  // if (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)) {
+  //   useEffect(() => {
+  //     const fetchMyProfile = async () => {
+  //       try {
+  //         const res = await employeeApi.getMyProfile();
+  //         setProfile(res.result);
+  //         sessionStorage.setItem("profile", JSON.stringify(res.result));
+  //       } catch (err) {
+  //         console.error("Không thể lấy profile của mình", err);
+  //       }
+  //     };
+  //     fetchMyProfile();
+  //   }, []);
+  // }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (safeRole === "ADMIN" || (safeRole === "MANAGER" && employeeId)) {
           const res = await adminApi.getUserById(employeeId);
-          // Lưu nhân viên vào session
           setProfile(res.data);
           sessionStorage.setItem("profile", JSON.stringify(res.data));
-        } catch (err) {
-          console.error("Lỗi khi load thông tin nhân viên:", err);
-        }
-      };
-      fetchProfile();
-    }, [employeeId]);
-  }
-
-  // Nếu là Employee/Manager xem hồ sơ nhân viên của mình
-  if (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)) {
-    useEffect(() => {
-      const fetchMyProfile = async () => {
-        try {
+        } else if (
+          safeRole === "EMPLOYEE" ||
+          (safeRole === "MANAGER" && !employeeId)
+        ) {
           const res = await employeeApi.getMyProfile();
           setProfile(res.result);
           sessionStorage.setItem("profile", JSON.stringify(res.result));
-        } catch (err) {
-          console.error("Không thể lấy profile của mình", err);
         }
-      };
-      fetchMyProfile();
-    }, []);
-  }
+      } catch (err) {
+        console.error("Lỗi khi load thông tin:", err);
+      }
+    };
+
+    fetchData();
+  }, [safeRole, employeeId]);
+
+  // Chuẩn hóa department và position trước khi render JSX
+  const departmentName = (() => {
+    if (!profile?.department) return "";
+    if (typeof profile.department === "string") return profile.department; // Employee xem chính mình
+    if (typeof profile.department === "object")
+      return profile.department.departmentName; // Admin/Manager xem nhân viên khác
+    return "";
+  })();
+
+  const positionName = (() => {
+    if (!profile?.position) return "";
+    if (typeof profile.position === "string") return profile.position; // Employee
+    if (typeof profile.position === "object")
+      return profile.position.positionName; // Admin/Manager
+    return "";
+  })();
 
   // Manager có thể chỉnh sửa profile của chính mình (khi không có employeeId)
   // Manager không thể chỉnh sửa profile của nhân viên khác (khi có employeeId)
@@ -122,30 +162,9 @@ function DetailProfile({}) {
               <div className="grid gap-4 sm:grid-cols-2">
                 <InfoField label="Họ và tên" value={profile?.employeeName} />
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
-                <InfoField
-                  label="Tên phòng ban"
-                  value={
-                    safeRole === "ADMIN" ||
-                    (safeRole === "MANAGER" && employeeId)
-                      ? profile?.department?.departmentName
-                      : safeRole === "EMPLOYEE" ||
-                        (safeRole === "MANAGER" && !employeeId)
-                      ? profile?.department
-                      : ""
-                  }
-                />
-                <InfoField
-                  label="Vị trí"
-                  value={
-                    safeRole === "ADMIN" ||
-                    (safeRole === "MANAGER" && employeeId)
-                      ? profile?.position.positionName
-                      : safeRole === "EMPLOYEE" ||
-                        (safeRole === "MANAGER" && !employeeId)
-                      ? profile?.position
-                      : ""
-                  }
-                />
+                <InfoField label="Tên phòng ban" value={departmentName} />
+                <InfoField label="Vị trí" value={positionName} />
+
                 <InfoField
                   label="Tài khoản ngân hàng"
                   value={`${profile?.bank.bankAccountNumber} - ${profile?.bank.bankName}`}

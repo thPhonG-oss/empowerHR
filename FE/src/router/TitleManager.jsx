@@ -38,22 +38,18 @@ export default function TitleManager() {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    // Return only the last segment of the path (endpoint)
-    const normalize = (p) => {
-      const cleaned = (p || "").replace(/^\/+|\/+$/g, "");
-      if (!cleaned) return "";
-      const parts = cleaned.split("/");
-      return parts[parts.length - 1];
-    };
+    const normalize = (p) => (p || "").replace(/^\/+|\/+$/g, "");
 
     const current = normalize(pathname);
 
     const matched = navSimple.find((item) => {
-      const itemPath = normalize(item.path || "");
+      const itemPath = normalize(item.path);
 
-      if (itemPath === "") return current === "";
+      // path rỗng chỉ match root
+      if (!itemPath) return current === "";
 
-      return current === itemPath || current.startsWith(itemPath + "/");
+      // kiểm tra substring
+      return current.includes(itemPath);
     });
 
     document.title = matched?.title ?? "404 Not Found";
