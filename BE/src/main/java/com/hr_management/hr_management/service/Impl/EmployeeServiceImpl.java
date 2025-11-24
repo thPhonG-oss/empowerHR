@@ -109,47 +109,108 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee existingEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
-        if(employeeUpdateRequestDTO.getIdentityCard() != null){
-            if(employeeRepository.existsByIdentityCard(employeeUpdateRequestDTO.getIdentityCard()) || employeeRepository.existsByEmail(employeeUpdateRequestDTO.getEmail())){
-                throw new AppException(ErrorCode.EMPLOYEE_ALREADY_EXISTS);
+        // check identity
+        if(employeeUpdateRequestDTO.getIdentityCard() != null && !employeeUpdateRequestDTO.getIdentityCard().equals(existingEmployee.getIdentityCard())){
+            if(employeeRepository.existsByIdentityCardAndEmployeeIdNot(employeeUpdateRequestDTO.getIdentityCard(), employeeId)){
+                throw new IllegalArgumentException("CCCD " + employeeUpdateRequestDTO.getIdentityCard() + " đã tồn tại.");
             }
         }
 
-        Bank bank = existingEmployee.getBank();
-        if(!bankRepository.findById(bank.getBankId()).isPresent()){
-            throw new AppException(ErrorCode.BANK_ACCOUNT_NOT_FOUND);
+        // check email
+        if(employeeUpdateRequestDTO.getEmail() != null && !employeeUpdateRequestDTO.getEmail().equals(existingEmployee.getEmail())){
+            if(employeeRepository.existsByEmailAndEmployeeIdNot(employeeUpdateRequestDTO.getEmail(), employeeId)){
+                throw new IllegalArgumentException("Email " + employeeUpdateRequestDTO.getEmail() + " đã được sử dụng bởi một nhân viên khác.");
+            }
         }
 
-        if(bankRepository.existsByBankAccountNumber(employeeUpdateRequestDTO.getBankAccountNumber()) && bankRepository.existsByBankName(employeeUpdateRequestDTO.getBankName())){
-            throw new AppException(ErrorCode.BANK_ACCOUNT_ALREADY_EXISTS);
+        // check isActive
+        if(employeeUpdateRequestDTO.getIsActive() != null && !employeeUpdateRequestDTO.getIsActive().equals(existingEmployee.getIsActive())){
+            existingEmployee.setIsActive(employeeUpdateRequestDTO.getIsActive());
         }
-
-        bank.setBankName(employeeUpdateRequestDTO.getBankName());
-        bank.setBranch(employeeUpdateRequestDTO.getBankBranch());
-        bank.setBankAccountNumber(employeeUpdateRequestDTO.getBankAccountNumber());
-        bank.setUpdatedAt(LocalDateTime.now());
-        Bank savedBank = bankRepository.save(bank);
-
-        existingEmployee.setBank(savedBank);
-
-        Department existingDepartment = departmentRepository.findById(employeeUpdateRequestDTO.getDepartmentId())
-                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
-
-        Position existingPosition = jobPositonRepository.findById(employeeUpdateRequestDTO.getPositionId())
-                .orElseThrow(() -> new AppException(ErrorCode.JOB_POSITION_NOT_FOUND));
 
         existingEmployee.setEmployeeName(employeeUpdateRequestDTO.getEmployeeName());
-        existingEmployee.setAddress(employeeUpdateRequestDTO.getAddress());
+        existingEmployee.setIdentityCard(employeeUpdateRequestDTO.getIdentityCard());
         existingEmployee.setEmail(employeeUpdateRequestDTO.getEmail());
+        existingEmployee.setAddress(employeeUpdateRequestDTO.getAddress());
+        existingEmployee.setGender(employeeUpdateRequestDTO.getGender());
+        existingEmployee.setDateOfBirth(employeeUpdateRequestDTO.getDateOfBirth());
         existingEmployee.setPhoneNumber(employeeUpdateRequestDTO.getPhoneNumber());
-        existingEmployee.setIsActive(employeeUpdateRequestDTO.getIsActive());
-        existingEmployee.setUpdatedAt(LocalDateTime.now());
         existingEmployee.setTaxCode(employeeUpdateRequestDTO.getTaxCode());
-        existingEmployee.setDepartment(existingDepartment);
-        existingEmployee.setPosition(existingPosition);
 
+        // check department
+        if(employeeUpdateRequestDTO.getDepartmentId() != null && !employeeUpdateRequestDTO.getDepartmentId().equals(existingEmployee.getDepartment().getDepartmentId())){
+            Department dept = departmentRepository.findById(employeeUpdateRequestDTO.getDepartmentId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
 
-        return employeeMapper.toEmployeeCreationResponseDTO(employeeRepository.save(existingEmployee));
+            existingEmployee.setDepartment(dept);
+        }
+
+        // check position
+        if(employeeUpdateRequestDTO.getPositionId() != null && !employeeUpdateRequestDTO.getPositionId().equals(existingEmployee.getPosition().getPositionId())){
+            Position pos = jobPositonRepository.findById(employeeUpdateRequestDTO.getPositionId())
+                    .orElseThrow(() -> new AppException(ErrorCode.JOB_POSITION_NOT_FOUND));
+
+            existingEmployee.setPosition(pos);
+        }
+
+        // check bank
+        String incomingBankName = employeeUpdateRequestDTO.getBankName();
+        String incomingBankAccountNumber = employeeUpdateRequestDTO.getBankAccountNumber();
+
+        if(
+                incomingBankName != null && !incomingBankName.isEmpty()
+                && incomingBankAccountNumber != null && !incomingBankAccountNumber.isEmpty()
+        ){
+            Bank bank = existingEmployee.getBank();
+            if(bank == null){
+
+                if(bankRepository.existsByBankName(incomingBankName) && bankRepository.existsByBankAccountNumber(incomingBankAccountNumber)){
+                    throw new AppException(ErrorCode.BANK_ACCOUNT_ALREADY_EXISTS);
+                }
+
+                bank = Bank.builder()
+                        .bankName(incomingBankName)
+                        .branch(employeeUpdateRequestDTO.getBankBranch())
+                        .bankAccountNumber(incomingBankAccountNumber)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+
+                existingEmployee.setBank(bank);
+            } else{
+                if(bankRepository.existsByBankAccountNumberAndBankIdNot(incomingBankAccountNumber, existingEmployee.getBank().getBankId())){
+                    throw new IllegalArgumentException("Tài khoản " + incomingBankAccountNumber + " đã có người sử dụng.");
+                }
+               bank.setBankName(incomingBankName);
+               bank.setBranch(employeeUpdateRequestDTO.getBankBranch());
+               bank.setBankAccountNumber(incomingBankAccountNumber);
+               bank.setUpdatedAt(LocalDateTime.now());
+            }
+
+            // check roles
+            if(employeeUpdateRequestDTO.getRoles() != null && !employeeUpdateRequestDTO.getRoles().isEmpty()){
+                Account acct = existingEmployee.getAccount();
+
+                if(acct == null){
+                    throw new AppException(ErrorCode.ACCOUNT_NOT_EXITS);
+                }
+                else {
+                    Set<Role> roles = new HashSet<>();
+
+                    Set<String> roleNames = employeeUpdateRequestDTO.getRoles();
+                    if (roleNames != null && !roleNames.isEmpty()) {
+                        roles = transformRole(roleNames);
+                    }
+                    acct.setRoles(roles);
+                    acct.setUpdatedAt(LocalDateTime.now());
+                }
+            }
+        }
+
+        existingEmployee.setUpdatedAt(LocalDateTime.now());
+        Employee updatedEmployee = employeeRepository.save(existingEmployee);
+
+        return employeeMapper.toEmployeeCreationResponseDTO(updatedEmployee);
     }
 
     @Transactional
@@ -213,20 +274,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Set<String> roleNames = request.getRoles();
         if (roleNames != null && !roleNames.isEmpty()) {
-
-            log.info("Roles: {}", roleNames);
-
-            for (String roleName : roleNames) {
-                log.info("Role: {}", roleName);
-                if (!roleRepository.existsByName(roleName)) {
-                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
-                } else {
-                    roles = roleNames.stream().map((role) -> {
-                        return roleRepository.findByName(role)
-                                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-                    }).collect(Collectors.toSet());
-                }
-            }
+            roles = transformRole(roleNames);
         }
 
         Account newAccount = Account.builder()
@@ -269,5 +317,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         return employeeMapper.toEmployeeCreationResponseDTO(existingEmployee);
+    }
+
+    @Override
+    public Set<Role> transformRole(Set<String> roleNames){
+        Set<Role> roles = new HashSet<>();
+        for(String roleName:roleNames){
+            log.info("Role: {}", roleName);
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            roles.add(role);
+        }
+        return roles;
     }
 }

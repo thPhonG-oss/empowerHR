@@ -26,8 +26,7 @@ public class Role {
 //    @ManyToMany
     // Udpate: thêm fetch type, cascade
     @ManyToMany(
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+            fetch = FetchType.EAGER
     )
     @JoinTable(
             name = "Role_Permission",

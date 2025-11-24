@@ -7,4 +7,6 @@ public interface BankRepository extends JpaRepository<Bank, Integer> {
     boolean existsByBankAccountNumber(String bankAccountNumber);
 
     boolean existsByBankName(String bankName);
+
+    boolean existsByBankAccountNumberAndBankIdNot(String bankAccountNumber, Integer bankId);
 }

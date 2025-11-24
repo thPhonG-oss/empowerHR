@@ -42,8 +42,7 @@ public class Account {
 //    @ManyToMany
     // Update: thêm fetch type, cascasdetype
     @ManyToMany(
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+            fetch = FetchType.EAGER
     )
     @JoinTable(
             name = "Account_Role",
