@@ -23,10 +23,10 @@ const AddEmployeeCard = ({ onClose }) => {
   });
 
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500";
+    "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   const btnPrimary =
-    "px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition";
+    "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition";
 
   const btnOutline =
     "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition";
@@ -70,6 +70,24 @@ const AddEmployeeCard = ({ onClose }) => {
     { id: 26, name: "HR Specialist" },
     { id: 27, name: "Receptionist" },
     { id: 28, name: "Intern" },
+  ];
+
+  const banks = [
+    "Vietcombank",
+    "BIDV",
+    "Vietinbank",
+    "Agribank",
+    "ACB",
+    "Techcombank",
+    "MBBank",
+    "VPBank",
+    "TPBank",
+    "Sacombank",
+    "HDBank",
+    "SHB",
+    "VIB",
+    "Eximbank",
+    "MSB",
   ];
 
   const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
@@ -124,7 +142,7 @@ const AddEmployeeCard = ({ onClose }) => {
               onClick={() => setActiveTab("personal")}
               className={`px-4 py-2 font-medium border-b-2 transition ${
                 activeTab === "personal"
-                  ? "border-green-600 text-green-600"
+                  ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -134,7 +152,7 @@ const AddEmployeeCard = ({ onClose }) => {
               onClick={() => setActiveTab("work")}
               className={`px-4 py-2 font-medium border-b-2 transition ${
                 activeTab === "work"
-                  ? "border-green-600 text-green-600"
+                  ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -249,7 +267,9 @@ const AddEmployeeCard = ({ onClose }) => {
                     onChange={handleChange}
                     className={inputClasses}
                   >
-                    <option value="">-- Chọn chức vụ --</option>
+                    <option value="" disabled>
+                      -- Chọn chức vụ --
+                    </option>
                     {positions.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
@@ -265,12 +285,24 @@ const AddEmployeeCard = ({ onClose }) => {
                   onChange={handleChange}
                 />
 
-                <InputField
-                  label="Tên ngân hàng"
-                  name="bankName"
-                  value={formData.bankName}
-                  onChange={handleChange}
-                />
+                <div>
+                  <label className="block text-gray-700 mb-1">Ngân hàng</label>
+                  <select
+                    name="bankName"
+                    value={formData.bankName}
+                    onChange={handleChange}
+                    className={inputClasses}
+                  >
+                    <option value="" disabled>
+                      -- Chọn ngân hàng --
+                    </option>
+                    {banks.map((bank) => (
+                      <option value={bank} key={bank}>
+                        {bank}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <InputField
                   label="Chi nhánh ngân hàng"
@@ -298,8 +330,8 @@ const AddEmployeeCard = ({ onClose }) => {
                         onClick={() => handleRoleToggle(role)}
                         className={`px-4 py-2 border rounded-lg cursor-pointer font-medium transition ${
                           formData.roles.includes(role)
-                            ? "bg-green-600 text-white border-green-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-green-600"
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-blue-600"
                         }`}
                       >
                         {role}

@@ -1,6 +1,7 @@
 import Header from "../../components/common/Header";
-
-import { useState } from "react";
+import ConfirmPopup from "../../components/common/ComfirmPopup";
+import adminApi from "../../api/adminApi";
+import { useState, useEffect } from "react";
 import {
   Contact,
   Lock,
@@ -55,34 +56,78 @@ function AccountManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [department, setDepartment] = useState("");
   const [role, setRole] = useState("");
+  const [accountList, setAccountList] = useState([]);
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [idBlock, setIdBlock] = useState(null);
+  const [isBlocking, setIsBlocking] = useState(false);
 
-  // Mock data - replace with actual API call
-  const mockEmployees = Array.from({ length: 300 }, (_, i) => ({
-    id: i + 1,
-    name: [
-      "Trương Việt Công",
-      "Độ Ngọc Cường",
-      "Nguyễn Văn Nam",
-      "Phạm Anh Tuấn",
-      "Lê Hoàng Minh",
-    ][i % 5],
-    account: `034233916${i % 10}`,
-    password: "*".repeat(8),
-    department: ["kế toán", "IT", "HR", "Marketing"][i % 4],
-    role: ["chủ tích", "nhân viên", "quản lý"][i % 3],
-    status: i % 3 !== 0 ? "active" : "inactive",
-  }));
+  // gọi axios api để lấy danh sách tài khoản nhân viên
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await adminApi.getAllUsers();
+
+        setAccountList(res.result);
+        console.log(res.result);
+        localStorage.setItem("employeeList", JSON.stringify(res.result));
+      } catch (err) {
+        console.error("Lỗi khi load danh sách nhân viên:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Khóa tài khoản
+  const handleBlockAccount = async () => {
+    try {
+      await adminApi.setStateAccount(idBlock);
+
+      // Update UI tại chỗ
+      setAccountList((prev) =>
+        prev.map((emp) =>
+          emp.employeeId === idBlock ? { ...emp, isActive: false } : emp
+        )
+      );
+    } catch (err) {
+      console.error("Không thể khóa tài khoản", err);
+    }
+
+    setIsConfirmPopupOpen(false);
+  };
+
+  // Mở khóa tài khoản
+  const handleUnLockAccount = async (id) => {
+    try {
+      await adminApi.setStateAccount(id);
+
+      setAccountList((prev) =>
+        prev.map((emp) =>
+          emp.employeeId === id ? { ...emp, isActive: true } : emp
+        )
+      );
+    } catch (err) {
+      console.error("Không thể mở khóa tài khoản", err);
+    }
+  };
 
   // Filter employees
-  const filtered = mockEmployees.filter((emp) => {
+  const filtered = accountList.filter((emp) => {
+    const text = searchQuery.toLowerCase();
+
     const matchesSearch =
       searchQuery === "" ||
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.account.includes(searchQuery);
+      emp.employeeName?.toLowerCase().includes(text) ||
+      emp.employeeCode?.toLowerCase().includes(text) ||
+      emp.email?.toLowerCase().includes(text) ||
+      emp.phoneNumber?.includes(searchQuery);
+
     const matchesDept = department === "" || emp.department === department;
-    const matchesRole = role === "" || emp.role === role;
+
+    const matchesRole = role === "" || emp.position === role;
+
     return matchesSearch && matchesDept && matchesRole;
   });
 
@@ -133,10 +178,11 @@ function AccountManagement() {
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder="Nhập tên, ID hoặc email.."
-                  //   value={searchTerm}
-                  //   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  placeholder="Nhập tên, mã nhân viên hoặc email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+             focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 />
               </div>
 
@@ -159,25 +205,6 @@ function AccountManagement() {
                 {/* Mũi tên */}
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 pointer-events-none" />
               </div>
-
-              {/* Position Dropdown */}
-              <div className="relative w-full md:w-48">
-                <select
-                  //   value={position}
-                  //   onChange={(e) => positions(e.target.value)}
-                  className="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white cursor-pointer"
-                >
-                  <option value="">Chọn chức vụ</option>
-
-                  {positions.map((pos) => (
-                    <option key={pos.id} value={pos.name}>
-                      {pos.name}
-                    </option>
-                  ))}
-                </select>
-                {/* Mũi tên */}
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 pointer-events-none" />
-              </div>
             </div>
           </div>
 
@@ -185,7 +212,7 @@ function AccountManagement() {
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="mb-6">
               <h2 className="text-lg font-bold text-gray-900">
-                Danh sách nhân viên ({filtered.length})
+                Danh sách nhân viên ({filtered?.length || 0})
               </h2>
               <p className="text-sm text-gray-500">
                 Cập nhật danh sách sinh viên
@@ -194,10 +221,10 @@ function AccountManagement() {
 
             {/* Employee Cards */}
             <div className="space-y-4 mb-8">
-              {paginatedEmployees.length > 0 ? (
+              {paginatedEmployees?.length > 0 ? (
                 paginatedEmployees.map((employee) => (
                   <div
-                    key={employee.id}
+                    key={employee.employeeId}
                     className="border border-gray-300 rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-shadow"
                   >
                     {/* Employee Info */}
@@ -205,42 +232,28 @@ function AccountManagement() {
                       {/* Avatar */}
                       <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
                         <span className="text-xl font-bold text-gray-600">
-                          {employee.name.charAt(0)}
+                          {employee.employeeName.charAt(0)}
                         </span>
                       </div>
 
                       {/* Details */}
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900 mb-2">
-                          {employee.name}
+                          {employee.employeeName}
                         </h3>
+
                         <div className="flex gap-4 text-sm">
                           <div className="flex flex-col space-y-1">
-                            <p className="text-gray-600 inline-block m-0">
-                              Tài khoản:
+                            <p className="text-gray-600">
+                              Mã NV:{" "}
                               <span className="font-semibold">
-                                {employee.account}
+                                {employee.employeeCode}
                               </span>
                             </p>
-                            <p className="text-gray-600 inline-block m-0">
-                              Mật khẩu:
-                              <span className="font-semibold">
-                                {employee.password}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-gray-600 inline-block m-0">
-                              Phòng ban:{" "}
-                              <span className="font-semibold">
-                                {employee.department}
-                              </span>
-                            </p>
-                            <p className="text-gray-600 inline-block m-0">
-                              Chức vụ:{" "}
-                              <span className="font-semibold">
-                                {employee.role}
-                              </span>
+
+                            <p className="text-gray-600">
+                              Mật khẩu:{" "}
+                              <span className="font-semibold">●●●●●●●●</span>
                             </p>
                           </div>
                         </div>
@@ -250,22 +263,39 @@ function AccountManagement() {
                     {/* Actions */}
                     <div className="flex items-center gap-4 ml-4">
                       {/* Status Button */}
-                      <button
+                      <div
                         className={`px-4 py-1 rounded-full text-white font-medium transition-colors ${
-                          employee.status === "active"
+                          employee.isActive
                             ? "bg-green-400 hover:bg-green-500"
                             : "bg-gray-400 hover:bg-gray-500"
                         }`}
                       >
-                        {employee.status === "active"
-                          ? "Hoạt động"
-                          : "Không hoạt động"}
-                      </button>
+                        {employee.isActive ? "Hoạt động" : "Không hoạt động"}
+                      </div>
 
                       {/* Lock Icon */}
-                      <button className="p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors">
-                        <Unlock size={20} />
-                      </button>
+                      {employee.isActive ? (
+                        // Bấm để khóa → hiện popup
+                        <button
+                          onClick={() => {
+                            setIdBlock(employee.employeeId);
+                            setIsConfirmPopupOpen(true);
+                          }}
+                          className="p-2 text-green-500 hover:bg-orange-50 rounded-lg transition-colors"
+                        >
+                          <Unlock size={20} />
+                        </button>
+                      ) : (
+                        // Bấm để mở khóa → gọi API trực tiếp
+                        <button
+                          onClick={() =>
+                            handleUnLockAccount(employee.employeeId)
+                          }
+                          className="p-2 text-orange-500 hover:bg-green-50 rounded-lg transition-colors"
+                        >
+                          <Lock size={20} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))
@@ -318,6 +348,14 @@ function AccountManagement() {
           </div>
         </div>
       </div>
+      {isConfirmPopupOpen && (
+        <ConfirmPopup
+          isOpen={isConfirmPopupOpen}
+          onClose={() => setIsConfirmPopupOpen(false)}
+          message="Bạn có chắc chắn muốn khóa tài khoản này?"
+          onConfirm={handleBlockAccount}
+        />
+      )}
     </main>
   );
 }

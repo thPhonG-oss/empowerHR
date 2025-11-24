@@ -315,7 +315,7 @@ function StaffManagement() {
                       >
                         <View className="size-4 text-gray-600" />
                       </button>
-                      <button
+                      {/*<button
                         onClick={() => {
                           setEmployeeToDelete(staff.employeeId);
                           setIsConfirmPopupOpen(true);
@@ -324,6 +324,7 @@ function StaffManagement() {
                       >
                         <Trash2 className="size-4 text-red-500" />
                       </button>
+                      */}
                     </div>
                   </div>
                 </div>
