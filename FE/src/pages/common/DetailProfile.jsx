@@ -18,7 +18,7 @@ function DetailProfile({}) {
   const [profile, setProfile] = useState(null);
 
   // Nếu là admin  xem hồ sơ nhân viên khác
-  if (safeRole === "ADMIN") {
+  if (safeRole === "ADMIN" || (safeRole === "MANAGER" && employeeId)) {
     // Lấy thông tin nhân viên từ API theo employeeId từ params
     useEffect(() => {
       const fetchProfile = async () => {
@@ -35,8 +35,8 @@ function DetailProfile({}) {
     }, [employeeId]);
   }
 
-  // Nếu là Employee xem hồ sơ nhân viên của mình
-  if (safeRole === "EMPLOYEE") {
+  // Nếu là Employee/Manager xem hồ sơ nhân viên của mình
+  if (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)) {
     useEffect(() => {
       const fetchMyProfile = async () => {
         try {
@@ -125,9 +125,11 @@ function DetailProfile({}) {
                 <InfoField
                   label="Tên phòng ban"
                   value={
-                    safeRole === "ADMIN"
+                    safeRole === "ADMIN" ||
+                    (safeRole === "MANAGER" && employeeId)
                       ? profile?.department?.departmentName
-                      : safeRole === "EMPLOYEE"
+                      : safeRole === "EMPLOYEE" ||
+                        (safeRole === "MANAGER" && !employeeId)
                       ? profile?.department
                       : ""
                   }
@@ -135,9 +137,11 @@ function DetailProfile({}) {
                 <InfoField
                   label="Vị trí"
                   value={
-                    safeRole === "ADMIN"
+                    safeRole === "ADMIN" ||
+                    (safeRole === "MANAGER" && employeeId)
                       ? profile?.position.positionName
-                      : safeRole === "EMPLOYEE"
+                      : safeRole === "EMPLOYEE" ||
+                        (safeRole === "MANAGER" && !employeeId)
                       ? profile?.position
                       : ""
                   }

@@ -10,6 +10,8 @@ import GoBackLink from "../../components/common/GoBackLink";
 import adminApi from "../../api/adminApi";
 import employeeApi from "../../api/employeeApi";
 
+import { getProvinces } from "vn-provinces-wards";
+
 // Mock dropdowns
 const departments = [
   { id: 1, name: "Ban Giám Đốc" },
@@ -122,7 +124,11 @@ function EditProfile() {
 
   const canEditField = (field) => {
     if (isAdmin) return !adminLocked.includes(field);
-    if (isManager) return ["phoneNumber", "address"].includes(field);
+
+    if (isManager) {
+      return ["phoneNumber", "address", "email"].includes(field);
+    }
+
     return employeeEditable.includes(field);
   };
 

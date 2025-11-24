@@ -3,6 +3,8 @@ import { useState } from "react";
 import InputField from "./InputField";
 import adminApi from "../../api/adminApi";
 
+import { getProvinces } from "vn-provinces-wards";
+
 const AddEmployeeCard = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
@@ -21,6 +23,8 @@ const AddEmployeeCard = ({ onClose }) => {
     bankAccountNumber: "",
     roles: [],
   });
+
+  const provinces = getProvinces();
 
   const inputClasses =
     "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500";
@@ -118,6 +122,8 @@ const AddEmployeeCard = ({ onClose }) => {
 
       alert("Tạo nhân viên thành công!");
       onClose(); // Đóng modal sau khi submit thành công
+      // reload
+      window.location.reload();
     } catch (error) {
       console.error("Lỗi khi tạo nhân viên:", error);
       alert("Tạo nhân viên thất bại. Vui lòng thử lại!");
@@ -192,13 +198,26 @@ const AddEmployeeCard = ({ onClose }) => {
                   onChange={handleChange}
                 />
 
-                <InputField
-                  label="Địa chỉ"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-
+                <div className="flex flex-col">
+                  <label htmlFor="" className="block text-gray-700 mb-1">
+                    Địa Chỉ
+                  </label>
+                  <select
+                    // value={value}
+                    // onChange={(e) => onChange(e.target.value)}
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">-- Chọn tỉnh / thành phố --</option>
+                    {provinces.map((p) => (
+                      <option key={p.code} value={p.name}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-gray-700 mb-1">Ngày sinh</label>
                   <input

@@ -89,11 +89,10 @@ function StaffManagement() {
       emp.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
     // Filter by department
-    const matchesDepartment =
-      department == "" || emp.departmentName == department;
+    const matchesDepartment = department == "" || emp.department == department;
 
     // Filter by position
-    const matchesPosition = position === "" || emp.positionName == position;
+    const matchesPosition = position === "" || emp.position == position;
 
     return matchesSearch && matchesDepartment && matchesPosition;
   });
@@ -270,7 +269,12 @@ function StaffManagement() {
                           {staff.employeeName}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {staff.employeeCode} - {staff.gender}
+                          {staff.employeeCode} -{" "}
+                          {staff.gender === "Male"
+                            ? "Nam"
+                            : staff.gender === "Female"
+                            ? "Nữ"
+                            : "Khác"}
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
