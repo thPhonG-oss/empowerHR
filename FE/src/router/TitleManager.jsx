@@ -2,15 +2,17 @@ import { useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const navSimple = [
+  { title: "Empower HR", path: "" },
   { title: "Empower HR", path: "login" },
+  { title: "Empower HR", path: "change-password" },
 
   { title: "Trang chủ", path: "dashboard" },
 
   // ADMIN ONLY
   { title: "Quản lý gian hàng", path: "store-management" },
   { title: "Điểm thưởng", path: "rewards" },
-  { title: "Quản lý nhân viên", path: "staff-management" },
-  { title: "Tài khoản nhân viên", path: "staff-accounts" },
+  { title: "Quản lý nhân viên", path: "employee-management" },
+  { title: "Tài khoản nhân viên", path: "employee-accounts" },
   { title: "Quản lý hoạt động", path: "activity-management" },
   { title: "Chính sách công ty", path: "company-policy" },
 
@@ -29,16 +31,28 @@ const navSimple = [
   { title: "Quản lý nhóm", path: "team-management" },
   { title: "Quản lý yêu cầu", path: "request-management" },
   { title: "Tặng điểm nhân viên", path: "give-rewards" },
-  { title: "404 Not Found", path: "" },
+  // { title: "404 Not Found", path: "" },
 ];
 
 export default function TitleManager() {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    document.title =
-      navSimple.find((item) => pathname.includes(item.path))?.title ||
-      "Empower HR";
+    const normalize = (p) => (p || "").replace(/^\/+|\/+$/g, "");
+
+    const current = normalize(pathname);
+
+    const matched = navSimple.find((item) => {
+      const itemPath = normalize(item.path);
+
+      // path rỗng chỉ match root
+      if (!itemPath) return current === "";
+
+      // kiểm tra substring
+      return current.includes(itemPath);
+    });
+
+    document.title = matched?.title ?? "404 Not Found";
   }, [pathname]);
 
   return null;

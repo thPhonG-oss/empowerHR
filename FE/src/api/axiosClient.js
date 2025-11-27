@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:/api", // Chưa có API
+  baseURL: "http://localhost:8081", // Chưa có API
   headers: {
     "Content-Type": "application/json",
   },
@@ -10,7 +10,6 @@ const axiosClient = axios.create({
 // Request Interceptor → tự gắn token
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

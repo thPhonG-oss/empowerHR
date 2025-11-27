@@ -4,7 +4,6 @@ import { AuthContext } from "../context/AuthContext";
 
 function RoleRoute({ children, allowedRoles }) {
   const { isLoggedIn, role } = useContext(AuthContext);
-
   // 1. Nếu chưa đăng nhập
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
@@ -12,6 +11,7 @@ function RoleRoute({ children, allowedRoles }) {
 
   // 2. Nếu không có quyền truy cập
   if (!allowedRoles.includes(role)) {
+    console.log("không có quyền");
     return <Navigate to="/unauthorized" replace />;
   }
 

@@ -2,17 +2,10 @@ import { useState, useContext } from "react";
 import { Users, Eye, EyeClosed } from "lucide-react";
 import authApi from "../../api/authApi";
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-// Mock tài khoản user role đăng nhập
-const mockUsers = [
-  { email: "employee", password: "123", roles: ["EMPLOYEE"] },
-  { email: "admin", password: "123", roles: ["ADMIN"] },
-  { email: "manager", password: "123", roles: ["MANAGER"] },
-];
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,31 +20,16 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // Tạm thời chưa có API
-      // const res = await authApi.login({ email, password });
-      // const token = res.data.result.token;
+      const res = await authApi.login({ userName, password });
+      const token = res.result.acessToken;
 
-      // // Lưu token + roles vào context
-      // login(token);
+      // Lưu token + roles vào context
+      login(token);
+      // Lấy role từ token
+      const role = localStorage.getItem("role");
 
-      // Mock login
-      const user = mockUsers.find(
-        (user) => user.email === email && user.password === password
-      );
-      if (user) {
-        const fakeToken = "fake_token_123"; // có thể dùng uuid hoặc random string
-        const fakeUserName = "Trương Việt Công";
-
-        login(fakeToken, user.roles[0], fakeUserName);
-
-        const roleString = user.roles[0].toLowerCase();
-
-        console.log(localStorage.getItem("token"));
-
-        navigate(`/${roleString}/dashboard`);
-      } else {
-        setWrongInput(true);
-      }
+      localStorage.setItem("userName", userName);
+      navigate(`/${role}/dashboard`);
 
       setIsLoading(false);
     } catch (err) {
@@ -68,8 +46,8 @@ function Login() {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="bg-white w-1/4 rounded-2xl shadow-lg p-8">
+    <div className="w-full h-screen flex items-start justify-center pt-20">
+      <div className="bg-white w-1/2 lg:w-1/3 xl:w-1/4 rounded-2xl shadow-lg p-8">
         {/* Header Icon */}
         <div className="flex justify-center mb-6">
           <div className="bg-black rounded-2xl p-4">
@@ -94,13 +72,14 @@ function Login() {
             </label>
             <input
               type="text"
-              value={email}
+              value={userName}
               onChange={(e) => {
-                setEmail(e.target.value);
+                setUserName(e.target.value);
                 setWrongInput(false);
               }}
               placeholder="Tên tài khoản"
               required
+              autoComplete="username"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
             />
           </div>
@@ -122,12 +101,13 @@ function Login() {
                   showPassword ? "mật khẩu của bạn" : "••••••••••••••••"
                 }
                 required
+                autoComplete="new-password"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
               />
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 hover:cursor-pointer"
               >
                 {showPassword ? <Eye /> : <EyeClosed />}
               </button>
@@ -137,24 +117,30 @@ function Login() {
           {/* Thông báo cáo thông tin đăng nhập */}
 
           <p className="text-red-600 min-h-6">
-            {wrongInput && "Email hoặc mật khẩu không chính xác"}
+            {wrongInput && "userName hoặc mật khẩu không chính xác"}
           </p>
 
           {/* Login Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-900 disabled:opacity-50 transition duration-200 mt-6"
+            className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-900 disabled:opacity-50 transition duration-200"
           >
             {isLoading ? "Đang xử lý..." : "Đăng nhập"}
           </button>
         </form>
 
-        {/* Forgot Password Link */}
-        <div className="text-center mt-4">
-          <a href="#" className="text-gray-600 text-sm hover:underline">
+        {/* Change and Forgot Password Link */}
+        <div className="text-center mt-4 flex justify-between">
+          <Link
+            to="/change-password"
+            className="text-gray-600 text-sm hover:underline"
+          >
+            Thay đổi mật khẩu
+          </Link>
+          <Link to="#" className="text-gray-600 text-sm hover:underline">
             Quên mật khẩu
-          </a>
+          </Link>
         </div>
       </div>
     </div>
