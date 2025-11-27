@@ -1,4 +1,4 @@
-package com.hr_management.hr_management.dto.request;
+package com.hr_management.hr_management.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +15,8 @@ public class RequestResponseDTO {
     private String requestType; // "Leave" hoặc "TimesheetUpdate"
     private String reason;
     private String employeeName;
+    private String employeeCode;
+    private String handleAt;
     private String submitAt;
+    private String responseReason;
 }
