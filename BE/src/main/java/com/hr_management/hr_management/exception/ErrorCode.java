@@ -32,6 +32,7 @@ public enum ErrorCode {
     NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_USED_BY_ANOTHER_PERSON("1014","Email already used by another person",HttpStatus.BAD_REQUEST),
     JOB_POSITION_IS_EMPTY("1015","Job position is empty",HttpStatus.BAD_REQUEST),
+    DEPARTMENT_IS_EMPTY("1016","Department is empty",HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
