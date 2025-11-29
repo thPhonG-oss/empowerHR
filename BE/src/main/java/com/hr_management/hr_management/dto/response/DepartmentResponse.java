@@ -20,4 +20,8 @@ public class DepartmentResponse {
     private LocalDate establishedDate;
 
     private Long pointBalance;
+
+    private Integer employeeId;
+    private String employeeCode;
+    private String employeeName;
 }
