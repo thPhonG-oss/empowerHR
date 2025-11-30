@@ -11,4 +11,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 public interface RequestService {
     LeaveRequestResponse createLeaveRequest(LeaveRequestDto leaveRequestDto, JwtAuthenticationToken jwtAuthenticationToken);
     TimeSheetResponse createTimeSheetRequest(TimeSheetRequestDto timeSheetRequestDto,JwtAuthenticationToken jwtAuthenticationToken);
+    HandledRequestResponseDTO getAllHandledRequests(Integer pageNumber, Integer pageSize);
+
+    Department getDepartmentOfManager();
+    RequestResponseDTO handleRequest(RequestHandleDTO requestHandleDTO, Integer requestId);
+    RequestResponseDTO getRequestById(Integer requestId);
 }

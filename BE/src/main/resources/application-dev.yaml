@@ -52,3 +52,8 @@ logging:
     org:
       springframework:
         security=TRACE:
+
+cloudinary:
+  cloud-name: ${CLOUD_NAME}
+  api-key: ${CLOUD_API_KEY}
+  api-secret: ${CLOUD_API_SECRET}

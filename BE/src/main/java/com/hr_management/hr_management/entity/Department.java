@@ -25,4 +25,9 @@ public class Department {
 
     @Column(name = "point_balance")
     private Long pointBalance;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id") // Tên cột trong DB
+    @ToString.Exclude
+    private Employee manager;
 }
