@@ -1,12 +1,16 @@
 package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.ApiResponse;
+import com.hr_management.hr_management.dto.request.LeaveRequestDto;
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
+import com.hr_management.hr_management.repository.LeaveRequestRepository;
 import com.hr_management.hr_management.service.AuthenticationService;
 import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
 import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import com.hr_management.hr_management.service.EmployeeService;
+import com.hr_management.hr_management.service.RequestService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +34,7 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final AuthenticationService authenticationService;
+    private final RequestService requestService;
 
 
 
@@ -55,6 +60,13 @@ public class EmployeeController {
         return ApiResponse.<EmployeeResponseDTO>builder()
                 .result(updatedProfile)
                 .message("Profile updated successfully")
+                .build();
+    }
+    // tạo leave request
+    @PostMapping("/requests/leaves")
+    public  ApiResponse<LeaveRequestResponse> createLeaveRequest(@RequestBody LeaveRequestDto leaveRequestDto,JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<LeaveRequestResponse>builder()
+                .result(requestService.createLeaveRequest(leaveRequestDto,jwtAuthenticationToken))
                 .build();
     }
 
