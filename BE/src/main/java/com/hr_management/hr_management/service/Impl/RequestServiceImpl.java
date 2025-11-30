@@ -44,10 +44,18 @@ import java.util.stream.Collectors;
 public class RequestServiceImpl implements RequestService {
     RequestRepository requestRepository;
     RequestMapper requestMapper;
-
     AccountRepository accountRepository;
     EmployeeRepository employeeRepository;
     DepartmentRepository departmentRepository;
+
+    @Override
+    public RequestResponseDTO getRequestById(Integer requestId){
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND));
+
+        return requestMapper.toResponseDTO(request);
+    }
+    
 
     @Override
     public HandledRequestResponseDTO getAllHandledRequests(Integer pageNumber, Integer pageSize){

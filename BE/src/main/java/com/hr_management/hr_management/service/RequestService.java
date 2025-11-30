@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.service;
 
+import com.hr_management.hr_management.dto.response.RequestResponseDTO;
 import com.hr_management.hr_management.dto.response.HandledRequestResponseDTO;
 import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.dto.request.RequestHandleDTO;
@@ -10,5 +11,6 @@ public interface RequestService {
     HandledRequestResponseDTO getAllHandledRequests(Integer pageNumber, Integer pageSize);
 
     Department getDepartmentOfManager();
-     RequestResponseDTO handleRequest(RequestHandleDTO requestHandleDTO, Integer requestId);
+    RequestResponseDTO handleRequest(RequestHandleDTO requestHandleDTO, Integer requestId);
+    RequestResponseDTO getRequestById(Integer requestId);
 }
