@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.mapper;
 
+import com.hr_management.hr_management.dto.request.LeaveRequestDto;
 import com.hr_management.hr_management.dto.response.LeaveRequestResponseDTO;
 import com.hr_management.hr_management.dto.response.RequestResponseDTO;
 import com.hr_management.hr_management.dto.response.TimesheetUpdateResponseDTO;
@@ -46,4 +47,6 @@ public interface RequestMapper {
     @Mapping(target = "employeeCode", source = "employee.employeeCode")
     @Mapping(target = "responseReason", source = "responseReason")
     RequestResponseDTO toBaseDTO(Request request);
+
+    Request toRequest(LeaveRequestDto leaveRequestDto);
 }

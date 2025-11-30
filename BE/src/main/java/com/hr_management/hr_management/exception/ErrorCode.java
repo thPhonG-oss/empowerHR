@@ -31,6 +31,8 @@ public enum ErrorCode {
     NOT_CHANGE_PASSWORD("1012","Do not change other people's passwords",HttpStatus.BAD_REQUEST),
     NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_USED_BY_ANOTHER_PERSON("1014","Email already used by another person",HttpStatus.BAD_REQUEST),
+    INCORRECT_REQUEST_TYPE("1015","incorrect request type",HttpStatus.BAD_REQUEST),
+    LEAVE_REQUEST_EXPIRED("1016","this type of leave has run out",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
