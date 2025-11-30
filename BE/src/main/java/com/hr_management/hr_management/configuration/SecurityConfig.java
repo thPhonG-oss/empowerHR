@@ -22,8 +22,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users/save", "/auth/log-in", "/auth/log-out","/auth/introspect", "/auth/refresh-token", "/auth/refresh","/user/*",
-            "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/v1/admin/**",
+            "/users/save", "/auth/log-in", "/auth/log-out","/auth/introspect", "/auth/refresh-token", "/auth/refresh","/user/*", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/v1/admin/**"
     };
     private CustomJwtDecoder customJwtDecoder;
 

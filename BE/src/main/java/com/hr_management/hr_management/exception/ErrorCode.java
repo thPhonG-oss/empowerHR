@@ -31,6 +31,11 @@ public enum ErrorCode {
     NOT_CHANGE_PASSWORD("1012","Do not change other people's passwords",HttpStatus.BAD_REQUEST),
     NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_USED_BY_ANOTHER_PERSON("1014","Email already used by another person",HttpStatus.BAD_REQUEST),
+    INCORRECT_REQUEST_TYPE("1015","incorrect request type",HttpStatus.BAD_REQUEST),
+    LEAVE_REQUEST_EXPIRED("1016","this type of leave has run out",HttpStatus.BAD_REQUEST),
+    TIME_ERROR("1017"," time cannot be later than current time",HttpStatus.BAD_REQUEST),
+    TIM_NULL_ERROR("1018"," time cannot NULL",HttpStatus.BAD_REQUEST),
+    EMPTY_ATTENDANCE("1019"," Unable to create request for current date",HttpStatus.BAD_REQUEST)
     JOB_POSITION_IS_EMPTY("1015","Job position is empty",HttpStatus.BAD_REQUEST),
     DEPARTMENT_IS_EMPTY("1016","Department is empty",HttpStatus.BAD_REQUEST),
     REQUEST_NOT_FOUND("1017","Request not found",HttpStatus.BAD_REQUEST),
