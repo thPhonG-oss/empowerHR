@@ -47,7 +47,7 @@ public class RequestController {
                         ApiResponse.builder()
                                 .code("1000")
                                 .message("Success")
-                                .result(requestService.getRequestById(requestId))
+                                .result(requestService.handleRequest(requestHandleDTO, requestId))
                                 .build()
                 );
     }
