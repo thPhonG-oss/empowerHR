@@ -72,6 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         EmployeeResponseDTO employeeResponseDTO = employeeMapper.ToEmployeeResponseDTO(existingEmployee);
         employeeResponseDTO.setBank(existingEmployee.getBank().getBankName());
+        employeeResponseDTO.setBankAccountNumber(existingEmployee.getBank().getBankAccountNumber());
         employeeResponseDTO.setDepartment(existingEmployee.getDepartment().getDepartmentName());
         employeeResponseDTO.setPosition(existingEmployee.getPosition().getPositionName());
 
@@ -85,6 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .map(emp -> {
                     var dto = employeeMapper.ToEmployeeResponseDTO(emp);
                     dto.setBank(emp.getBank().getBankName());
+                    dto.setBankAccountNumber(emp.getBank().getBankAccountNumber());
                     dto.setDepartment(emp.getDepartment().getDepartmentName());
                     dto.setPosition(emp.getPosition().getPositionName());
                     return dto;
