@@ -1,12 +1,10 @@
 package com.hr_management.hr_management.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hr_management.hr_management.enums.Gender;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -112,4 +110,9 @@ public class Employee {
             orphanRemoval = true
     )
     private List<LeaveBalance> leaveBalances = new ArrayList<>();
+
+    @OneToOne(mappedBy = "manager") // map với biến 'manager' bên Department
+    @JsonIgnore // Ngăn vòng lặp khi convert JSON từ Employee -> Department -> Employee
+    @ToString.Exclude
+    private Department managedDepartment;
 }
