@@ -1,13 +1,11 @@
 package com.hr_management.hr_management.controller;
 
-import com.hr_management.hr_management.dto.request.ApiResponse;
-import com.hr_management.hr_management.dto.request.LeaveRequestDto;
-import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
+import com.hr_management.hr_management.dto.request.*;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
+import com.hr_management.hr_management.dto.response.TimeSheetResponse;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
 import com.hr_management.hr_management.service.AuthenticationService;
-import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
 import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import com.hr_management.hr_management.service.EmployeeService;
 import com.hr_management.hr_management.service.RequestService;
@@ -36,9 +34,6 @@ public class EmployeeController {
     private final AuthenticationService authenticationService;
     private final RequestService requestService;
 
-
-
-
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
 
@@ -62,11 +57,19 @@ public class EmployeeController {
                 .message("Profile updated successfully")
                 .build();
     }
+
     // tạo leave request
     @PostMapping("/requests/leaves")
     public  ApiResponse<LeaveRequestResponse> createLeaveRequest(@RequestBody LeaveRequestDto leaveRequestDto,JwtAuthenticationToken jwtAuthenticationToken){
         return ApiResponse.<LeaveRequestResponse>builder()
                 .result(requestService.createLeaveRequest(leaveRequestDto,jwtAuthenticationToken))
+                .build();
+    }
+    //tao update timesheet
+    @PostMapping("/requests/timesheet")
+    public ApiResponse<TimeSheetResponse> createTimeSheet(@RequestBody TimeSheetRequestDto timeSheetRequestDto, JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<TimeSheetResponse>builder()
+                .result(requestService.createTimeSheetRequest(timeSheetRequestDto,jwtAuthenticationToken))
                 .build();
     }
 

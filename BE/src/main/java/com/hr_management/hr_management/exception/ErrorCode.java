@@ -32,7 +32,11 @@ public enum ErrorCode {
     NOT_VIEW_OTHER_DEPARTMENT("1013","Cannot view other department staff list",HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_USED_BY_ANOTHER_PERSON("1014","Email already used by another person",HttpStatus.BAD_REQUEST),
     INCORRECT_REQUEST_TYPE("1015","incorrect request type",HttpStatus.BAD_REQUEST),
-    LEAVE_REQUEST_EXPIRED("1016","this type of leave has run out",HttpStatus.BAD_REQUEST)
+    LEAVE_REQUEST_EXPIRED("1016","this type of leave has run out",HttpStatus.BAD_REQUEST),
+    TIME_ERROR("1017"," time cannot be later than current time",HttpStatus.BAD_REQUEST),
+    TIM_NULL_ERROR("1018"," time cannot NULL",HttpStatus.BAD_REQUEST),
+    EMPTY_ATTENDANCE("1019"," Unable to create request for current date",HttpStatus.BAD_REQUEST)
+
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
