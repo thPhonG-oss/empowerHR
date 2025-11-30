@@ -1,7 +1,9 @@
 package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.ApiResponse;
+import com.hr_management.hr_management.dto.request.RequestHandleDTO;
 import com.hr_management.hr_management.service.RequestService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/requests")
@@ -22,7 +25,9 @@ public class RequestController {
     public ResponseEntity<Object> getHandledRequests(
             @RequestParam(name = "pageNumber", required = false, defaultValue = "1") Integer pageNumber,
             @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize
-    ) {
+    ) { }
+    @PatchMapping("/{requestId}")
+    public ResponseEntity<Object> handleRequest(@RequestBody @Valid RequestHandleDTO requestHandleDTO, @PathVariable(name = "requestId") Integer requestId){
         return ResponseEntity.ok()
                 .body(
                         ApiResponse.builder()
