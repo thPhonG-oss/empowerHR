@@ -95,4 +95,10 @@ public class EmployeeController {
                 .result(leaveTypeService.getAll())
                 .build();
     }
+    @GetMapping("/time-checkin-checkout")
+    public ApiResponse<CheckinCheckoutResponse>timeCheckinCheckout(JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<CheckinCheckoutResponse>builder()
+                .result(attendanceService.timeCheckinCheckout(jwtAuthenticationToken))
+                .build();
+    }
 }

@@ -2,6 +2,7 @@ package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.dto.request.CheckInRequest;
 import com.hr_management.hr_management.dto.request.CheckOutRequest;
+import com.hr_management.hr_management.dto.response.CheckinCheckoutResponse;
 import com.hr_management.hr_management.dto.response.CheckinResponse;
 import com.hr_management.hr_management.dto.response.CheckoutResponse;
 import com.hr_management.hr_management.entity.Attendance;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +52,19 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setIpCheckout(checkOutRequest.getIpCheckout());
         attendance.setCheckoutLocationStatus(checkOutRequest.getCheckoutLocationStatus());
         return attendanceMapper.toCheckoutResponse(attendanceRepository.save(attendance));
+    }
+
+    @Override
+    public CheckinCheckoutResponse timeCheckinCheckout(JwtAuthenticationToken jwtAuthenticationToken) {
+        Employee employee=employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).get();
+        Optional<Attendance> attendanceOptional=attendanceRepository.findByEmployee_EmployeeIdAndAttendanceDate(employee.getEmployeeId(),LocalDate.now());
+        Attendance attendance;
+        if(attendanceOptional.isPresent()){
+            attendance=attendanceOptional.get();
+        }else{
+            attendance = new Attendance();
+            attendance.setEmployee(employee);
+        }
+        return attendanceMapper.toCheckinCheckoutResponse(attendance);
     }
 }

@@ -2,6 +2,7 @@ package com.hr_management.hr_management.mapper;
 
 import com.hr_management.hr_management.dto.request.CheckInRequest;
 import com.hr_management.hr_management.dto.request.CheckOutRequest;
+import com.hr_management.hr_management.dto.response.CheckinCheckoutResponse;
 import com.hr_management.hr_management.dto.response.CheckinResponse;
 import com.hr_management.hr_management.dto.response.CheckoutResponse;
 import com.hr_management.hr_management.entity.Attendance;
@@ -18,4 +19,5 @@ public interface AttendanceMapper {
     @Mapping(target = "checkoutTime", source = "checkoutTime")
     CheckoutResponse toCheckoutResponse(Attendance attendance);
     Attendance toAttendance(CheckOutRequest checkOutRequest);
+    CheckinCheckoutResponse toCheckinCheckoutResponse(Attendance attendance);
 }
