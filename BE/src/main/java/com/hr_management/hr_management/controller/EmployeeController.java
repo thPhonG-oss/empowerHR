@@ -101,4 +101,10 @@ public class EmployeeController {
                 .result(attendanceService.timeCheckinCheckout(jwtAuthenticationToken))
                 .build();
     }
+    @GetMapping("/attendances")
+    public ApiResponse<List<AttendanceResponse>> getAllAttendance(JwtAuthenticationToken jwtAuthenticationToken){
+        return  ApiResponse.<List<AttendanceResponse>>builder()
+                .result(attendanceService.getAll(jwtAuthenticationToken))
+                .build();
+    }
 }
