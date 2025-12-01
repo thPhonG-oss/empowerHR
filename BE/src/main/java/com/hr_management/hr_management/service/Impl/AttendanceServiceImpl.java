@@ -2,6 +2,7 @@ package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.dto.request.CheckInRequest;
 import com.hr_management.hr_management.dto.request.CheckOutRequest;
+import com.hr_management.hr_management.dto.response.AttendanceResponse;
 import com.hr_management.hr_management.dto.response.CheckinCheckoutResponse;
 import com.hr_management.hr_management.dto.response.CheckinResponse;
 import com.hr_management.hr_management.dto.response.CheckoutResponse;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,5 +68,11 @@ public class AttendanceServiceImpl implements AttendanceService {
             attendance.setEmployee(employee);
         }
         return attendanceMapper.toCheckinCheckoutResponse(attendance);
+    }
+
+    @Override
+    public List<AttendanceResponse> getAll(JwtAuthenticationToken jwtAuthenticationToken) {
+        Employee employee=employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).get();
+        return attendanceMapper.toAttendanceResponse(attendanceRepository.findAllByEmployee_EmployeeId(employee.getEmployeeId()));
     }
 }
