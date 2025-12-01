@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.response.DepartmentResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponseDTO;
 import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.exception.AppException;
@@ -10,11 +11,13 @@ import com.hr_management.hr_management.service.DepartmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,18 +26,19 @@ public class DepartmentServiceImpl implements DepartmentService {
     DepartmentMapper departmentMapper;
 
     @Override
-    public List<DepartmentResponseDTO> getAllDepartments(){
+    public List<DepartmentResponse> getAllDepartments(){
         List<Department> departments = departmentRepository.findAll();
         if(departments.isEmpty()){
             throw new AppException(ErrorCode.DEPARTMENT_IS_EMPTY);
         }
 
-        List<DepartmentResponseDTO> departmentResponseDTOS = new ArrayList<>();
+        List<DepartmentResponse> departmentResponses = new ArrayList<>();
 
         for(Department department : departments){
-            departmentResponseDTOS.add(departmentMapper.toDepartmentResponseDTO(department));
+            log.info("department: {}", department.toString());
+            departmentResponses.add(departmentMapper.toDepartmentResponse(department));
         }
 
-        return departmentResponseDTOS;
+        return departmentResponses;
     }
 }
