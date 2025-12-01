@@ -48,4 +48,7 @@ public interface EmployeeMapper {
 
     EmployeeCreationResponseDTO toEmployeeCreationResponseDTO(Employee employee);
     AllEmployeeResponse toEmployeeResponse(Employee employee);
+//    DepartmentResponse toDepartmentDTO(Department department);
+    PositionResponse toPositionDTO(Position position);
+    BankResponse toBankDTO(Bank bank);
 }

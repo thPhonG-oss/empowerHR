@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface DepartmentMapper {
-    DepartmentResponseDTO toDepartmentResponseDTO(Department department);
+//    DepartmentResponseDTO toDepartmentResponseDTO(Department department);
 
     @Mapping(target = "employeeId", source = "manager.employeeId")
     @Mapping(target = "employeeCode", source = "manager.employeeCode")
