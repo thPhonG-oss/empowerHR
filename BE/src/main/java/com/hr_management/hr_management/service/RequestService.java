@@ -1,10 +1,10 @@
 package com.hr_management.hr_management.service;
 
 import com.hr_management.hr_management.dto.request.LeaveRequestDto;
+import com.hr_management.hr_management.dto.request.RequestHandleDTO;
 import com.hr_management.hr_management.dto.request.TimeSheetRequestDto;
-import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
-import com.hr_management.hr_management.dto.response.RequestResponse;
-import com.hr_management.hr_management.dto.response.TimeSheetResponse;
+import com.hr_management.hr_management.dto.response.*;
+import com.hr_management.hr_management.entity.Department;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 

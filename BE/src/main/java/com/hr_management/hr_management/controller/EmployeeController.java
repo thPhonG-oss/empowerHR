@@ -1,12 +1,10 @@
 package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.*;
-import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
-import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
-import com.hr_management.hr_management.dto.response.TimeSheetResponse;
+import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
+import com.hr_management.hr_management.service.AttendanceService;
 import com.hr_management.hr_management.service.AuthenticationService;
-import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import com.hr_management.hr_management.service.EmployeeService;
 import com.hr_management.hr_management.service.RequestService;
 import lombok.AccessLevel;
@@ -33,6 +31,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final AuthenticationService authenticationService;
     private final RequestService requestService;
+    AttendanceService attendanceService;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -72,5 +71,10 @@ public class EmployeeController {
                 .result(requestService.createTimeSheetRequest(timeSheetRequestDto,jwtAuthenticationToken))
                 .build();
     }
-
+    @PostMapping("/checkin")
+    public ApiResponse<CheckinResponse> checkin( @RequestBody CheckInRequest checkInRequest,JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<CheckinResponse>builder()
+                .result(attendanceService.checkin(checkInRequest,jwtAuthenticationToken))
+                .build();
+    }
 }
