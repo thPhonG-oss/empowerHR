@@ -77,4 +77,10 @@ public class EmployeeController {
                 .result(attendanceService.checkin(checkInRequest,jwtAuthenticationToken))
                 .build();
     }
+    @PostMapping("/checkout")
+    public ApiResponse<CheckoutResponse> checkout( @RequestBody CheckOutRequest checkOutRequest,JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<CheckoutResponse>builder()
+                .result(attendanceService.checkout(checkOutRequest,jwtAuthenticationToken))
+                .build();
+    }
 }

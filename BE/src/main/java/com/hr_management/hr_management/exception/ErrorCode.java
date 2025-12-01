@@ -39,7 +39,9 @@ public enum ErrorCode {
     JOB_POSITION_IS_EMPTY("1015","Job position is empty",HttpStatus.BAD_REQUEST),
     DEPARTMENT_IS_EMPTY("1016","Department is empty",HttpStatus.BAD_REQUEST),
     REQUEST_NOT_FOUND("1017","Request not found",HttpStatus.BAD_REQUEST),
-    CHECKIN_ERROR("1018","checked in today",HttpStatus.BAD_REQUEST)
+    CHECKIN_ERROR("1018","checked in today",HttpStatus.BAD_REQUEST),
+    NOT_CHECKIN("1019","haven't checked in yet",HttpStatus.BAD_REQUEST),
+    CHECKOUT_ERROR("1020","checked out today ",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
