@@ -3,10 +3,7 @@ package com.hr_management.hr_management.controller;
 import com.hr_management.hr_management.dto.request.*;
 import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
-import com.hr_management.hr_management.service.AttendanceService;
-import com.hr_management.hr_management.service.AuthenticationService;
-import com.hr_management.hr_management.service.EmployeeService;
-import com.hr_management.hr_management.service.RequestService;
+import com.hr_management.hr_management.service.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +29,7 @@ public class EmployeeController {
     private final AuthenticationService authenticationService;
     private final RequestService requestService;
     AttendanceService attendanceService;
+    LeaveBalanceService leaveBalanceService;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -81,6 +79,12 @@ public class EmployeeController {
     public ApiResponse<CheckoutResponse> checkout( @RequestBody CheckOutRequest checkOutRequest,JwtAuthenticationToken jwtAuthenticationToken){
         return ApiResponse.<CheckoutResponse>builder()
                 .result(attendanceService.checkout(checkOutRequest,jwtAuthenticationToken))
+                .build();
+    }
+    @GetMapping("/filter-leave-days")
+    public ApiResponse<LeaveBalanceResponse> filterLeaveDays( @RequestBody LeaveTypeRequest leaveTypeRequest,JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<LeaveBalanceResponse>builder()
+                .result(leaveBalanceService.filterLeaveDays(leaveTypeRequest,jwtAuthenticationToken))
                 .build();
     }
 }
