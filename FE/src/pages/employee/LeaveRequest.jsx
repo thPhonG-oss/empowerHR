@@ -2,20 +2,23 @@ import { Upload, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import Header from "../../components/common/Header";
 
+import employeeApi from "../../api/employeeApi";
+
+import { countDays } from "../../utils/countDays";
+
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 const CLOUD_FOLDER = import.meta.env.VITE_CLOUD_FOLDER;
 
 function LeaveRequest() {
-  // -----------------------------
-  // FORM DATA (đúng DTO backend)
-  // -----------------------------
+  const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
   const [formData, setFormData] = useState({
     reason: "",
-    request_type: "",
+    request_type: "LeaveRequest",
     startDate: "",
     endDate: "",
-    proof_document: "",
+    proofDocument: "",
     leaveTypeId: "",
     agreed: false,
   });
@@ -24,24 +27,43 @@ function LeaveRequest() {
   const [userInfo, setUserInfo] = useState({
     fullName: "",
     department: "",
-    daysOff: 0,
   });
 
+  // Leave Type
+  const [leaveTypes, setLeaveTypes] = useState([]);
+  const [daysOff, setDaysOff] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [totalLeave, setTotalLeave] = useState(0);
+
+  // Số ngày yêu cầu phải nhỏ hơn số ngày nghỉ được phép
+  const [validTotal, setValidTotal] = useState(true);
+
+  //
+  const [isUploading, setIsUploading] = useState(false);
 
   // -----------------------------
   // Fetch info từ API
   // -----------------------------
   useEffect(() => {
     async function fetchInfo() {
-      const res = await fetch("http://localhost:8080/api/user/info");
-      const data = await res.json();
+      const res = await employeeApi.getMyProfile();
 
       setUserInfo({
-        fullName: data.fullName,
-        department: data.department,
-        daysOff: data.remainingLeaveDays,
+        fullName: res.result.employeeName,
+        department: res.result.department,
       });
+    }
+
+    fetchInfo();
+  }, []);
+
+  // -----------------------------
+  // Fetch lấy danh sách loại yêu cầu
+  // -----------------------------
+  useEffect(() => {
+    async function fetchInfo() {
+      const res = await employeeApi.getLeaveType();
+      setLeaveTypes(res.result);
     }
 
     fetchInfo();
@@ -53,10 +75,19 @@ function LeaveRequest() {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
+
+    // Nếu user chọn loại nghỉ phép (leaveTypeId)
+    if (name === "leaveTypeId") {
+      const selected = leaveTypes.find((x) => x.leaveTypeId == value);
+
+      if (selected) {
+        setDaysOff(selected.totalDay);
+      }
+    }
   };
 
   // -----------------------------
@@ -76,6 +107,7 @@ function LeaveRequest() {
     if (CLOUD_FOLDER) formDataCloud.append("folder", CLOUD_FOLDER);
 
     try {
+      setIsUploading(true); // Bắt đầu loading
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
         {
@@ -90,13 +122,15 @@ function LeaveRequest() {
       if (data.secure_url) {
         setFormData((prev) => ({
           ...prev,
-          proof_document: data.secure_url,
+          proofDocument: data.secure_url,
         }));
       }
 
       console.log(data.secure_url);
     } catch (err) {
       console.error("Upload Cloudinary error:", err);
+    } finally {
+      setIsUploading(false); // Kết thúc loading
     }
   };
 
@@ -106,22 +140,34 @@ function LeaveRequest() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const { agreed, ...rest } = formData;
     const body = {
-      ...formData,
-      leaveTypeId: parseInt(formData.leaveTypeId),
+      ...rest,
+      leaveTypeId: Number(rest.leaveTypeId),
     };
 
-    console.log("DATA gửi backend:", body);
-
-    // const res = await fetch("http://localhost:8080/api/leave-requests", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(body),
-    // });
-
-    // if (res.ok) alert("Gửi yêu cầu thành công!");
-    // else alert("Lỗi khi gửi yêu cầu");
+    try {
+      const res = await employeeApi.makeLeaveRequest(body);
+      alert("Đã gửi yêu cầu thành công");
+      window.location.reload();
+    } catch (err) {
+      console.error("Lỗi", err);
+    }
+    console.log(JSON.stringify(body));
   };
+
+  // Cập nhật tổng số ngày nghỉ
+  useEffect(() => {
+    const total = countDays(formData.startDate, formData.endDate);
+    setTotalLeave(total);
+
+    // Kiểm tra tổng số ngày nghỉ có vượt quá ngày còn lại không
+    if (daysOff && total > Number(daysOff)) {
+      setValidTotal(false);
+    } else {
+      setValidTotal(true);
+    }
+  }, [formData.startDate, formData.endDate, daysOff]);
 
   return (
     <main className="min-h-screen">
@@ -154,7 +200,7 @@ function LeaveRequest() {
                   type="text"
                   value={userInfo.fullName}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
 
@@ -166,7 +212,7 @@ function LeaveRequest() {
                   type="text"
                   value={userInfo.department}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -182,15 +228,20 @@ function LeaveRequest() {
                   Chọn loại yêu cầu
                 </label>
                 <select
-                  name="request_type"
-                  value={formData.request_type}
+                  name="leaveTypeId"
+                  value={formData.leaveTypeId}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-400 rounded-lg"
                 >
                   <option value="">-- Chọn loại --</option>
-                  <option value="LEAVE">Nghỉ phép</option>
-                  <option value="LATE">Đi muộn</option>
-                  <option value="EARLY">Về sớm</option>
+                  {leaveTypes.map((leaveType) => (
+                    <option
+                      key={leaveType.leaveTypeId}
+                      value={leaveType.leaveTypeId}
+                    >
+                      {leaveType.leaveTypeName}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -200,9 +251,9 @@ function LeaveRequest() {
                 </label>
                 <input
                   type="number"
-                  value={userInfo.daysOff}
+                  value={daysOff}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -222,7 +273,10 @@ function LeaveRequest() {
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-400 rounded-lg"
+                  min={today}
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    !validTotal ? "border-red-500" : "border-gray-400"
+                  }`}
                 />
               </div>
 
@@ -235,7 +289,27 @@ function LeaveRequest() {
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-400 rounded-lg"
+                  min={formData.startDate || today}
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    !validTotal ? "border-red-500" : "border-gray-400"
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Tổng ngày nghỉ */}
+            <div className="grid grid-cols-1 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Tổng số ngày nghỉ
+                </label>
+                <input
+                  type="number"
+                  readOnly
+                  value={totalLeave}
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    !validTotal ? "border-red-500" : "border-gray-400"
+                  }`}
                 />
               </div>
             </div>
@@ -252,40 +326,55 @@ function LeaveRequest() {
                 className="w-full px-4 py-2 border border-gray-400 rounded-lg"
               />
             </div>
-
-            {/* Leave Type ID */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium mb-2">
-                Mã loại nghỉ phép (leaveTypeId)
-              </label>
-              <input
-                type="number"
-                name="leaveTypeId"
-                value={formData.leaveTypeId}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-400 rounded-lg"
-              />
-            </div>
           </div>
 
           {/* File upload */}
           <div className="p-6 border-b border-gray-200">
-            <label
-              htmlFor="file-upload"
-              className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg py-12 cursor-pointer hover:border-blue-400"
-            >
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-gray-600">Tải minh chứng</span>
-              <input
-                id="file-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-            </label>
+            {!formData.proofDocument ? (
+              <label
+                htmlFor="file-upload"
+                className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg py-12 cursor-pointer hover:border-blue-400 ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isUploading ? (
+                  <span className="text-gray-500">Đang tải lên...</span>
+                ) : (
+                  <>
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-gray-600">Tải minh chứng</span>
+                  </>
+                )}
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+              </label>
+            ) : (
+              <div className="flex flex-col items-center">
+                <img
+                  src={formData.proofDocument}
+                  alt="Minh chứng"
+                  className="w-48 h-48 object-contain rounded-lg mb-2 border"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({ ...prev, proofDocument: "" }));
+                    setUploadedFiles([]);
+                  }}
+                  className="text-red-500 text-sm hover:underline"
+                >
+                  Xóa ảnh
+                </button>
+              </div>
+            )}
 
-            {uploadedFiles.length > 0 && (
+            {uploadedFiles.length > 0 && !formData.proofDocument && (
               <ul className="mt-4 text-sm text-gray-600">
                 {uploadedFiles.map((f, i) => (
                   <li key={i}>• {f.name}</li>
@@ -302,9 +391,15 @@ function LeaveRequest() {
                 name="agreed"
                 checked={formData.agreed}
                 onChange={handleInputChange}
+                disabled={!validTotal}
               />
               <span>Tôi cam kết thông tin trên là chính xác</span>
             </label>
+            {!validTotal && (
+              <p className="text-red-500 text-sm mt-1">
+                Tổng số ngày nghỉ vượt quá số ngày còn lại!
+              </p>
+            )}
           </div>
 
           {/* Submit */}

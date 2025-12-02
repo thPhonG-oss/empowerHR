@@ -30,6 +30,8 @@ function DetailProfile({}) {
         ) {
           const res = await employeeApi.getMyProfile();
           setProfile(res.result);
+          console.log(res.result);
+
           sessionStorage.setItem("profile", JSON.stringify(res.result));
         }
       } catch (err) {
