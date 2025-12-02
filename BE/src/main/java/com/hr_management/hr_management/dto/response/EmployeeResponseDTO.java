@@ -37,4 +37,5 @@ public class EmployeeResponseDTO {
     private String position;
     private String department;
     private String bank;
+    private String bankAccountNumber;
 }
