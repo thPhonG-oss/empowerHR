@@ -32,7 +32,7 @@ public class RequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getRequestById(@PathVariable("requestId") Integer requestId){
-        return null;
+        return ResponseEntity.ok(requestService.getRequestById(requestId));
     }
     @GetMapping("/handled")
     public ResponseEntity<Object> getHandledRequests(
