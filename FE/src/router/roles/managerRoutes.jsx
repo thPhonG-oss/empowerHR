@@ -3,6 +3,10 @@ import DashboardManager from "../../pages/manager/Dashboard";
 import ManagerEmployeeList from "../../pages/manager/EmployeeList";
 import DetailProfile from "../../pages/common/DetailProfile";
 import EditProfile from "../../pages/common/EditProfile";
+import Attendance from "../../pages/employee/Attendance";
+import LeaveRequest from "../../pages/employee/LeaveRequest";
+import HistoryRequests from "../../pages/employee/HistoryRequests";
+
 import RoleRoute from "../RoleRoute";
 
 const managerRoutes = [
@@ -19,6 +23,9 @@ const managerRoutes = [
       { path: "profile/edit", element: <EditProfile /> },
       { path: "team-management", element: <ManagerEmployeeList /> },
       { path: "team-management/:employeeId", element: <DetailProfile /> },
+      { path: "attendance", element: <Attendance /> },
+      { path: "leave", element: <LeaveRequest /> },
+      { path: "request-history", element: <HistoryRequests /> },
     ],
   },
 ];
