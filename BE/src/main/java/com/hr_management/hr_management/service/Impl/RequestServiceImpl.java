@@ -5,6 +5,7 @@ import com.hr_management.hr_management.dto.request.TimeSheetRequestDto;
 import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
 import com.hr_management.hr_management.dto.response.TimeSheetResponse;
 import com.hr_management.hr_management.entity.*;
+import com.hr_management.hr_management.enums.RequestStatus;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.LeaveRequestMapper;
@@ -126,7 +127,31 @@ public class RequestServiceImpl implements RequestService {
 
         return requestMapper.toResponseDTO(request);
     }
-    
+
+    @Override
+    public HandledRequestResponseDTO getMyRequests(Integer userId, Integer pageNumber, Integer pageSize, List<RequestStatus> status) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.DESC, "handleAt"));
+
+        List<RequestStatus> requestStatuses = (status == null || status.isEmpty())
+                ? List.of(RequestStatus.Pending, RequestStatus.Approved, RequestStatus.Rejected)
+                : status;
+
+
+        Page<Request> requests = requestRepository.findAllByEmployee_EmployeeIdAndStatusIn(userId, requestStatuses, pageable);
+        List<RequestResponseDTO> requestResponseDTOs = requests.getContent().stream()
+                .map(requestMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return HandledRequestResponseDTO.builder()
+                .requestResponseDTOS(requestResponseDTOs)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalPages(requests.getTotalPages())
+                .totalElements(requests.getTotalElements())
+                .isLastPage(requests.isLast())
+                .build();
+    }
+
 
     @Override
     public HandledRequestResponseDTO getAllHandledRequests(Integer pageNumber, Integer pageSize){
