@@ -201,7 +201,15 @@ public class RequestServiceImpl implements RequestService {
         String position = manager.getPosition().getPositionName();
         log.info("Employee position: {}", position);
 
-        if(!position.equals("Manager")){
+        boolean isManger = false;
+
+        for(Role role : account.getRoles()){
+            if(role.getName().equals("MANAGER")){
+                isManger = true;
+            }
+        }
+
+        if(!isManger){
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 

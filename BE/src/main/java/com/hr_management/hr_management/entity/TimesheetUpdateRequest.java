@@ -18,7 +18,7 @@ import java.time.LocalTime;
 @PrimaryKeyJoinColumn(name = "request_id")
 // Thêm @SuperBuilder
 @SuperBuilder
-@DiscriminatorValue("TimesheetUpdate")
+@DiscriminatorValue("TimesheetUpdateRequest")
 public class TimesheetUpdateRequest extends Request {
 
     @Column(name = "attendance_date", nullable = false)

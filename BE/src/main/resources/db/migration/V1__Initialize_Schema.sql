@@ -48,9 +48,7 @@ CREATE TABLE Account (
     password VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    role_id INT,
-    CONSTRAINT fk_account_role FOREIGN KEY (role_id)
-        REFERENCES Role(role_id) ON DELETE SET NULL
+    account_status BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- ============================================
@@ -75,13 +73,27 @@ CREATE TABLE JobPosition (
 );
 
 -- ============================================
+-- BẢNG WorkLocation
+-- ============================================
+CREATE TABLE WorkLocation(
+    work_location_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255),
+    allowed_ip_ranges JSON NOT NULL
+);
+
+-- ============================================
 -- Bảng Department
 -- ============================================
 CREATE TABLE Department (
     department_id INT PRIMARY KEY AUTO_INCREMENT,
     department_name VARCHAR(100) NOT NULL UNIQUE,
     established_date DATE,
-    point_balance DECIMAL(10,2) DEFAULT 0.00
+    point_balance DECIMAL(10,2) DEFAULT 0.00,
+    manager_id INT DEFAULT NULL,
+    work_location_id INT DEFAULT NULL,
+    CONSTRAINT fk_department_work_location
+    FOREIGN KEY (work_location_id) REFERENCES WorkLocation(work_location_id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -107,6 +119,9 @@ CREATE TABLE Employee (
     position_id INT,
     department_id INT,
     bank_id INT,
+    CONSTRAINT uq_employee_code UNIQUE (employee_code),
+    CONSTRAINT uq_identity_card UNIQUE (identity_card),
+    CONSTRAINT uq_email UNIQUE (email),
     CONSTRAINT fk_employee_account FOREIGN KEY (account_id)
         REFERENCES Account(account_id) ON DELETE SET NULL,
     CONSTRAINT fk_employee_position FOREIGN KEY (position_id)
@@ -118,6 +133,13 @@ CREATE TABLE Employee (
 );
 
 -- ============================================
+-- 4. CẬP NHẬT CIRCULAR REFERENCE (Department <-> Employee)
+-- ============================================
+ALTER TABLE Department
+ADD CONSTRAINT fk_department_manager
+FOREIGN KEY (manager_id) REFERENCES Employee(employee_id) ON DELETE SET NULL;
+
+-- ============================================
 -- Bảng Request
 -- ============================================
 CREATE TABLE Request (
@@ -125,7 +147,7 @@ CREATE TABLE Request (
     status ENUM('Pending', 'Approved', 'Rejected', 'Cancelled') DEFAULT 'Pending',
     submit_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     reason TEXT,
-    request_type ENUM('Leave', 'TimesheetUpdate', 'Other') NOT NULL,
+    request_type VARCHAR(31) NOT NULL,
     handle_at DATETIME,
     response_reason TEXT,
     employee_id INT NOT NULL,
@@ -197,8 +219,8 @@ CREATE TABLE Attendance (
     checkin_time TIME,
     checkout_time TIME,
     working_hours DECIMAL(4,2),
-    IP_checkin VARCHAR(45),
-    IP_checkout VARCHAR(45),
+    IP_checkin VARCHAR(255),
+    IP_checkout VARCHAR(255),
     checkin_location_status ENUM('OnSite', 'Remote', 'Unknown'),
     checkout_location_status ENUM('OnSite', 'Remote', 'Unknown'),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -355,7 +377,7 @@ CREATE TABLE ConversionRule(
     expiry INT DEFAULT 365, -- hạn dùng điểm
     min_points INT DEFAULT 0,
     max_points INT DEFAULT 0,
-    conversion_rate DECIMAL(4,2) DEFAULT 0.00,
+    conversion_rate DECIMAL(10,2) DEFAULT 0.00,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     effective_at DATETIME DEFAULT CURRENT_TIMESTAMP,
