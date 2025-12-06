@@ -29,6 +29,9 @@ const managerRoutes = [
       { path: "attendance", element: <Attendance /> },
       { path: "leave", element: <LeaveRequest /> },
       { path: "request-history", element: <HistoryRequests /> },
+      { path: "request-management", element: <RequestManagement /> },
+      { path: "request-management-history", element: <RequestManagementHistory /> },
+
     ],
   },
 ];
