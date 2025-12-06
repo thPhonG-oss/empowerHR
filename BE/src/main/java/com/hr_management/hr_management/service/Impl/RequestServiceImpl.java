@@ -15,19 +15,11 @@ import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.repository.LeaveTypeRepository;
 import com.hr_management.hr_management.dto.response.HandledRequestResponseDTO;
 import com.hr_management.hr_management.dto.response.RequestResponseDTO;
-import com.hr_management.hr_management.entity.*;
-import com.hr_management.hr_management.exception.AppException;
-import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.RequestMapper;
 import com.hr_management.hr_management.repository.AccountRepository;
 import com.hr_management.hr_management.repository.DepartmentRepository;
-import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.dto.request.RequestHandleDTO;
-import com.hr_management.hr_management.dto.response.RequestResponseDTO;
 import com.hr_management.hr_management.entity.Request;
-import com.hr_management.hr_management.exception.AppException;
-import com.hr_management.hr_management.exception.ErrorCode;
-import com.hr_management.hr_management.mapper.RequestMapper;
 import com.hr_management.hr_management.repository.RequestRepository;
 import com.hr_management.hr_management.service.RequestService;
 import lombok.AccessLevel;
@@ -48,14 +40,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -231,5 +217,31 @@ public class RequestServiceImpl implements RequestService {
 
         Request updatedRequest = requestRepository.save(request);
         return requestMapper.toResponseDTO(updatedRequest);
+    }
+
+    // get all unresolved requests of the specific deparment
+    @Override
+    public HandledRequestResponseDTO getAllPendingRequests(Integer pageNumber, Integer pageSize){
+        Department department = getDepartmentOfManager();
+
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.DESC, "submitAt"));
+
+        Page<Request> requests = requestRepository.findAllPendingRequestsByDepartmentId( department.getDepartmentId(), pageable);
+
+        log.info("Unresolved requests count: " + requests.getTotalElements());
+
+        List<RequestResponseDTO> requestResponseDTOs = requests.stream()
+                .map(requestMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return HandledRequestResponseDTO.builder()
+                .requestResponseDTOS(requestResponseDTOs)
+                .pageNumber(requests.getNumber())
+                .pageSize(requests.getSize())
+                .totalPages(requests.getTotalPages())
+                .totalElements(requests.getTotalElements())
+                .isLastPage(true)
+                .build();
     }
 }
