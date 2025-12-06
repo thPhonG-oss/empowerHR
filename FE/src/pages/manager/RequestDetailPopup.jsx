@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { Toast } from "../../components/common/Toast"
 
 function formatDate(dateString) {
   if (!dateString) return ""
@@ -46,16 +47,6 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
   const isTimesheet = request.requestType === "TIMESHEET_UPDATE"
   const days = isLeave && request.startDate && request.endDate ? calculateDays(request.startDate, request.endDate) : 0
 
-  // Auto hide toast after 3 seconds
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => {
-        setShowToast(false)
-      }, 3000)
-      return () => clearTimeout(timer)
-    }
-  }, [showToast])
-
   const handleApproveClick = () => {
     setShowConfirm("approve")
     setError("")
@@ -77,46 +68,33 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
       setToastType("success")
       setShowToast(true)
       setShowConfirm(null)
-      // Close popup after 1.5 seconds
+      // Close popup after 2 seconds to let user see the toast
       setTimeout(() => {
         onClose()
-      }, 1500)
+      }, 2000)
     } else if (showConfirm === "reject") {
       onReject(request.requestId, note)
       setToastMessage("Từ chối yêu cầu thành công!")
       setToastType("success")
       setShowToast(true)
       setShowConfirm(null)
-      // Close popup after 1.5 seconds
+      // Close popup after 2 seconds to let user see the toast
       setTimeout(() => {
         onClose()
-      }, 1500)
+      }, 2000)
     }
   }
 
   return (
     <>
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-4 right-4 z-[70] animate-slide-in">
-          <div
-            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 ${
-              toastType === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-            }`}
-          >
-            {toastType === "success" ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
-            <span className="font-medium">{toastMessage}</span>
-          </div>
-        </div>
-      )}
+     
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={4000}
+      />
 
       {/* Main Popup */}
       <div className="fixed inset-0 z-50 flex items-center justify-center">
