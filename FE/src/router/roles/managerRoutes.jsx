@@ -9,8 +9,8 @@ import HistoryRequests from "../../pages/employee/HistoryRequests";
 
 import RoleRoute from "../RoleRoute";
 import RequestManagement from "../../pages/manager/RequestManagement";
-//import RequestManagementDetail from "../../pages/manager/RequestManagementDetail";
-//import RequestManagementHistory from "../../pages/manager/RequestManagementHistory";
+import RequestManagementHistory from "../../pages/manager/RequestManagementHistory";
+
 
 const managerRoutes = [
   {
@@ -30,7 +30,9 @@ const managerRoutes = [
       { path: "leave", element: <LeaveRequest /> },
       { path: "request-history", element: <HistoryRequests /> },
       { path: "request-management", element: <RequestManagement /> },
- 
+      { path: "request-management-history", element: <RequestManagementHistory /> },
+
+
     ],
   },
 ];
