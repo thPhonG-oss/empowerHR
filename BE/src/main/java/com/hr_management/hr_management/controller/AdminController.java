@@ -86,6 +86,7 @@ public class AdminController {
     }
 
     //[Admin] Block employee account
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/accounts/block/{employeeId}")
     public ResponseEntity<ApiResponse<Object>> blockEmployeeAccount(@PathVariable Integer employeeId) {
         accountService.blockAccountByEmployeeId(employeeId);
