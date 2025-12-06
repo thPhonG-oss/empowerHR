@@ -19,4 +19,8 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
     Page<Request> findAllHandledRequests(@Param("departmentId") Integer departmentId, Pageable pageable);
     Page<Request> findAllByEmployee_EmployeeIdAndStatusIn( Integer employeeId, List<RequestStatus> status, Pageable pageable);
 
+    // get all unresolved requests of the specific deparment
+    @Query("SELECT r FROM Request r WHERE r.status = 'Pending' AND r.employee.department.departmentId = :departmentId")
+    Page<Request> findAllPendingRequestsByDepartmentId(@Param("departmentId") Integer departmentId, Pageable pageable);
+
 }
