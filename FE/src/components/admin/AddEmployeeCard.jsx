@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import InputField from "./InputField";
 import adminApi from "../../api/adminApi";
+import positionApi from "../../api/positionApi";
+import departmentApi from "../../api/departmentApi";
 
 import { getProvinces } from "vn-provinces-wards";
 
@@ -24,6 +26,9 @@ const AddEmployeeCard = ({ onClose }) => {
     roles: [],
   });
 
+  const [positions, setPositions] = useState([]);
+  const [departments, setDepartments] = useState([]);
+
   const provinces = getProvinces();
 
   const inputClasses =
@@ -35,46 +40,46 @@ const AddEmployeeCard = ({ onClose }) => {
   const btnOutline =
     "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition";
 
-  const departments = [
-    { id: 1, name: "Ban Giám Đốc" },
-    { id: 2, name: "Phòng Nhân Sự" },
-    { id: 3, name: "Phòng Kỹ Thuật" },
-    { id: 4, name: "Phòng Kinh Doanh" },
-    { id: 5, name: "Phòng Marketing" },
-    { id: 6, name: "Phòng Kế Toán" },
-    { id: 7, name: "Phòng Hành Chính" },
-  ];
+  // const departments = [
+  //   { id: 1, name: "Ban Giám Đốc" },
+  //   { id: 2, name: "Phòng Nhân Sự" },
+  //   { id: 3, name: "Phòng Kỹ Thuật" },
+  //   { id: 4, name: "Phòng Kinh Doanh" },
+  //   { id: 5, name: "Phòng Marketing" },
+  //   { id: 6, name: "Phòng Kế Toán" },
+  //   { id: 7, name: "Phòng Hành Chính" },
+  // ];
 
-  const positions = [
-    { id: 1, name: "CEO" },
-    { id: 2, name: "CTO" },
-    { id: 3, name: "CFO" },
-    { id: 4, name: "HR Manager" },
-    { id: 5, name: "Department Manager" },
-    { id: 6, name: "Team Leader" },
-    { id: 7, name: "Senior Software Engineer" },
-    { id: 8, name: "Software Engineer" },
-    { id: 9, name: "Junior Software Engineer" },
-    { id: 10, name: "Senior Business Analyst" },
-    { id: 11, name: "Business Analyst" },
-    { id: 12, name: "Junior Business Analyst" },
-    { id: 13, name: "Senior QA Engineer" },
-    { id: 14, name: "QA Engineer" },
-    { id: 15, name: "Junior QA Engineer" },
-    { id: 16, name: "Senior Designer" },
-    { id: 17, name: "Designer" },
-    { id: 18, name: "Junior Designer" },
-    { id: 19, name: "DevOps Engineer" },
-    { id: 20, name: "Data Analyst" },
-    { id: 21, name: "Product Manager" },
-    { id: 22, name: "Project Manager" },
-    { id: 23, name: "Marketing Manager" },
-    { id: 24, name: "Sales Manager" },
-    { id: 25, name: "Accountant" },
-    { id: 26, name: "HR Specialist" },
-    { id: 27, name: "Receptionist" },
-    { id: 28, name: "Intern" },
-  ];
+  // const positions = [
+  //   { id: 1, name: "CEO" },
+  //   { id: 2, name: "CTO" },
+  //   { id: 3, name: "CFO" },
+  //   { id: 4, name: "HR Manager" },
+  //   { id: 5, name: "Department Manager" },
+  //   { id: 6, name: "Team Leader" },
+  //   { id: 7, name: "Senior Software Engineer" },
+  //   { id: 8, name: "Software Engineer" },
+  //   { id: 9, name: "Junior Software Engineer" },
+  //   { id: 10, name: "Senior Business Analyst" },
+  //   { id: 11, name: "Business Analyst" },
+  //   { id: 12, name: "Junior Business Analyst" },
+  //   { id: 13, name: "Senior QA Engineer" },
+  //   { id: 14, name: "QA Engineer" },
+  //   { id: 15, name: "Junior QA Engineer" },
+  //   { id: 16, name: "Senior Designer" },
+  //   { id: 17, name: "Designer" },
+  //   { id: 18, name: "Junior Designer" },
+  //   { id: 19, name: "DevOps Engineer" },
+  //   { id: 20, name: "Data Analyst" },
+  //   { id: 21, name: "Product Manager" },
+  //   { id: 22, name: "Project Manager" },
+  //   { id: 23, name: "Marketing Manager" },
+  //   { id: 24, name: "Sales Manager" },
+  //   { id: 25, name: "Accountant" },
+  //   { id: 26, name: "HR Specialist" },
+  //   { id: 27, name: "Receptionist" },
+  //   { id: 28, name: "Intern" },
+  // ];
 
   const banks = [
     "Vietcombank",
@@ -95,6 +100,42 @@ const AddEmployeeCard = ({ onClose }) => {
   ];
 
   const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
+
+  // const handleDeleteEmployee = () => {
+  //   // Xóa giả
+  //   setEmployeeList((prev) =>
+  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
+  //   );
+  //   // Gọi API xóa ở đây
+  //   setIsConfirmPopupOpen(false);
+  // };
+
+  // Load danh sách departments
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await departmentApi.getAllDepartment();
+        setDepartments(res.result);
+      } catch (err) {
+        console.error("Lỗi khi load danh sách phòng ban");
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Load danh sách position
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await positionApi.getAllPosition();
+        setPositions(res.result);
+      } catch (err) {
+        console.error("Lỗi khi load danh sách position");
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -271,8 +312,8 @@ const AddEmployeeCard = ({ onClose }) => {
                   >
                     <option value="">-- Chọn phòng ban --</option>
                     {departments.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
+                      <option key={d.departmentId} value={d.departmentId}>
+                        {d.departmentName}
                       </option>
                     ))}
                   </select>
@@ -290,8 +331,8 @@ const AddEmployeeCard = ({ onClose }) => {
                       -- Chọn chức vụ --
                     </option>
                     {positions.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
+                      <option key={p.positionId} value={p.positionId}>
+                        {p.positionName}
                       </option>
                     ))}
                   </select>

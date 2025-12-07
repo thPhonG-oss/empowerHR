@@ -1,260 +1,68 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, History } from "lucide-react";
 
 import Header from "../../components/common/Header";
+import employeeApi from "../../api/employeeApi";
 
-import { History } from "lucide-react";
-const requests = [
-  {
-    id: 1,
-    title: "Yêu cầu nghỉ phép",
-    description: "Nghỉ phép từ 12/01/2025 đến 14/01/2025",
-    dateRange: "12/01/2025 đến 14/01/2025",
-    requestDate: "10/01/2025",
-    requestTime: "08:20",
-    status: "approved",
-    person: "Nguyễn Văn Minh",
-    deadline: "11/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 2,
-    title: "Yêu cầu làm việc từ xa",
-    description: "Làm việc từ xa ngày 20/01/2025",
-    dateRange: "20/01/2025",
-    requestDate: "18/01/2025",
-    requestTime: "09:45",
-    status: "pending",
-    person: "Trần Thị Lan",
-    deadline: "19/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 3,
-    title: "Yêu cầu cập nhật giờ chấm công",
-    description: "Điều chỉnh check-out ngày 09/01/2025 thành 17:45",
-    dateRange: "09/01/2025",
-    requestDate: "10/01/2025",
-    requestTime: "14:10",
-    status: "rejected",
-    person: "Phạm Quốc Bảo",
-    deadline: "11/01/2025",
-    notes: "Lý do từ chối: Không khớp với dữ liệu máy chấm công",
-    statusBadge: "Đã từ chối",
-  },
-  {
-    id: 4,
-    title: "Yêu cầu nghỉ ốm",
-    description: "Nghỉ ốm ngày 22/01/2025",
-    dateRange: "22/01/2025",
-    requestDate: "21/01/2025",
-    requestTime: "07:55",
-    status: "approved",
-    person: "Lê Hoàng Duy",
-    deadline: "21/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 5,
-    title: "Yêu cầu hỗ trợ thiết bị",
-    description: "Thay bàn phím bị hỏng",
-    dateRange: "15/01/2025",
-    requestDate: "14/01/2025",
-    requestTime: "15:40",
-    status: "pending",
-    person: "Võ Hải Yến",
-    deadline: "16/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 6,
-    title: "Yêu cầu đi công tác",
-    description: "Công tác tại Đà Nẵng từ 18/01 đến 19/01",
-    dateRange: "18/01/2025 đến 19/01/2025",
-    requestDate: "13/01/2025",
-    requestTime: "10:30",
-    status: "approved",
-    person: "Phan Anh Tú",
-    deadline: "15/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 7,
-    title: "Yêu cầu cập nhật giờ chấm công",
-    description: "Điều chỉnh check-in ngày 11/01/2025 thành 08:20",
-    dateRange: "11/01/2025",
-    requestDate: "12/01/2025",
-    requestTime: "09:20",
-    status: "pending",
-    person: "Đặng Thu Thảo",
-    deadline: "13/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 8,
-    title: "Yêu cầu nghỉ phép",
-    description: "Nghỉ phép ngày 05/01/2025",
-    dateRange: "05/01/2025",
-    requestDate: "04/01/2025",
-    requestTime: "16:15",
-    status: "rejected",
-    person: "Ngô Minh Khôi",
-    deadline: "04/01/2025",
-    notes: "Lý do từ chối: Gần deadline dự án",
-    statusBadge: "Đã từ chối",
-  },
-  {
-    id: 9,
-    title: "Yêu cầu làm việc từ xa",
-    description: "Làm việc từ xa ngày 23/01/2025",
-    dateRange: "23/01/2025",
-    requestDate: "22/01/2025",
-    requestTime: "09:00",
-    status: "approved",
-    person: "Tạ Thanh Hà",
-    deadline: "22/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 10,
-    title: "Yêu cầu cấp tài khoản hệ thống",
-    description: "Tạo tài khoản Jira cho nhân viên mới",
-    dateRange: "16/01/2025",
-    requestDate: "15/01/2025",
-    requestTime: "08:50",
-    status: "pending",
-    person: "Mai Đức Huy",
-    deadline: "17/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 11,
-    title: "Yêu cầu thay đổi lịch làm việc",
-    description: "Đổi ca làm từ ca sáng sang ca chiều",
-    dateRange: "19/01/2025",
-    requestDate: "17/01/2025",
-    requestTime: "13:30",
-    status: "pending",
-    person: "Huỳnh Ngọc Bích",
-    deadline: "18/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 12,
-    title: "Yêu cầu nghỉ phép",
-    description: "Nghỉ phép ngày 07/01/2025",
-    dateRange: "07/01/2025",
-    requestDate: "06/01/2025",
-    requestTime: "07:40",
-    status: "approved",
-    person: "Nguyễn Kiều Anh",
-    deadline: "06/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 13,
-    title: "Yêu cầu cập nhật giờ chấm công",
-    description: "Điều chỉnh check-out ngày 03/01/2025 thành 18:00",
-    dateRange: "03/01/2025",
-    requestDate: "04/01/2025",
-    requestTime: "11:00",
-    status: "rejected",
-    person: "Bùi Nhật Tân",
-    deadline: "05/01/2025",
-    notes: "Lý do từ chối: Không có xác nhận từ quản lý",
-    statusBadge: "Đã từ chối",
-  },
-  {
-    id: 14,
-    title: "Yêu cầu làm việc từ xa",
-    description: "Làm việc tại nhà ngày 25/01/2025",
-    dateRange: "25/01/2025",
-    requestDate: "24/01/2025",
-    requestTime: "09:10",
-    status: "pending",
-    person: "Hồ Thuận Phát",
-    deadline: "24/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 15,
-    title: "Yêu cầu nghỉ bù",
-    description: "Nghỉ bù ngày 13/01/2025 sau OT cuối tuần",
-    dateRange: "13/01/2025",
-    requestDate: "12/01/2025",
-    requestTime: "12:50",
-    status: "approved",
-    person: "Trương Mỹ Duyên",
-    deadline: "12/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 16,
-    title: "Yêu cầu cấp thiết bị",
-    description: "Cấp chuột không dây cho nhân viên mới",
-    dateRange: "14/01/2025",
-    requestDate: "13/01/2025",
-    requestTime: "14:30",
-    status: "pending",
-    person: "Đinh Tấn Lộc",
-    deadline: "15/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 17,
-    title: "Yêu cầu cập nhật giờ chấm công",
-    description: "Điều chỉnh check-in ngày 02/01/2025 thành 08:10",
-    dateRange: "02/01/2025",
-    requestDate: "03/01/2025",
-    requestTime: "10:15",
-    status: "approved",
-    person: "Lương Đức Thịnh",
-    deadline: "03/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 18,
-    title: "Yêu cầu nghỉ phép dài ngày",
-    description: "Nghỉ phép từ 28/01/2025 đến 31/01/2025",
-    dateRange: "28/01/2025 đến 31/01/2025",
-    requestDate: "20/01/2025",
-    requestTime: "08:00",
-    status: "pending",
-    person: "Tôn Nữ Khánh Linh",
-    deadline: "22/01/2025",
-    statusBadge: "Chờ phê duyệt",
-  },
-  {
-    id: 19,
-    title: "Yêu cầu thay đổi vị trí làm việc",
-    description: "Chuyển sang desk 14 vì lý do sức khỏe",
-    dateRange: "21/01/2025",
-    requestDate: "19/01/2025",
-    requestTime: "15:00",
-    status: "approved",
-    person: "Hoàng Ngọc Sơn",
-    deadline: "20/01/2025",
-    statusBadge: "Đã phê duyệt",
-  },
-  {
-    id: 20,
-    title: "Yêu cầu cập nhật giờ chấm công",
-    description: "Điều chỉnh check-out ngày 06/01/2025 thành 17:30",
-    dateRange: "06/01/2025",
-    requestDate: "07/01/2025",
-    requestTime: "09:55",
-    status: "rejected",
-    person: "Trần Nhật Vy",
-    deadline: "08/01/2025",
-    notes: "Lý do từ chối: Không có chứng minh OT",
-    statusBadge: "Đã từ chối",
-  },
-];
 export default function HistoryRequests() {
+  const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 5;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await employeeApi.getMyRequest({ page: 1, size: 100 });
+        console.log(res);
+        if (res?.result?.requestResponseDTOS) {
+          const mapped = res.result.requestResponseDTOS.map((item) => ({
+            id: item.requestId,
+            title:
+              item.requestType === "LEAVE"
+                ? "Yêu cầu nghỉ phép"
+                : "Yêu cầu cập nhật giờ chấm công",
+
+            description:
+              item.requestType === "LEAVE"
+                ? `Nghỉ từ ${item.startDate} đến ${item.endDate}`
+                : `Điều chỉnh ngày ${item.attendanceDate}: ${item.checkinTime} → ${item.checkoutTime}`,
+
+            dateRange:
+              item.requestType === "LEAVE"
+                ? `${item.startDate} đến ${item.endDate}`
+                : item.attendanceDate,
+
+            requestDate: item.submitAt?.split("T")[0] || "",
+            requestTime: item.submitAt?.split("T")[1]?.substring(0, 5) || "",
+
+            status: item.status.toLowerCase(),
+            statusBadge:
+              item.status === "Approved"
+                ? "Đã phê duyệt"
+                : item.status === "Rejected"
+                ? "Đã từ chối"
+                : "Chờ phê duyệt",
+
+            person: item.employeeName,
+            deadline: item.handleAt || "—",
+
+            notes:
+              item.status === "Rejected" && item.responseReason
+                ? `Lý do từ chối: ${item.responseReason}`
+                : null,
+          }));
+
+          setRequests(mapped);
+        }
+      } catch (e) {
+        console.error("Lỗi gọi API:", e);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const tabs = [
     { id: "all", label: "Tất cả", count: requests.length },
@@ -275,21 +83,17 @@ export default function HistoryRequests() {
     },
   ];
 
-  // Filter theo tab
   const filteredRequests =
     activeTab === "all"
       ? requests
       : requests.filter((req) => req.status === activeTab);
 
-  // Total pages
   const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
 
-  // Reset trang khi đổi tab
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  // Lấy item theo trang
   const pageData = filteredRequests.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -336,12 +140,11 @@ export default function HistoryRequests() {
 
   return (
     <div className="p-0 relative">
-      <div className=" mx-auto">
+      <div className="mx-auto">
         <Header title="Lịch sử yêu cầu" icon={History} />
 
         <div className="px-4">
           <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-            {/* Tabs */}
             <div className="flex gap-8 border-b border-gray-200 mb-6">
               {tabs.map((tab) => (
                 <button
@@ -361,7 +164,6 @@ export default function HistoryRequests() {
               ))}
             </div>
 
-            {/* Request List */}
             <div className="space-y-4">
               {pageData.map((request) => (
                 <div
@@ -429,53 +231,43 @@ export default function HistoryRequests() {
               ))}
             </div>
 
-            {/* PAGINATION NEW */}
             <div className="flex items-center justify-center gap-2 mt-6 select-none">
-              {/* Previous */}
               <button
                 onClick={() => setCurrentPage((p) => p - 1)}
                 disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm
-                    ${
-                      currentPage === 1
-                        ? "opacity-40 cursor-not-allowed"
-                        : "hover:bg-gray-100"
-                    }
-                    `}
+                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm ${
+                  currentPage === 1
+                    ? "opacity-40 cursor-not-allowed"
+                    : "hover:bg-gray-100"
+                }`}
               >
                 ← Trước
               </button>
 
-              {/* Page Numbers */}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium transition
-                        ${
-                          currentPage === page
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "bg-white hover:bg-gray-100"
-                        }
-                    `}
+                    className={`w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium transition ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white hover:bg-gray-100"
+                    }`}
                   >
                     {page}
                   </button>
                 )
               )}
 
-              {/* Next */}
               <button
                 onClick={() => setCurrentPage((p) => p + 1)}
                 disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm
-                ${
+                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm ${
                   currentPage === totalPages
                     ? "opacity-40 cursor-not-allowed"
                     : "hover:bg-gray-100"
-                }
-                `}
+                }`}
               >
                 Sau →
               </button>

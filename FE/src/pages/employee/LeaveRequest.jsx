@@ -1,16 +1,21 @@
 import { Upload, FileText } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router";
 import Header from "../../components/common/Header";
 
 import employeeApi from "../../api/employeeApi";
 
 import { countDays } from "../../utils/countDays";
+import { AuthContext } from "../../context/AuthContext";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 const CLOUD_FOLDER = import.meta.env.VITE_CLOUD_FOLDER;
 
 function LeaveRequest() {
+  const { role } = useContext(AuthContext);
+  const safeRole = typeof role === "string" ? role.toLowerCase() : "";
+
   const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
 
   const [formData, setFormData] = useState({
@@ -37,9 +42,9 @@ function LeaveRequest() {
 
   // Số ngày yêu cầu phải nhỏ hơn số ngày nghỉ được phép
   const [validTotal, setValidTotal] = useState(true);
-
   //
   const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate();
 
   // -----------------------------
   // Fetch info từ API
@@ -117,7 +122,6 @@ function LeaveRequest() {
       );
 
       const data = await res.json();
-      console.log("Cloudinary upload result:", data);
 
       if (data.secure_url) {
         setFormData((prev) => ({
@@ -125,8 +129,6 @@ function LeaveRequest() {
           proofDocument: data.secure_url,
         }));
       }
-
-      console.log(data.secure_url);
     } catch (err) {
       console.error("Upload Cloudinary error:", err);
     } finally {
@@ -149,11 +151,11 @@ function LeaveRequest() {
     try {
       const res = await employeeApi.makeLeaveRequest(body);
       alert("Đã gửi yêu cầu thành công");
-      window.location.reload();
+      // Qua trang Lịch sử yêu cầu
+      navigate(`/${safeRole}/request-history`);
     } catch (err) {
       console.error("Lỗi", err);
     }
-    console.log(JSON.stringify(body));
   };
 
   // Cập nhật tổng số ngày nghỉ

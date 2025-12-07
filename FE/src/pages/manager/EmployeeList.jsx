@@ -124,7 +124,10 @@ function ManagerEmployeeList() {
   const totalItems = displayStaff.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentStaff = displayStaff.slice(startIndex, startIndex + itemsPerPage);
+  const currentStaff = displayStaff.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const generatePaginationPages = () => {
     const pages = [];
@@ -171,7 +174,8 @@ function ManagerEmployeeList() {
                 Tìm kiếm nhân viên
               </h2>
               <div className="text-sm text-gray-600">
-                Phòng ban: <span className="font-semibold">{MANAGER_DEPARTMENT}</span>
+                Phòng ban:{" "}
+                <span className="font-semibold">{MANAGER_DEPARTMENT}</span>
               </div>
             </div>
 
@@ -330,4 +334,3 @@ function ManagerEmployeeList() {
 }
 
 export default ManagerEmployeeList;
-
