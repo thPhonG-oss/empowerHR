@@ -1,93 +1,106 @@
-import { useState } from "react"
-import { Toast } from "../../components/common/Toast"
+import { useState } from "react";
+import requestApi from "../../api/requestApi";
+import { Toast } from "../common/Toast";
 
 function formatDate(dateString) {
-  if (!dateString) return ""
-  const date = new Date(dateString)
-  return date.toLocaleDateString("vi-VN")
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("vi-VN");
 }
-//
-
 
 function formatTimeOnly(timeString) {
-  if (!timeString) return ""
-  // Format "09:00:00" to "9h00"
-  const [hours, minutes] = timeString.split(":")
-  return `${parseInt(hours)}h${minutes}`
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(":");
+  return `${parseInt(hours)}h${minutes}`;
 }
 
 function calculateDays(startDate, endDate) {
-  if (!startDate || !endDate) return 0
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-  const diffTime = Math.abs(end.getTime() - start.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
-  return diffDays
+  if (!startDate || !endDate) return 0;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  return diffDays;
 }
 
-function isImageFile(fileName) {
-  if (!fileName) return false
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg"]
-  const lowerFileName = fileName.toLowerCase()
-  return imageExtensions.some((ext) => lowerFileName.endsWith(ext))
-}
+export function RequestDetailPopup({ request, onClose, reloadData }) {
+  const [note, setNote] = useState("");
+  const [showConfirm, setShowConfirm] = useState(null);
+  const [error, setError] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
 
+  const isProcessed = request.status !== "Pending";
+  const isLeave = request.requestType === "LEAVE";
+  const isTimesheet = request.requestType === "TIMESHEET_UPDATE";
 
+  // ===== CALL API APPROVE =====
+  const approveRequest = async () => {
+    try {
+      await requestApi.approve(request.requestId, note);
 
-export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
-  const [note, setNote] = useState("")
-  const [showConfirm, setShowConfirm] = useState(null)
-  const [error, setError] = useState("")
-  const [showToast, setShowToast] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
-  const [toastType, setToastType] = useState("success") // "success" | "error"
+      setToastMessage("Phê duyệt yêu cầu thành công!");
+      setToastType("success");
+      setShowToast(true);
 
-  const isProcessed = request.status !== "Pending"
-  const isLeave = request.requestType === "LEAVE"
-  const isTimesheet = request.requestType === "TIMESHEET_UPDATE"
-  const days = isLeave && request.startDate && request.endDate ? calculateDays(request.startDate, request.endDate) : 0
+      if (reloadData) reloadData();
+
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setToastMessage("Lỗi khi phê duyệt!");
+      setToastType("error");
+      setShowToast(true);
+    }
+  };
+
+  // ===== CALL API REJECT =====
+  const rejectRequest = async () => {
+    try {
+      await requestApi.reject(request.requestId, note);
+
+      setToastMessage("Từ chối yêu cầu thành công!");
+      setToastType("success");
+      setShowToast(true);
+
+      if (reloadData) reloadData();
+
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setToastMessage("Lỗi khi từ chối!");
+      setToastType("error");
+      setShowToast(true);
+    }
+  };
 
   const handleApproveClick = () => {
-    setShowConfirm("approve")
-    setError("")
-  }
+    setShowConfirm("approve");
+    setError("");
+  };
 
   const handleRejectClick = () => {
     if (!note.trim()) {
-      setError("Vui lòng nhập lý do từ chối")
-      return
+      setError("Vui lòng nhập lý do từ chối");
+      return;
     }
-    setShowConfirm("reject")
-    setError("")
-  }
+    setShowConfirm("reject");
+    setError("");
+  };
 
   const confirmAction = () => {
-    if (showConfirm === "approve") {
-      onApprove(request.requestId, note)
-      setToastMessage("Phê duyệt yêu cầu thành công!")
-      setToastType("success")
-      setShowToast(true)
-      setShowConfirm(null)
-      // Close popup after 2 seconds to let user see the toast
-      setTimeout(() => {
-        onClose()
-      }, 2000)
-    } else if (showConfirm === "reject") {
-      onReject(request.requestId, note)
-      setToastMessage("Từ chối yêu cầu thành công!")
-      setToastType("success")
-      setShowToast(true)
-      setShowConfirm(null)
-      // Close popup after 2 seconds to let user see the toast
-      setTimeout(() => {
-        onClose()
-      }, 2000)
-    }
-  }
+    if (showConfirm === "approve") approveRequest();
+    else rejectRequest();
+    setShowConfirm(null);
+    window.location.reload();
+  };
+
+  const days =
+    isLeave && request.startDate && request.endDate
+      ? calculateDays(request.startDate, request.endDate)
+      : 0;
 
   return (
     <>
-     
       <Toast
         message={toastMessage}
         type={toastType}
@@ -98,70 +111,97 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
 
       {/* Main Popup */}
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        {/* Backdrop */}
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-        {/* Popup Content */}
         <div className="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-          {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
-              {isLeave ? "Xin nghỉ phép" : isTimesheet ? "Cập nhật chấm công" : "Yêu cầu"}
+              {isLeave
+                ? "Xin nghỉ phép"
+                : isTimesheet
+                ? "Cập nhật chấm công"
+                : "Yêu cầu"}
             </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 cursor-pointer p-1 rounded-md hover:bg-gray-100 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           {/* Content */}
           <div className="p-4">
-            {/* Info Grid */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">Người yêu cầu:</span>
-                <span className="text-gray-900 font-semibold">{request.employeeName}</span>
+                <span className="text-gray-900 font-semibold">
+                  {request.employeeName}
+                </span>
               </div>
+
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">Bộ phận:</span>
                 <span className="text-gray-900">Developer</span>
               </div>
+
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">Ngày yêu cầu:</span>
-                <span className="text-gray-900">{formatDate(request.submitAt)}</span>
+                <span className="text-gray-900">
+                  {formatDate(request.submitAt)}
+                </span>
               </div>
+
               <div></div>
 
-              {/* Leave Request Fields */}
+              {/* Leave */}
               {isLeave && (
                 <>
                   <div className="flex items-center gap-2">
                     <span className="text-gray-500">Bắt đầu:</span>
                     <span className="text-gray-900">
-                      {request.startDate ? `${formatTimeOnly("08:00:00")} - ${formatDate(request.startDate)}` : "N/A"}
+                      {request.startDate
+                        ? `${formatTimeOnly("08:00:00")} - ${formatDate(
+                            request.startDate
+                          )}`
+                        : "N/A"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-gray-500">Đến ngày:</span>
                     <span className="text-gray-900">
-                      {request.endDate ? `${formatTimeOnly("17:00:00")} - ${formatDate(request.endDate)}` : "N/A"}
+                      {request.endDate
+                        ? `${formatTimeOnly("17:00:00")} - ${formatDate(
+                            request.endDate
+                          )}`
+                        : "N/A"}
                     </span>
                   </div>
                 </>
               )}
 
-              {/* Timesheet Update Fields */}
+              {/* Timesheet */}
               {isTimesheet && (
                 <>
                   <div className="flex items-center gap-2">
                     <span className="text-gray-500">Checkin Time:</span>
                     <span className="text-gray-900">
                       {request.attendanceDate && request.checkinTime
-                        ? `${formatTimeOnly(request.checkinTime)} - ${formatDate(request.attendanceDate)}`
+                        ? `${formatTimeOnly(
+                            request.checkinTime
+                          )} - ${formatDate(request.attendanceDate)}`
                         : "N/A"}
                     </span>
                   </div>
@@ -169,7 +209,9 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
                     <span className="text-gray-500">Checkout Time:</span>
                     <span className="text-gray-900">
                       {request.attendanceDate && request.checkoutTime
-                        ? `${formatTimeOnly(request.checkoutTime)} - ${formatDate(request.attendanceDate)}`
+                        ? `${formatTimeOnly(
+                            request.checkoutTime
+                          )} - ${formatDate(request.attendanceDate)}`
                         : "N/A"}
                     </span>
                   </div>
@@ -177,35 +219,35 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
               )}
             </div>
 
-            {/* Total Leave Days - Only for Leave Request */}
             {isLeave && days > 0 && (
               <div className="mt-3 text-sm">
                 <span className="text-gray-500">Tổng ngày nghỉ:</span>
-                <span className="ml-2 text-gray-900 font-medium">{days} ngày</span>
+                <span className="ml-2 text-gray-900 font-medium">
+                  {days} ngày
+                </span>
               </div>
             )}
 
-            {/* Reason Box */}
+            {/* Reason */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
               <p className="text-sm text-gray-500 mb-1">Lý do:</p>
               <p className="text-sm text-gray-700">{request.reason}</p>
             </div>
 
-            {/* Proof Document - Only for Leave Request */}
+            {/* Proof Image */}
             {request.proofDocument && isLeave && (
               <div className="mt-4">
                 <p className="text-sm text-gray-500 mb-2">File đính kèm</p>
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-2">
-                  <img 
+                  <img
                     src={request.proofDocument}
                     alt="Minh chứng"
                     className="w-[400px] h-[300px] object-contain rounded mx-auto"
                     onError={(e) => {
-                      // Fallback nếu ảnh không load được
-                      e.target.style.display = "none"
-                      const errorDiv = e.target.nextElementSibling
+                      e.target.style.display = "none";
+                      const errorDiv = e.target.nextElementSibling;
                       if (errorDiv) {
-                        errorDiv.style.display = "block"
+                        errorDiv.style.display = "block";
                       }
                     }}
                   />
@@ -229,7 +271,7 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
               </div>
             )}
 
-            {/* Status Badge for Processed Requests */}
+            {/* Status */}
             {isProcessed && (
               <div className="mt-4 p-4 rounded-md border border-gray-200 bg-gray-50">
                 <div className="flex items-center gap-2 mb-2">
@@ -240,30 +282,40 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
                         : "bg-red-100 text-red-700 border border-red-200"
                     }`}
                   >
-                    {request.status === "Approved" ? "Đã phê duyệt" : "Đã từ chối"}
+                    {request.status === "Approved"
+                      ? "Đã phê duyệt"
+                      : "Đã từ chối"}
                   </span>
                   {request.handleAt && (
-                    <span className="text-sm text-gray-500">vào {formatDate(request.handleAt)}</span>
+                    <span className="text-sm text-gray-500">
+                      vào {formatDate(request.handleAt)}
+                    </span>
                   )}
                 </div>
                 {request.responseReason && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-1">Ghi chú của quản lý:</p>
-                    <p className="text-sm text-gray-700">{request.responseReason}</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      Ghi chú của quản lý:
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      {request.responseReason}
+                    </p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Manager Note - Only for Pending */}
+            {/* Manager Note */}
             {!isProcessed && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-900 mb-2">Ghi chú của quản lý</p>
+                <p className="text-sm font-medium text-gray-900 mb-2">
+                  Ghi chú của quản lý
+                </p>
                 <textarea
                   value={note}
                   onChange={(e) => {
-                    setNote(e.target.value)
-                    setError("")
+                    setNote(e.target.value);
+                    setError("");
                   }}
                   placeholder="Ghi chú lý do từ chối hoặc phê duyệt"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
@@ -274,7 +326,6 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
             )}
           </div>
 
-          {/* Footer - Only for Pending */}
           {!isProcessed && (
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
               <button
@@ -294,10 +345,13 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
         </div>
       </div>
 
-      {/* Confirmation Popup */}
+      {/* Confirmation */}
       {showConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setShowConfirm(null)} />
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setShowConfirm(null)}
+          />
           <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
             <div className="flex items-center gap-3 mb-4">
               <div
@@ -306,12 +360,32 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
                 }`}
               >
                 {showConfirm === "approve" ? (
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 )}
               </div>
@@ -321,10 +395,13 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
                 </h3>
               </div>
             </div>
+
             <p className="text-sm text-gray-600 mb-6">
-              Bạn có chắc chắn muốn {showConfirm === "approve" ? "phê duyệt" : "từ chối"} yêu cầu của{" "}
+              Bạn có chắc chắn muốn{" "}
+              {showConfirm === "approve" ? "phê duyệt" : "từ chối"} yêu cầu của{" "}
               <span className="font-medium">{request.employeeName}</span>?
             </p>
+
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setShowConfirm(null)}
@@ -335,7 +412,9 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
               <button
                 onClick={confirmAction}
                 className={`px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer transition-colors ${
-                  showConfirm === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+                  showConfirm === "approve"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
                 }`}
               >
                 Xác nhận
@@ -345,5 +424,5 @@ export function RequestDetailPopup({ request, onClose, onApprove, onReject }) {
         </div>
       )}
     </>
-  )
+  );
 }

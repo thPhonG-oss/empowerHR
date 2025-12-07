@@ -135,7 +135,7 @@ function DetailProfile({}) {
 
                 <InfoField
                   label="Tài khoản ngân hàng"
-                  value={`${profile?.bank.bankAccountNumber} - ${profile?.bank.bankName}`}
+                  value={`${profile?.bankAccountNumber} - ${profile?.bank}`}
                 />
                 <InfoField
                   label="Ngày vào làm"

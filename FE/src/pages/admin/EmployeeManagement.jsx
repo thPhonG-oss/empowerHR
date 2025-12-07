@@ -93,14 +93,14 @@ function StaffManagement() {
     return pages;
   };
 
-  const handleDeleteEmployee = () => {
-    // Xóa giả
-    setEmployeeList((prev) =>
-      prev.filter((emp) => emp.employeeId !== employeeToDelete)
-    );
-    // Gọi API xóa ở đây
-    setIsConfirmPopupOpen(false);
-  };
+  // const handleDeleteEmployee = () => {
+  //   // Xóa giả
+  //   setEmployeeList((prev) =>
+  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
+  //   );
+  //   // Gọi API xóa ở đây
+  //   setIsConfirmPopupOpen(false);
+  // };
 
   // Load danh sách departments
   useEffect(() => {
