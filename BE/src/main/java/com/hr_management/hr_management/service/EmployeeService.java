@@ -2,8 +2,8 @@ package com.hr_management.hr_management.service;
 
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.Role;
-import com.hr_management.hr_management.repository.EmployeeRepository;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
@@ -13,10 +13,8 @@ import com.hr_management.hr_management.dto.request.EmployeeProfileCreationReques
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
 import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
-import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 
 public interface EmployeeService {
@@ -47,4 +45,7 @@ public interface EmployeeService {
     EmployeeCreationResponseDTO getFullEmployeeInfo(Integer employeeId);
 
     Set<Role> transformRole(Set<String> roleNames);
+
+    @Transactional
+    Employee createDefaultMangerProfile(EmployeeProfileCreationRequestDTO request);
 }
