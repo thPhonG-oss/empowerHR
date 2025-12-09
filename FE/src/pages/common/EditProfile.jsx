@@ -9,51 +9,11 @@ import GoBackLink from "../../components/common/GoBackLink";
 
 import adminApi from "../../api/adminApi";
 import employeeApi from "../../api/employeeApi";
-
+import departmentApi from "../../api/departmentApi";
+import positionApi from "../../api/positionApi";
 import { getProvinces } from "vn-provinces-wards";
 
-// Mock dropdowns
-const departments = [
-  { id: 1, name: "Ban Giám Đốc" },
-  { id: 2, name: "Phòng Nhân Sự" },
-  { id: 3, name: "Phòng Kỹ Thuật" },
-  { id: 4, name: "Phòng Kinh Doanh" },
-  { id: 5, name: "Phòng Marketing" },
-  { id: 6, name: "Phòng Kế Toán" },
-  { id: 7, name: "Phòng Hành Chính" },
-];
-
-const positions = [
-  { id: 1, name: "CEO" },
-  { id: 2, name: "CTO" },
-  { id: 3, name: "CFO" },
-  { id: 4, name: "HR Manager" },
-  { id: 5, name: "Department Manager" },
-  { id: 6, name: "Team Leader" },
-  { id: 7, name: "Senior Software Engineer" },
-  { id: 8, name: "Software Engineer" },
-  { id: 9, name: "Junior Software Engineer" },
-  { id: 10, name: "Senior Business Analyst" },
-  { id: 11, name: "Business Analyst" },
-  { id: 12, name: "Junior Business Analyst" },
-  { id: 13, name: "Senior QA Engineer" },
-  { id: 14, name: "QA Engineer" },
-  { id: 15, name: "Junior QA Engineer" },
-  { id: 16, name: "Senior Designer" },
-  { id: 17, name: "Designer" },
-  { id: 18, name: "Junior Designer" },
-  { id: 19, name: "DevOps Engineer" },
-  { id: 20, name: "Data Analyst" },
-  { id: 21, name: "Product Manager" },
-  { id: 22, name: "Project Manager" },
-  { id: 23, name: "Marketing Manager" },
-  { id: 24, name: "Sales Manager" },
-  { id: 25, name: "Accountant" },
-  { id: 26, name: "HR Specialist" },
-  { id: 27, name: "Receptionist" },
-  { id: 28, name: "Intern" },
-  { id: 29, name: "Nhân viên" },
-];
+import toast from "react-hot-toast";
 
 const banks = [
   "Vietcombank",
@@ -80,15 +40,34 @@ function EditProfile() {
 
   const [formData, setFormData] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   const safeRole = typeof role === "string" ? role.toUpperCase() : "";
   const isAdmin = safeRole === "ADMIN";
   const isManager = safeRole === "MANAGER";
 
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      try {
+        const [deptRes, posRes] = await Promise.all([
+          departmentApi.getAllDepartment(),
+          positionApi.getAllPosition(),
+        ]);
+        setDepartments(deptRes.result || []);
+        setPositions(posRes.result || []);
+      } catch (err) {
+        console.error("Error loading dropdowns:", err);
+        toast.error("Không thể tải danh sách phòng ban / chức vụ");
+      }
+    };
+
+    fetchDropdowns();
+  }, []);
+
   // Load initial profile
   useEffect(() => {
     const stored = JSON.parse(sessionStorage.getItem("profile"));
-    console.log(stored);
     if (stored) {
       setFormData({
         ...stored,
@@ -96,8 +75,8 @@ function EditProfile() {
         departmentName: stored.department?.departmentName,
         positionId: stored.position?.positionId,
         positionName: stored.position?.positionName,
-        bankName: stored.bank?.bankName ?? "",
-        bankAccountNumber: stored.bank?.bankAccountNumber ?? "",
+        bankName: stored.bank ?? "",
+        bankAccountNumber: stored.bankAccountNumber ?? "",
       });
     }
   }, []);
@@ -163,25 +142,24 @@ function EditProfile() {
         };
 
         const res = await adminApi.updateUserById(employeeId, payload);
-        console.log("Update response:", res.data);
-        alert(`Cập nhật thông tin ${res.data.employeeCode} thành công!`);
+        toast.success(
+          `Cập nhật thông tin ${res.data.employeeCode} thành công!`
+        );
       }
 
       if (safeRole === "EMPLOYEE") {
-        console.log("Nhân viên");
         const payload = {
           address: formData.address ?? "",
           email: formData.email ?? "",
           phoneNumber: formData.phoneNumber ?? "",
         };
-        console.log(JSON.stringify(payload));
         const res = employeeApi.updateMyProfile(payload);
-        console.log(res);
-        alert("Cập nhật thông tin liên hệ của bạn thành công");
+        toast.success("Cập nhật thông tin liên hệ của bạn thành công");
       }
       navigate(backPath);
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);
+      toast.error("Cập nhật thông tin liên hệ không thành công");
     } finally {
       setSaving(false);
     }
@@ -196,8 +174,8 @@ function EditProfile() {
         departmentName: stored.department?.departmentName,
         positionId: stored.position?.positionId,
         positionName: stored.position?.positionName,
-        bankName: stored.bank?.bankName ?? "",
-        bankAccountNumber: stored.bank?.bankAccountNumber ?? "",
+        bankName: stored.bank ?? "",
+        bankAccountNumber: stored.bankAccountNumber ?? "",
       });
     }
   };
@@ -209,7 +187,7 @@ function EditProfile() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
-        <Header title={"Hồ sơ nhân viên"} icon={Contact} />
+        <Header title={"Hồ sơ"} icon={Contact} />
 
         <div className="px-8">
           <GoBackLink destination={backPath} />
@@ -244,12 +222,14 @@ function EditProfile() {
                     label="Tên phòng ban"
                     value={formData.departmentName}
                     type="select"
-                    options={departments.map((d) => d.name)}
+                    options={departments.map((d) => d.departmentName)}
                     disabled={!canEditField("departmentId")}
                     onChange={(v) => {
-                      const dept = departments.find((d) => d.name === v);
+                      const dept = departments.find(
+                        (d) => d.departmentName === v
+                      );
                       handleChange("departmentName", v);
-                      handleChange("departmentId", dept?.id);
+                      handleChange("departmentId", dept?.departmentId);
                     }}
                   />
 
@@ -257,12 +237,12 @@ function EditProfile() {
                     label="Vị trí"
                     value={formData.positionName}
                     type="select"
-                    options={positions.map((p) => p.name)}
+                    options={positions.map((p) => p.positionName)}
                     disabled={!canEditField("positionId")}
                     onChange={(v) => {
-                      const pos = positions.find((p) => p.name === v);
+                      const pos = positions.find((p) => p.positionName === v);
                       handleChange("positionName", v);
-                      handleChange("positionId", pos?.id);
+                      handleChange("positionId", pos?.positionId);
                     }}
                   />
 

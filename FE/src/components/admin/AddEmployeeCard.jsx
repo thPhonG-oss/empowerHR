@@ -40,47 +40,6 @@ const AddEmployeeCard = ({ onClose }) => {
   const btnOutline =
     "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition";
 
-  // const departments = [
-  //   { id: 1, name: "Ban Giám Đốc" },
-  //   { id: 2, name: "Phòng Nhân Sự" },
-  //   { id: 3, name: "Phòng Kỹ Thuật" },
-  //   { id: 4, name: "Phòng Kinh Doanh" },
-  //   { id: 5, name: "Phòng Marketing" },
-  //   { id: 6, name: "Phòng Kế Toán" },
-  //   { id: 7, name: "Phòng Hành Chính" },
-  // ];
-
-  // const positions = [
-  //   { id: 1, name: "CEO" },
-  //   { id: 2, name: "CTO" },
-  //   { id: 3, name: "CFO" },
-  //   { id: 4, name: "HR Manager" },
-  //   { id: 5, name: "Department Manager" },
-  //   { id: 6, name: "Team Leader" },
-  //   { id: 7, name: "Senior Software Engineer" },
-  //   { id: 8, name: "Software Engineer" },
-  //   { id: 9, name: "Junior Software Engineer" },
-  //   { id: 10, name: "Senior Business Analyst" },
-  //   { id: 11, name: "Business Analyst" },
-  //   { id: 12, name: "Junior Business Analyst" },
-  //   { id: 13, name: "Senior QA Engineer" },
-  //   { id: 14, name: "QA Engineer" },
-  //   { id: 15, name: "Junior QA Engineer" },
-  //   { id: 16, name: "Senior Designer" },
-  //   { id: 17, name: "Designer" },
-  //   { id: 18, name: "Junior Designer" },
-  //   { id: 19, name: "DevOps Engineer" },
-  //   { id: 20, name: "Data Analyst" },
-  //   { id: 21, name: "Product Manager" },
-  //   { id: 22, name: "Project Manager" },
-  //   { id: 23, name: "Marketing Manager" },
-  //   { id: 24, name: "Sales Manager" },
-  //   { id: 25, name: "Accountant" },
-  //   { id: 26, name: "HR Specialist" },
-  //   { id: 27, name: "Receptionist" },
-  //   { id: 28, name: "Intern" },
-  // ];
-
   const banks = [
     "Vietcombank",
     "BIDV",

@@ -196,12 +196,12 @@ export default function HistoryRequests() {
                           </div>
 
                           <div>
-                            <p className="text-gray-600">
+                            {/* <p className="text-gray-600">
                               Người phê duyệt:{" "}
                               <span className="font-medium">
                                 {request.person}
                               </span>
-                            </p>
+                            </p> */}
                             <p className="text-gray-600">
                               Xử lý lúc:{" "}
                               <span className="font-medium">

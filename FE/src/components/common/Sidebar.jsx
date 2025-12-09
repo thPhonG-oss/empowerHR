@@ -15,7 +15,8 @@ function Sidebar() {
   const location = useLocation();
 
   useEffect(() => {
-    setCurrentPath(location.pathname.split("/").pop());
+    setCurrentPath(location.pathname);
+
     setUserName(localStorage.getItem("userName") || "");
   }, [location]);
 
@@ -59,7 +60,7 @@ function Sidebar() {
                   <Link
                     to={item.path}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
-                      currentPath === item.path ? "bg-gray-400" : ""
+                      currentPath.includes(item.path) ? "bg-gray-400" : ""
                     }`}
                   >
                     {item.icon && <item.icon className="w-5 h-5" />}
@@ -71,7 +72,7 @@ function Sidebar() {
                   key={item.title}
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
-                    currentPath === item.path ? "bg-gray-400" : ""
+                    currentPath.includes(item.path) ? "bg-gray-400" : ""
                   }`}
                 >
                   {item.icon && <item.icon className="w-5 h-5" />}
@@ -87,7 +88,7 @@ function Sidebar() {
                 key={item.title}
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
-                  currentPath === item.path ? "bg-gray-400" : ""
+                  currentPath.includes(item.path) ? "bg-gray-400" : ""
                 }`}
               >
                 {item.icon && <item.icon className="w-5 h-5" />}

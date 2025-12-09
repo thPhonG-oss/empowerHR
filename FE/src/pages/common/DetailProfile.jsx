@@ -98,7 +98,7 @@ function DetailProfile({}) {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
         {/* Header */}
-        <Header title="Hồ sơ nhân viên" icon={Contact} />
+        <Header title="Hồ sơ" icon={Contact} />
         {/* Header với nút chỉnh sửa nổi bật */}
         <div className="px-8">
           <GoBackLink />
