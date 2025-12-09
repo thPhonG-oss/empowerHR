@@ -97,6 +97,18 @@ CREATE TABLE Department (
 );
 
 -- ============================================
+-- Bảng PointAccount
+-- ============================================
+CREATE TABLE PointAccount (
+    point_account_id INT PRIMARY KEY AUTO_INCREMENT,
+    current_points DECIMAL(10,2) DEFAULT 0.00,
+    total_earns INT DEFAULT 0,
+    total_transferred INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ============================================
 -- Bảng Employee
 -- ============================================
 CREATE TABLE Employee (
@@ -107,18 +119,18 @@ CREATE TABLE Employee (
     address TEXT,
     date_of_birth DATE,
     gender ENUM('Male', 'Female', 'Other'),
-    email VARCHAR(100) UNIQUE,
+    email VARCHAR(100),
     phone_number VARCHAR(20),
     starting_date DATE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     tax_code VARCHAR(50),
-    point_balance DECIMAL(10,2) DEFAULT 0.00,
     account_id INT UNIQUE,
     position_id INT,
     department_id INT,
     bank_id INT,
+    point_account_id INT UNIQUE,
     CONSTRAINT uq_employee_code UNIQUE (employee_code),
     CONSTRAINT uq_identity_card UNIQUE (identity_card),
     CONSTRAINT uq_email UNIQUE (email),
@@ -129,7 +141,9 @@ CREATE TABLE Employee (
     CONSTRAINT fk_employee_department FOREIGN KEY (department_id)
         REFERENCES Department(department_id) ON DELETE SET NULL,
     CONSTRAINT fk_employee_bank FOREIGN KEY (bank_id)
-        REFERENCES Bank(bank_id) ON DELETE SET NULL
+        REFERENCES Bank(bank_id) ON DELETE SET NULL,
+    CONSTRAINT fk_employee_point_account FOREIGN KEY (point_account_id)
+        REFERENCES PointAccount(point_account_id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -278,7 +292,7 @@ CREATE TABLE RunningActivity (
     min_participant INT,
     max_participant INT,
     status ENUM('Draft', 'Active', 'Completed', 'Cancelled') DEFAULT 'Draft',
-    target_distance VARCHAR(50),
+    target_distance INT,
     rules TEXT,
     completion_bonus INT,
     top_1_bonus INT,
@@ -292,8 +306,9 @@ CREATE TABLE ParticipateIn (
     participate_in_id INT PRIMARY KEY AUTO_INCREMENT,
     employee_id INT NOT NULL,
     running_activity_id INT NOT NULL,
-    total_run INT DEFAULT 0,
+    total_run DECIMAL(10,2) DEFAULT 0.00,
     is_completed BOOLEAN DEFAULT false,
+    is_canncelled BOOLEAN DEFAULT false,
     rank_position INT,
     reward_points INT DEFAULT 0,
     CONSTRAINT fk_employee_participatein FOREIGN KEY (employee_id)
@@ -301,22 +316,6 @@ CREATE TABLE ParticipateIn (
     CONSTRAINT fk_running_activity_participate_in FOREIGN KEY (running_activity_id)
         REFERENCES RunningActivity(running_activity_id),
     CONSTRAINT unique_employee_running_activity UNIQUE(employee_id, running_activity_id)
-);
-
--- ============================================
--- Bảng PointAccount
--- ============================================
-CREATE TABLE PointAccount (
-    point_account_id INT PRIMARY KEY AUTO_INCREMENT,
-    current_points DECIMAL(10,2) DEFAULT 0.00,
-    total_earns INT DEFAULT 0,
-    total_transferred INT DEFAULT 0,
-    last_monthly_reward INT DEFAULT 0,
-    last_performance_reward INT DEFAULT 0,
-    update_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    employee_id INT UNIQUE,
-    CONSTRAINT fk_point_account_employee FOREIGN KEY (employee_id)
-        REFERENCES Employee(employee_id) ON DELETE CASCADE
 );
 
 -- ============================================
@@ -370,33 +369,19 @@ CREATE TABLE PerformanceReward (
 );
 
 -- ============================================
--- Bảng ConversionRule
--- ============================================
-CREATE TABLE ConversionRule(
-    conversion_rule_id INT PRIMARY KEY AUTO_INCREMENT,
-    expiry INT DEFAULT 365, -- hạn dùng điểm
-    min_points INT DEFAULT 0,
-    max_points INT DEFAULT 0,
-    conversion_rate DECIMAL(10,2) DEFAULT 0.00,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    effective_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expired_at DATETIME DEFAULT NULL,
-    is_begin_applied BOOLEAN DEFAULT TRUE
-);
-
-
--- ============================================
 -- Bảng PointPolicy
 -- ============================================
 CREATE TABLE PointPolicy(
    point_policy_id INT PRIMARY KEY AUTO_INCREMENT,
+   expiry INT DEFAULT 365, -- hạn dùng điểm
+   min_points INT DEFAULT 0,
+   max_points INT DEFAULT 0,
+   conversion_rate DECIMAL(10,2) DEFAULT 0.00,
+   start_date DATE,
+   end_date DATE,
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   is_being_applied BOOLEAN DEFAULT true,
-   conversion_rule_id INT NOT NULL,
-   CONSTRAINT fk_point_policy_conversion_rule FOREIGN KEY (conversion_rule_id)
-        REFERENCES ConversionRule(conversion_rule_id)
+   is_active BOOLEAN DEFAULT true
 );
 
 
@@ -404,10 +389,15 @@ CREATE TABLE PointPolicy(
 -- Bảng MonthlyReward
 -- ============================================
 CREATE TABLE MonthlyReward (
+    monthly_reward_id INT PRIMARY KEY AUTO_INCREMENT,
     position_id INT NOT NULL,
     point_policy_id INT NOT NULL,
     monthly_points INT DEFAULT 0,
-    PRIMARY KEY (position_id, point_policy_id),
+    start_date DATE,
+    end_date DATE,
+    is_active BOOLEAN DEFAULT true,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_monthly_budget_position FOREIGN KEY (position_id)
         REFERENCES JobPosition(position_id),
     CONSTRAINT fk_monthly_budget_point_policy FOREIGN KEY (point_policy_id)
@@ -419,10 +409,15 @@ CREATE TABLE MonthlyReward (
 -- Bảng DepartmentBudget
 -- ============================================
 CREATE TABLE DepartmentBudget (
+    department_budget_id INT PRIMARY KEY AUTO_INCREMENT,
     department_id INT NOT NULL,
     point_policy_id INT  NOT NULL,
     budget INT DEFAULT 0,
-    PRIMARY KEY (department_id, point_policy_id),
+    start_date DATE,
+    end_date DATE,
+    is_active BOOLEAN DEFAULT true,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_department_budget_department FOREIGN KEY (department_id)
         REFERENCES Department(department_id),
     CONSTRAINT fk_department_budget_point_policy FOREIGN KEY (point_policy_id)
