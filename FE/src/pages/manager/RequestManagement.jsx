@@ -164,7 +164,7 @@ export default function RequestManagement() {
                 </div>
 
                 <Link
-                  to={"/manager/request-management-history"}
+                  to={"/manager/request-management/history"}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800"
                 >
                   <svg

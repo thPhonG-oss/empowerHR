@@ -175,7 +175,7 @@ function LeaveRequest() {
     <main className="min-h-screen">
       <Header title="Bảng chấm công" icon={FileText} />
 
-      <div className="mx-6 my-6 px-6 py-4 bg-gray-100 rounded-2xl">
+      <div className="mx-6 my-6 px-6 py-4 bg-gray-100 rounded-2xl shadow-2xl">
         {/* Header */}
         <div className="text-center py-8 mb-4">
           <h1 className="text-4xl font-bold mb-2">Yêu cầu hành chính</h1>
@@ -306,9 +306,9 @@ function LeaveRequest() {
                   Tổng số ngày nghỉ
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   readOnly
-                  value={totalLeave}
+                  value={!totalLeave ? "0" : totalLeave}
                   className={`w-full px-4 py-2 border rounded-lg ${
                     !validTotal ? "border-red-500" : "border-gray-400"
                   }`}
