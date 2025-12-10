@@ -1,21 +1,22 @@
-# BÁO CÁO SPRINT REVIEW - [TÊN DỰ ÁN]
+# BÁO CÁO SPRINT REVIEW - [EmpowerHR]
 
-**Sprint:** # [Số thứ tự, ví dụ: Sprint 04]
-**Ngày:** [DD/MM/YYYY]
-**Thời gian:** [Giờ bắt đầu] - [Giờ kết thúc]
-**Địa điểm/Link họp:** [Phòng họp / Google Meet Link]
-**Người ghi biên bản:** [Tên người ghi]
+**Sprint:** Sprint 03
+**Ngày:** 11/12/2025
+**Thời gian:** 9:30PM - 11:30PM
+**Hình thức/Địa điểm:** Online meeting (google meet) 
+**Người ghi biên bản:** Nguyễn Thanh Phong
 
 ---
 
 ### 1. Thành phần tham dự
-* **Team:** [Liệt kê tên các thành viên]
-* **Stakeholders (Giảng viên/Mentor/Khách mời):** [Tên]
-* **Vắng mặt:** [Tên - Lý do nếu có]
-
+* **Team:** 
+    1. 22120033 - Đạo Minh Chiến
+    2. 22120036 - Phan Công Châu
+    3. 22120040 - Trương Việt Công
+    4. 22120042 - Đỗ Ngọc Cường
+    5. 22120265 - Nguyễn Thanh Phong
 ### 2. Mục tiêu Sprint (Sprint Goal)
-> *Nhắc lại ngắn gọn mục tiêu cốt lõi mà team đã cam kết trong Sprint này.*
-* Ví dụ: Hoàn thiện luồng đăng ký và xác thực người dùng qua Email.
+* Demo các chức năng sprint 2, feed cải thiện.
 
 ---
 
@@ -24,9 +25,9 @@
 
 | STT | Tên chức năng (User Story) | Người Demo | Trạng thái | Đánh giá (Accept/Reject) | Ghi chú ngắn |
 |:---:|:---|:---:|:---:|:---:|:---|
-| 1 | Đăng nhập bằng Google | Nguyễn Văn A | ✅ Done | Accepted | Mượt, nhưng icon hơi nhỏ |
-| 2 | Quản lý giỏ hàng | Trần Thị B | ✅ Done | Accepted | |
-| 3 | Thanh toán VNPAY | Lê Văn C | ⚠️ Partial | Rejected | Chưa xử lý khi mất mạng |
+| 1 | Manager quản lý request  | Công | ✅ Done | Accepted |  |
+| 2 | Nhân viên thực hiện gửi request nghỉ phép | Công | ✅ Done | Accepted | |
+| 3 | Nhân viên checkin/checkout | Châu | ⚠️ Partial | Rejected | Chưa sửa logic backend |
 
 *(Trạng thái: ✅ Done, ⚠️ Partial (Một phần), ❌ Not Done)*
 
@@ -37,28 +38,21 @@
 
 | STT | Chức năng liên quan | Nội dung góp ý / Vấn đề phát hiện | Người góp ý | Mức độ nghiêm trọng | Hành động tiếp theo (Action Item) |
 |:---:|:---|:---|:---:|:---:|:---|
-| 1 | Đăng nhập | Cần thêm validate định dạng email chặt chẽ hơn | Thầy Tú | Low | Tạo task fix bug cho Sprint sau |
-| 2 | Thanh toán | Luồng xử lý timeout đang bị crash app | Team | High (Critical) | **Fix gấp** trong 24h tới |
-| 3 | UI/UX chung | Màu sắc button chưa đồng bộ với Design System | Bạn D | Medium | Review lại toàn bộ CSS |
+| 1 | Manager quản lý request | Thực hiện thêm filter dạng dropdown menu ở giao diện request chờ xử lý, check lại logic lọc theo status, thêm button xử lý phê duyệt/từ chối nhanh ở giao diện dashboard | Phong | Medium | Thêm filter theo ngày, check logic lọc theo status, test tích hợp api từ backend |
 
 ---
 
 ### 5. Các hạng mục chưa hoàn thành (Incomplete Items)
-*Các task đã cam kết nhưng chưa làm xong, cần giải trình lý do.*
-
-* **Task:** [Tên task]
-    * **Lý do:** [Ví dụ: Thiếu API từ bên thứ 3, gặp lỗi kỹ thuật phức tạp...]
-    * **Hướng giải quyết:** [Đẩy sang Sprint sau / Hủy bỏ / Nhờ hỗ trợ]
-
+>*Các task đã cam kết nhưng chưa làm xong, cần giải trình lý do.*
 ---
 
 ### 6. Thống kê nhanh (Optional)
-* **Tổng số Story points cam kết:** [Số lượng]
-* **Tổng số Story points hoàn thành:** [Số lượng]
-* **Velocity (Tốc độ):** [Tăng/Giảm so với Sprint trước]
+* **Tổng số Story points cam kết:** 
+* **Tổng số Story points hoàn thành:** 
+* **Velocity (Tốc độ):** 
 
 ### 7. Kế hoạch tiếp theo
-* **Thời gian Sprint Review tiếp theo:** [DD/MM/YYYY]
-* **Trọng tâm dự kiến Sprint tới:** [Ghi chú ngắn]
+* **Thời gian Sprint Review tiếp theo:** 19/12/2025
+* **Trọng tâm dự kiến Sprint tới:** Hoàn thiện chức năng quản lý hoạt động nội bộ và tích hợp hệ thống điểm thưởng
 
 ---
