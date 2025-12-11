@@ -48,6 +48,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //    AccountRepository accountRepository;
     PasswordEncoder passwordEncoder;
     PointAccountRepository pointAccountRepository;
+    LeaveTypeRepository leaveTypeRepository;
+    LeaveBalanceRepository leaveBalanceRepository;
 
 
     @Override
@@ -303,6 +305,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Account savedAccount = accountRepository.save(newAccount);
         savedEmployee.setAccount(savedAccount);
+
+        // create default leave balance for employee
+        List<LeaveType> leaveTypes = leaveTypeRepository.findAll();
+        for(LeaveType leaveType : leaveTypes){
+            LeaveBalance leaveBalance = LeaveBalance.builder()
+                    .employee(savedEmployee)
+                    .leaveType(leaveType)
+                    .year(LocalDateTime.now().getYear())
+                    .usedLeave(0)
+                    .remainingLeave(leaveType.getTotalDay())
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            leaveBalanceRepository.save(leaveBalance);
+        }
 
         return employeeMapper.toEmployeeCreationResponseDTO(employeeRepository.save(savedEmployee));
     }
