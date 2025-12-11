@@ -10,5 +10,5 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance,Integ
             Integer employeeId, Integer leaveTypeId, Integer year);
 
 
-
+    boolean existsByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(Integer employeeEmployeeId, Integer leaveTypeLeaveTypeId, Integer year);
 }
