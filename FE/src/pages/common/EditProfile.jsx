@@ -154,6 +154,7 @@ function EditProfile() {
           phoneNumber: formData.phoneNumber ?? "",
         };
         const res = employeeApi.updateMyProfile(payload);
+
         toast.success("Cập nhật thông tin liên hệ của bạn thành công");
       }
       navigate(backPath);
