@@ -173,7 +173,7 @@ function LeaveRequest() {
       // Qua trang Lịch sử yêu cầu
       navigate(`/${safeRole}/request-history`);
     } catch (err) {
-      toast.success("Gửi yêu cầu không thành công");
+      toast.error("Gửi yêu cầu không thành công");
       console.error("Lỗi", err);
     }
   };
