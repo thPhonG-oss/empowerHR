@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "ParticipateIn")
 @Data
@@ -32,6 +34,9 @@ public class ParticipateIn {
 
     @Column(name = "is_completed")
     private Boolean isCompleted = false;
+
+    @Column(name = "completed_date")
+    LocalDateTime completedDate;
 
     @Column(name = "rank_position")
     private Integer rankPosition;
