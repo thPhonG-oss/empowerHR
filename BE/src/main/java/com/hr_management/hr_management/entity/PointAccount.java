@@ -1,10 +1,7 @@
 package com.hr_management.hr_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -30,17 +27,14 @@ public class PointAccount {
     @Column(name = "total_transferred")
     private Integer totalTransferred = 0;
 
-    @Column(name = "last_monthly_reward")
-    private Integer lastMonthlyReward = 0;
-
-    @Column(name = "last_performance_reward")
-    private Integer lastPerformanceReward = 0;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id", unique = true)
+    @ToString.Exclude
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "pointAccount")
     private Employee employee;
 
 }
