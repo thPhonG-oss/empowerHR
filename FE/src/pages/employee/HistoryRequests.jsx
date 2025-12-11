@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Clock, XCircle, History } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, History, RefreshCw } from "lucide-react";
 
 import Header from "../../components/common/Header";
 import employeeApi from "../../api/employeeApi";
@@ -9,13 +9,16 @@ export default function HistoryRequests() {
   const [activeTab, setActiveTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await employeeApi.getMyRequest({ page: 1, size: 100 });
-        console.log(res);
+
         if (res?.result?.requestResponseDTOS) {
           const mapped = res.result.requestResponseDTOS.map((item) => ({
             id: item.requestId,
@@ -37,6 +40,8 @@ export default function HistoryRequests() {
             requestDate: item.submitAt?.split("T")[0] || "",
             requestTime: item.submitAt?.split("T")[1]?.substring(0, 5) || "",
 
+            submitAt: item.submitAt, // ⭐ THÊM ĐỂ SORT
+
             status: item.status.toLowerCase(),
             statusBadge:
               item.status === "Approved"
@@ -53,6 +58,9 @@ export default function HistoryRequests() {
                 ? `Lý do từ chối: ${item.responseReason}`
                 : null,
           }));
+
+          // ⭐ SORT SUBMIT MỚI NHẤT
+          mapped.sort((a, b) => new Date(b.submitAt) - new Date(a.submitAt));
 
           setRequests(mapped);
         }
@@ -83,16 +91,23 @@ export default function HistoryRequests() {
     },
   ];
 
-  const filteredRequests =
-    activeTab === "all"
-      ? requests
-      : requests.filter((req) => req.status === activeTab);
+  // ⭐ LỌC THEO TAB + NGÀY
+  const filteredRequests = requests
+    .filter((req) => (activeTab === "all" ? true : req.status === activeTab))
+    .filter((req) => {
+      const date = new Date(req.requestDate);
+
+      if (startDate && date < new Date(startDate)) return false;
+      if (endDate && date > new Date(endDate)) return false;
+
+      return true;
+    });
 
   const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab]);
+  }, [activeTab, startDate, endDate]);
 
   const pageData = filteredRequests.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -150,7 +165,7 @@ export default function HistoryRequests() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`pb-4 px-2 font-semibold transition-colors ${
+                  className={`pb-4 px-2 font-semibold transition-colors cursor-pointer hover:border-b-2 border-gray-300 ${
                     activeTab === tab.id
                       ? "text-gray-900 border-b-2 border-gray-900"
                       : "text-gray-600 hover:text-gray-900"
@@ -163,7 +178,37 @@ export default function HistoryRequests() {
                 </button>
               ))}
             </div>
+            <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 my-4">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500">Từ ngày:</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
 
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500">Đến ngày:</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                className="px-3 py-1.5 text-sm border rounded-md hover:bg-gray-200 flex justify-center items-center gap-2 cursor-pointer "
+              >
+                <RefreshCw size={18} />
+                <span>Thiết lại lại</span>
+              </button>
+            </div>
             <div className="space-y-4">
               {pageData.map((request) => (
                 <div
@@ -196,12 +241,6 @@ export default function HistoryRequests() {
                           </div>
 
                           <div>
-                            {/* <p className="text-gray-600">
-                              Người phê duyệt:{" "}
-                              <span className="font-medium">
-                                {request.person}
-                              </span>
-                            </p> */}
                             <p className="text-gray-600">
                               Xử lý lúc:{" "}
                               <span className="font-medium">
