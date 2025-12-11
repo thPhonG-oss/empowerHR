@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.controller;
 
+import com.hr_management.hr_management.dto.request.ApiResponse;
 import com.hr_management.hr_management.service.StravaService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,11 @@ public class OAuth2CallbackController {
             @RequestParam("scope") String scope
     ) {
         return new ResponseEntity<>(
-                stravaService.connectStravaAccount(code, state),
+                ApiResponse.builder()
+                        .code("1000")
+                        .message("Success")
+                        .result(stravaService.connectStravaAccount(code, state))
+                        .build(),
                 HttpStatus.CREATED
         );
     }

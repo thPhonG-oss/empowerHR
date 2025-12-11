@@ -7,6 +7,8 @@ import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.StravaConnections;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
+import com.hr_management.hr_management.exception.StravaApiException;
+import com.hr_management.hr_management.exception.StravaUnauthorizedException;
 import com.hr_management.hr_management.mapper.StravaConnectionMapper;
 import com.hr_management.hr_management.repository.AccountRepository;
 import com.hr_management.hr_management.repository.EmployeeRepository;
@@ -19,6 +21,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -26,10 +29,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -122,9 +127,17 @@ public class StravaServiceImpl implements StravaService {
         }
 
         StravaTokenResponseDTO tokenResponseDTO = exchangeCodeForToken(code, state);
-        StravaConnections connections =   stravaConnectionRepository.findByEmployee_EmployeeId(employee.getEmployeeId());
+        StravaConnections connections =   stravaConnectionRepository.findByStravaAthleteId(
+                String.valueOf(tokenResponseDTO.getAthlete().getId())
+        );
 
         if(connections != null && connections.getConnectionStatus().equals("Connected")){
+            Integer ownerEmployeeId = connections.getEmployee().getEmployeeId();
+
+            if(!ownerEmployeeId.equals(employee.getEmployeeId())){
+                throw new AppException(ErrorCode.STRAVA_ACCOUNT_ALREADY_CONNECTED);
+            }
+
             connections.setAccessToken(tokenResponseDTO.getAccessToken());
             connections.setRefreshToken(tokenResponseDTO.getRefreshToken());
             connections.setExpiresAt(tokenResponseDTO.getExpiresAt());
@@ -181,6 +194,62 @@ public class StravaServiceImpl implements StravaService {
         catch (Exception e){
             log.error("Error exchanging code for token: {}", e.getMessage());
             throw new AppException(ErrorCode.STRAVA_TOKEN_EXCHANGE_FAILED);
+        }
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void refreshExpiringAccessToken(){
+        log.info("Starting scheduled token refresh check...");
+        long now = System.currentTimeMillis() / 1000L;
+        long threshold = now + 1800; // 30 minutes from now
+
+        List<StravaConnections> expiringConnections = stravaConnectionRepository.findAllByExpiresAtLessThanAndConnectionStatus(threshold, "Connected");
+        log.info("Expiring connections: {}", expiringConnections.size());
+
+        for(StravaConnections connection : expiringConnections){
+            try {
+                StravaTokenResponseDTO refreshedToken = refreshAccessToken(connection.getRefreshToken());
+                connection.setAccessToken(refreshedToken.getAccessToken());
+                connection.setRefreshToken(refreshedToken.getRefreshToken());
+                connection.setExpiresAt(refreshedToken.getExpiresAt());
+                stravaConnectionRepository.save(connection);
+            } catch (AppException e) {
+                log.error("Failed to refresh token for connection ID {}: {}", connection.getEmployee().getEmployeeId(), e.getMessage());
+                connection.setConnectionStatus("Refresh Failed");
+                stravaConnectionRepository.save(connection);
+            }
+        }
+    }
+
+    protected StravaTokenResponseDTO refreshAccessToken(String refreshToken){
+        // prepare request body to refresh token
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("client_id", clientId);
+        requestBody.add("client_secret", clientSecret);
+        requestBody.add("grant_type", "refresh_token");
+        requestBody.add("refresh_token", refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            // call strava token endpoint
+            ResponseEntity<StravaTokenResponseDTO> response = restTemplate.postForEntity(
+                    tokenUri,
+                    requestEntity,
+                    StravaTokenResponseDTO.class
+            );
+            StravaTokenResponseDTO responseDTO = response.getBody();
+            assert responseDTO != null;
+            log.info("Refreshed token: {}", responseDTO.getAthlete().toString());
+            return responseDTO;
+        }
+        catch (HttpClientErrorException e){
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new StravaUnauthorizedException("Invalid refresh token");
+            }
+            throw new StravaApiException("Failed to refresh token");
         }
     }
 }
