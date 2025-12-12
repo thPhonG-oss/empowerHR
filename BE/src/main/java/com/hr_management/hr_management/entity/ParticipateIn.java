@@ -35,6 +35,9 @@ public class ParticipateIn {
     @Column(name = "is_completed")
     private Boolean isCompleted = false;
 
+    @Column(name = "is_cancelled")
+    private Boolean isCancelled = false;
+
     @Column(name = "completed_date")
     LocalDateTime completedDate;
 

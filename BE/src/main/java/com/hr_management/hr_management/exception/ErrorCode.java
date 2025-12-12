@@ -47,7 +47,8 @@ public enum ErrorCode {
     STRAVA_ALREADY_CONNECTED("1022","Strava already connected",HttpStatus.BAD_REQUEST),
     INVALID_STRAVA_STATE("1023","Invalid Strava state parameter",HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_REFRESH_FAILED("1024","Strava refresh token failed",HttpStatus.BAD_REQUEST),
-    STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST)
+    STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST),
+    CONNECTION_NOT_FOUND("1026","Strava connection not found",HttpStatus.BAD_REQUEST)
     ;
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
