@@ -270,6 +270,11 @@ CREATE TABLE StravaConnections (
     strava_lastname TEXT,
     strava_username TEXT,
     strava_athlete_id VARCHAR(50),
+
+    -- THÊM 2 DÒNG NÀY:
+    last_sync_at BIGINT, -- Lưu thời điểm sync cuối (Unix timestamp) để truyền vào param 'after' của Strava
+    scope VARCHAR(255),  -- Lưu scope (vd: read,activity:read_all)
+
     employee_id INT NOT NULL,
     connection_status VARCHAR(50),
     connection_at DATETIME,
@@ -308,6 +313,7 @@ CREATE TABLE ParticipateIn (
     running_activity_id INT NOT NULL,
     total_run DECIMAL(10,2) DEFAULT 0.00,
     is_completed BOOLEAN DEFAULT false,
+    completed_date DATETIME, -- Thời điểm nhân viên đạt đủ target (quan trọng để xét Top 1,2,3)
     is_canncelled BOOLEAN DEFAULT false,
     rank_position INT,
     reward_points INT DEFAULT 0,
@@ -316,6 +322,24 @@ CREATE TABLE ParticipateIn (
     CONSTRAINT fk_running_activity_participate_in FOREIGN KEY (running_activity_id)
         REFERENCES RunningActivity(running_activity_id),
     CONSTRAINT unique_employee_running_activity UNIQUE(employee_id, running_activity_id)
+);
+
+CREATE TABLE EmployeeRunningData (
+    running_data_id INT PRIMARY KEY AUTO_INCREMENT,
+    strava_activity_id BIGINT NOT NULL UNIQUE, -- ID hoạt động bên Strava (để tránh trùng lặp)
+    employee_id INT NOT NULL,
+
+    name TEXT, -- Tên buổi chạy
+    distance DECIMAL(10,2), -- Quãng đường (mét)
+    moving_time INT, -- Thời gian di chuyển (giây)
+    elapsed_time INT, -- Tổng thời gian (giây)
+    activity_type VARCHAR(50), -- Ví dụ: Run, TrailRun
+    start_date DATETIME, -- Thời gian bắt đầu chạy
+    average_speed DECIMAL(5,2), -- Tốc độ trung bình (m/s)
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_running_data_employee FOREIGN KEY (employee_id)
+        REFERENCES Employee(employee_id)
 );
 
 -- ============================================

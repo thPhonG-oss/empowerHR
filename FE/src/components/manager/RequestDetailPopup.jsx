@@ -1,6 +1,7 @@
 import { useState } from "react";
 import requestApi from "../../api/requestApi";
-import { Toast } from "../common/Toast";
+// import { Toast } from "../common/Toast";
+import toast from "react-hot-toast";
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -27,9 +28,6 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
   const [note, setNote] = useState("");
   const [showConfirm, setShowConfirm] = useState(null);
   const [error, setError] = useState("");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("success");
 
   const isProcessed = request.status !== "Pending";
   const isLeave = request.requestType === "LEAVE";
@@ -40,17 +38,11 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
     try {
       await requestApi.approve(request.requestId, note);
 
-      setToastMessage("Phê duyệt yêu cầu thành công!");
-      setToastType("success");
-      setShowToast(true);
-
       if (reloadData) reloadData();
-
-      setTimeout(() => onClose(), 1500);
+      toast.success("Phê duyệt yêu cầu thành công");
     } catch (err) {
-      setToastMessage("Lỗi khi phê duyệt!");
-      setToastType("error");
-      setShowToast(true);
+      toast.error("Phê duyệt yêu cầu thất bại");
+      console.log(err);
     }
   };
 
@@ -59,17 +51,11 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
     try {
       await requestApi.reject(request.requestId, note);
 
-      setToastMessage("Từ chối yêu cầu thành công!");
-      setToastType("success");
-      setShowToast(true);
-
       if (reloadData) reloadData();
-
-      setTimeout(() => onClose(), 1500);
+      toast.success("Từ chối yêu cầu thành công");
     } catch (err) {
-      setToastMessage("Lỗi khi từ chối!");
-      setToastType("error");
-      setShowToast(true);
+      toast.error("Từ chối yêu cầu thất bại");
+      console.log(err);
     }
   };
 
@@ -91,7 +77,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
     if (showConfirm === "approve") approveRequest();
     else rejectRequest();
     setShowConfirm(null);
-    window.location.reload();
+    onClose();
   };
 
   const days =
@@ -101,14 +87,6 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
 
   return (
     <>
-      <Toast
-        message={toastMessage}
-        type={toastType}
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        duration={4000}
-      />
-
       {/* Main Popup */}
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />

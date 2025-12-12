@@ -114,11 +114,8 @@ const AddEmployeeCard = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    console.log("Form Data Submitted:", formData);
-
     try {
       const response = await adminApi.addUser(formData);
-      console.log("API Response:", response);
 
       alert("Tạo nhân viên thành công!");
       onClose(); // Đóng modal sau khi submit thành công

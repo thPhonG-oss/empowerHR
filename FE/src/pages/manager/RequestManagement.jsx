@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { RequestDetailPopup } from "../../components/manager/RequestDetailPopup";
 import Header from "../../components/common/Header";
-import { FileCheck } from "lucide-react";
+import { FileCheck, RefreshCw } from "lucide-react";
 import requestApi from "../../api/requestApi";
 
 const ITEMS_PER_PAGE = 4;
@@ -32,6 +32,9 @@ export default function RequestManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   // ================================
   // 🔥 CALL API GET DATA
   // ================================
@@ -60,19 +63,37 @@ export default function RequestManagement() {
   }, [requests]);
 
   // ================================
-  // 🔎 FILTER TAB
+  // 🔎 FILTER + SORT
   // ================================
+  // 🔎 FILTER + SORT
   const filteredRequests = useMemo(() => {
     let filtered = pendingRequests;
 
+    // Tab filter
     if (activeTab === "leave") {
       filtered = filtered.filter((r) => r.requestType === "LEAVE");
     } else if (activeTab === "timesheet") {
       filtered = filtered.filter((r) => r.requestType === "TIMESHEET_UPDATE");
     }
 
-    return filtered;
-  }, [pendingRequests, activeTab]);
+    // Date filter
+    if (startDate) {
+      filtered = filtered.filter(
+        (r) => new Date(r.submitAt) >= new Date(startDate)
+      );
+    }
+
+    if (endDate) {
+      filtered = filtered.filter(
+        (r) => new Date(r.submitAt) <= new Date(endDate + "T23:59:59")
+      );
+    }
+
+    // Sort by newest
+    return [...filtered].sort(
+      (a, b) => new Date(b.submitAt) - new Date(a.submitAt)
+    );
+  }, [pendingRequests, activeTab, startDate, endDate]);
 
   // ================================
   // 📄 PAGINATION
@@ -219,6 +240,39 @@ export default function RequestManagement() {
                   Chấm công
                 </button>
               </div>
+              {/* Filter by date */}
+              <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-500">Từ ngày</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-500">Đến ngày</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+
+                <button
+                  onClick={() => {
+                    setStartDate("");
+                    setEndDate("");
+                  }}
+                  className="px-3 py-1.5 text-sm border rounded-md hover:bg-gray-200 flex justify-center items-center gap-2 cursor-pointer "
+                >
+                  <RefreshCw size={18} />
+                  <span>Thiết lại lại</span>
+                </button>
+              </div>
             </div>
 
             {/* Request list */}
@@ -269,7 +323,7 @@ export default function RequestManagement() {
 
                       <button
                         onClick={() => setSelectedRequest(request)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-lg"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-lg cursor-pointer"
                       >
                         Chi tiết →
                       </button>

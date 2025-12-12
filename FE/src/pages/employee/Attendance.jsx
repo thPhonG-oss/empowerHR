@@ -114,7 +114,7 @@ function Attendance() {
               {/* FILTER */}
               <div className="h-fit flex gap-4">
                 <select
-                  className="border border-gray-300 rounded-md p-2"
+                  className="border border-gray-300 rounded-md p-2 cursor-pointer"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
@@ -126,7 +126,7 @@ function Attendance() {
                 </select>
 
                 <select
-                  className="border border-gray-300 rounded-md p-2"
+                  className="border border-gray-300 rounded-md p-2 cursor-pointer"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
@@ -157,7 +157,7 @@ function Attendance() {
               {filtered.map((att, index) => (
                 <div
                   key={att.id}
-                  className="grid grid-cols-8 py-3 border-t border-gray-300 text-sm items-center"
+                  className="grid grid-cols-8 py-3 border-t border-gray-300 text-sm items-center hover:bg-gray-100"
                 >
                   <div>{index + 1}</div>
                   <div>{att.date}</div>

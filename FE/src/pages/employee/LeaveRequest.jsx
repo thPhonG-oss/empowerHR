@@ -7,7 +7,7 @@ import employeeApi from "../../api/employeeApi";
 
 import { countDays } from "../../utils/countDays";
 import { AuthContext } from "../../context/AuthContext";
-
+import toast from "react-hot-toast";
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 const CLOUD_FOLDER = import.meta.env.VITE_CLOUD_FOLDER;
@@ -85,13 +85,28 @@ function LeaveRequest() {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Nếu user chọn loại nghỉ phép (leaveTypeId)
+    // Khi chọn loại nghỉ phép → gọi API lấy remainingLeave
     if (name === "leaveTypeId") {
-      const selected = leaveTypes.find((x) => x.leaveTypeId == value);
+      const selectedId = Number(value);
 
-      if (selected) {
-        setDaysOff(selected.totalDay);
+      if (!selectedId) {
+        setDaysOff("");
+        return;
       }
+
+      const fetchLeaveBalance = async () => {
+        try {
+          const res = await employeeApi.filterLeaveType({ selectedId });
+          console.log(res);
+          // setDaysOff(res.result.remainingLeave || 0);
+          setDaysOff(0);
+        } catch (err) {
+          console.error("Fetch remaining leave error:", err);
+          setDaysOff(0);
+        }
+      };
+
+      fetchLeaveBalance();
     }
   };
 
@@ -150,10 +165,15 @@ function LeaveRequest() {
 
     try {
       const res = await employeeApi.makeLeaveRequest(body);
-      alert("Đã gửi yêu cầu thành công");
+
+      toast.success("Đã gửi yêu cầu thành công");
+
+      await new Promise((r) => setTimeout(r, 1500));
+
       // Qua trang Lịch sử yêu cầu
       navigate(`/${safeRole}/request-history`);
     } catch (err) {
+      toast.error("Gửi yêu cầu không thành công");
       console.error("Lỗi", err);
     }
   };

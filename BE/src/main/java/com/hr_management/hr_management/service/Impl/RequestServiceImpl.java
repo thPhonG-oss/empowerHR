@@ -10,21 +10,18 @@ import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.LeaveRequestMapper;
 import com.hr_management.hr_management.mapper.TimeSheetUpdateMapper;
-import com.hr_management.hr_management.repository.AttendanceRepository;
-import com.hr_management.hr_management.repository.EmployeeRepository;
-import com.hr_management.hr_management.repository.LeaveTypeRepository;
+import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.dto.response.HandledRequestResponseDTO;
 import com.hr_management.hr_management.dto.response.RequestResponseDTO;
 import com.hr_management.hr_management.mapper.RequestMapper;
-import com.hr_management.hr_management.repository.AccountRepository;
-import com.hr_management.hr_management.repository.DepartmentRepository;
 import com.hr_management.hr_management.dto.request.RequestHandleDTO;
 import com.hr_management.hr_management.entity.Request;
-import com.hr_management.hr_management.repository.RequestRepository;
 import com.hr_management.hr_management.service.RequestService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +56,7 @@ public class RequestServiceImpl implements RequestService {
     RequestMapper requestMapper;
     AccountRepository accountRepository;
     DepartmentRepository departmentRepository;
+    LeaveBalanceRepository leaveBalanceRepository;
 
     @Override
     public LeaveRequestResponse createLeaveRequest(LeaveRequestDto leaveRequestDto, JwtAuthenticationToken jwtAuthenticationToken) {
@@ -207,13 +205,20 @@ public class RequestServiceImpl implements RequestService {
 
         return dept;
     }
+
     @Override
+    @Transactional
     public RequestResponseDTO handleRequest(RequestHandleDTO requestHandleDTO, Integer requestId){
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND));
 
+        if(request instanceof LeaveRequest && requestHandleDTO.getRequestStatus() == RequestStatus.Approved){
+            handleLeaveRequestApproval((LeaveRequest) request);
+        }
+
         request.setStatus(requestHandleDTO.getRequestStatus());
         request.setResponseReason(requestHandleDTO.getResponseReason());
+        request.setHandleAt(LocalDateTime.now());
 
         Request updatedRequest = requestRepository.save(request);
         return requestMapper.toResponseDTO(updatedRequest);
@@ -243,5 +248,59 @@ public class RequestServiceImpl implements RequestService {
                 .totalElements(requests.getTotalElements())
                 .isLastPage(true)
                 .build();
+    }
+
+    public void handleLeaveRequestApproval(LeaveRequest leaveRequest){
+        Employee employee = leaveRequest.getEmployee();
+        LeaveType leaveType = leaveRequest.getLeaveType();
+        if(leaveRequest.getStartDate().getYear() < leaveRequest.getEndDate().getYear()){
+            LeaveBalance leaveBalance1 = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getStartDate().getYear()
+            );
+
+            LeaveBalance leaveBalance2 = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getEndDate().getYear()
+            );
+
+            int totalLeaveDaysYear1 = leaveRequest.getStartDate().until(
+                    LocalDate.of(leaveRequest.getStartDate().getYear(), 12, 31)
+            ).getDays() + 1;
+            int totalLeaveDaysYear2 = LocalDate.of(leaveRequest.getEndDate().getYear(), 1, 1).until(
+                    leaveRequest.getEndDate()
+            ).getDays() + 1;
+
+            if(leaveBalance1.getRemainingLeave() < totalLeaveDaysYear1 || leaveBalance2.getRemainingLeave() < totalLeaveDaysYear2) {
+                throw new AppException(ErrorCode.LEAVE_REQUEST_EXPIRED);
+            }
+            else{
+                leaveBalance1.setRemainingLeave(leaveBalance1.getRemainingLeave() - totalLeaveDaysYear1);
+                leaveBalance1.setUsedLeave(leaveBalance1.getUsedLeave() + totalLeaveDaysYear1);
+                leaveBalanceRepository.save(leaveBalance1);
+
+                leaveBalance2.setRemainingLeave(leaveBalance2.getRemainingLeave() - totalLeaveDaysYear2);
+                leaveBalance2.setUsedLeave(leaveBalance2.getUsedLeave() + totalLeaveDaysYear2);
+                leaveBalanceRepository.save(leaveBalance2);
+            }
+        } else{
+            LeaveBalance leaveBalance = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getStartDate().getYear()
+            );
+
+            int totalLeaveDays = leaveRequest.getStartDate().until(leaveRequest.getEndDate()).getDays() + 1;
+            if(leaveBalance.getRemainingLeave() < totalLeaveDays) {
+                throw new AppException(ErrorCode.LEAVE_REQUEST_EXPIRED);
+            }
+            else{
+                leaveBalance.setRemainingLeave(leaveBalance.getRemainingLeave() - totalLeaveDays);
+                leaveBalance.setUsedLeave(leaveBalance.getUsedLeave() + totalLeaveDays);
+                leaveBalanceRepository.save(leaveBalance);
+            }
+        }
     }
 }
