@@ -5,33 +5,23 @@ import com.hr_management.hr_management.dto.request.TimeSheetRequestDto;
 import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
 import com.hr_management.hr_management.dto.response.TimeSheetResponse;
 import com.hr_management.hr_management.entity.*;
+import com.hr_management.hr_management.enums.RequestStatus;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.LeaveRequestMapper;
 import com.hr_management.hr_management.mapper.TimeSheetUpdateMapper;
-import com.hr_management.hr_management.repository.AttendanceRepository;
-import com.hr_management.hr_management.repository.EmployeeRepository;
-import com.hr_management.hr_management.repository.LeaveTypeRepository;
+import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.dto.response.HandledRequestResponseDTO;
 import com.hr_management.hr_management.dto.response.RequestResponseDTO;
-import com.hr_management.hr_management.entity.*;
-import com.hr_management.hr_management.exception.AppException;
-import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.RequestMapper;
-import com.hr_management.hr_management.repository.AccountRepository;
-import com.hr_management.hr_management.repository.DepartmentRepository;
-import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.dto.request.RequestHandleDTO;
-import com.hr_management.hr_management.dto.response.RequestResponseDTO;
 import com.hr_management.hr_management.entity.Request;
-import com.hr_management.hr_management.exception.AppException;
-import com.hr_management.hr_management.exception.ErrorCode;
-import com.hr_management.hr_management.mapper.RequestMapper;
-import com.hr_management.hr_management.repository.RequestRepository;
 import com.hr_management.hr_management.service.RequestService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -47,14 +37,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,6 +56,7 @@ public class RequestServiceImpl implements RequestService {
     RequestMapper requestMapper;
     AccountRepository accountRepository;
     DepartmentRepository departmentRepository;
+    LeaveBalanceRepository leaveBalanceRepository;
 
     @Override
     public LeaveRequestResponse createLeaveRequest(LeaveRequestDto leaveRequestDto, JwtAuthenticationToken jwtAuthenticationToken) {
@@ -126,7 +111,31 @@ public class RequestServiceImpl implements RequestService {
 
         return requestMapper.toResponseDTO(request);
     }
-    
+
+    @Override
+    public HandledRequestResponseDTO getMyRequests(Integer userId, Integer pageNumber, Integer pageSize, List<RequestStatus> status) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.DESC, "handleAt"));
+
+        List<RequestStatus> requestStatuses = (status == null || status.isEmpty())
+                ? List.of(RequestStatus.Pending, RequestStatus.Approved, RequestStatus.Rejected)
+                : status;
+
+
+        Page<Request> requests = requestRepository.findAllByEmployee_EmployeeIdAndStatusIn(userId, requestStatuses, pageable);
+        List<RequestResponseDTO> requestResponseDTOs = requests.getContent().stream()
+                .map(requestMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return HandledRequestResponseDTO.builder()
+                .requestResponseDTOS(requestResponseDTOs)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalPages(requests.getTotalPages())
+                .totalElements(requests.getTotalElements())
+                .isLastPage(requests.isLast())
+                .build();
+    }
+
 
     @Override
     public HandledRequestResponseDTO getAllHandledRequests(Integer pageNumber, Integer pageSize){
@@ -176,7 +185,15 @@ public class RequestServiceImpl implements RequestService {
         String position = manager.getPosition().getPositionName();
         log.info("Employee position: {}", position);
 
-        if(!position.equals("Manager")){
+        boolean isManger = false;
+
+        for(Role role : account.getRoles()){
+            if(role.getName().equals("MANAGER")){
+                isManger = true;
+            }
+        }
+
+        if(!isManger){
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -188,15 +205,102 @@ public class RequestServiceImpl implements RequestService {
 
         return dept;
     }
+
     @Override
+    @Transactional
     public RequestResponseDTO handleRequest(RequestHandleDTO requestHandleDTO, Integer requestId){
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND));
 
+        if(request instanceof LeaveRequest && requestHandleDTO.getRequestStatus() == RequestStatus.Approved){
+            handleLeaveRequestApproval((LeaveRequest) request);
+        }
+
         request.setStatus(requestHandleDTO.getRequestStatus());
         request.setResponseReason(requestHandleDTO.getResponseReason());
+        request.setHandleAt(LocalDateTime.now());
 
         Request updatedRequest = requestRepository.save(request);
         return requestMapper.toResponseDTO(updatedRequest);
+    }
+
+    // get all unresolved requests of the specific deparment
+    @Override
+    public HandledRequestResponseDTO getAllPendingRequests(Integer pageNumber, Integer pageSize){
+        Department department = getDepartmentOfManager();
+
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.DESC, "submitAt"));
+
+        Page<Request> requests = requestRepository.findAllPendingRequestsByDepartmentId( department.getDepartmentId(), pageable);
+
+        log.info("Unresolved requests count: " + requests.getTotalElements());
+
+        List<RequestResponseDTO> requestResponseDTOs = requests.stream()
+                .map(requestMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return HandledRequestResponseDTO.builder()
+                .requestResponseDTOS(requestResponseDTOs)
+                .pageNumber(requests.getNumber())
+                .pageSize(requests.getSize())
+                .totalPages(requests.getTotalPages())
+                .totalElements(requests.getTotalElements())
+                .isLastPage(true)
+                .build();
+    }
+
+    public void handleLeaveRequestApproval(LeaveRequest leaveRequest){
+        Employee employee = leaveRequest.getEmployee();
+        LeaveType leaveType = leaveRequest.getLeaveType();
+        if(leaveRequest.getStartDate().getYear() < leaveRequest.getEndDate().getYear()){
+            LeaveBalance leaveBalance1 = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getStartDate().getYear()
+            );
+
+            LeaveBalance leaveBalance2 = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getEndDate().getYear()
+            );
+
+            int totalLeaveDaysYear1 = leaveRequest.getStartDate().until(
+                    LocalDate.of(leaveRequest.getStartDate().getYear(), 12, 31)
+            ).getDays() + 1;
+            int totalLeaveDaysYear2 = LocalDate.of(leaveRequest.getEndDate().getYear(), 1, 1).until(
+                    leaveRequest.getEndDate()
+            ).getDays() + 1;
+
+            if(leaveBalance1.getRemainingLeave() < totalLeaveDaysYear1 || leaveBalance2.getRemainingLeave() < totalLeaveDaysYear2) {
+                throw new AppException(ErrorCode.LEAVE_REQUEST_EXPIRED);
+            }
+            else{
+                leaveBalance1.setRemainingLeave(leaveBalance1.getRemainingLeave() - totalLeaveDaysYear1);
+                leaveBalance1.setUsedLeave(leaveBalance1.getUsedLeave() + totalLeaveDaysYear1);
+                leaveBalanceRepository.save(leaveBalance1);
+
+                leaveBalance2.setRemainingLeave(leaveBalance2.getRemainingLeave() - totalLeaveDaysYear2);
+                leaveBalance2.setUsedLeave(leaveBalance2.getUsedLeave() + totalLeaveDaysYear2);
+                leaveBalanceRepository.save(leaveBalance2);
+            }
+        } else{
+            LeaveBalance leaveBalance = leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                    employee.getEmployeeId(),
+                    leaveType.getLeaveTypeId(),
+                    leaveRequest.getStartDate().getYear()
+            );
+
+            int totalLeaveDays = leaveRequest.getStartDate().until(leaveRequest.getEndDate()).getDays() + 1;
+            if(leaveBalance.getRemainingLeave() < totalLeaveDays) {
+                throw new AppException(ErrorCode.LEAVE_REQUEST_EXPIRED);
+            }
+            else{
+                leaveBalance.setRemainingLeave(leaveBalance.getRemainingLeave() - totalLeaveDays);
+                leaveBalance.setUsedLeave(leaveBalance.getUsedLeave() + totalLeaveDays);
+                leaveBalanceRepository.save(leaveBalance);
+            }
+        }
     }
 }

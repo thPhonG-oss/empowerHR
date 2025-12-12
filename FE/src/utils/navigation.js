@@ -9,7 +9,7 @@ import {
   Activity,
   Wrench,
   CalendarX,
-  Clock,
+  CalendarClock,
   Target,
   History,
   DollarSign,
@@ -81,7 +81,7 @@ const navConfig = [
   {
     title: "Chấm công",
     path: "attendance",
-    icon: Clock,
+    icon: CalendarClock,
     roles: ["employee", "manager"],
   },
   {

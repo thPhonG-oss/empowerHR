@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hr_management.hr_management.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Struct;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,9 +64,6 @@ public class Employee {
     @Column(name = "tax_code", length = 50)
     private String taxCode;
 
-    @Column(name = "point_balance", precision = 10, scale = 2)
-    private Long pointBalance;
-
 //    @OneToOne(fetch = FetchType.LAZY)
     // Update: bỏ fetchtype => @OneToOne mặc định fetchtype là EAGER
     @OneToOne
@@ -115,4 +113,9 @@ public class Employee {
     @JsonIgnore // Ngăn vòng lặp khi convert JSON từ Employee -> Department -> Employee
     @ToString.Exclude
     private Department managedDepartment;
+
+    @OneToOne
+    @ToString.Exclude
+    @JoinColumn(name = "point_account_id", unique = true)
+    private PointAccount pointAccount;
 }

@@ -6,26 +6,45 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "MonthlyReward")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(MonthlyRewardId.class)
-//Update: thêm annotation @SuperBuilder
 @SuperBuilder
 public class MonthlyReward {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "monthly_reward_id")
+    private Integer monthlyRewardId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "point_policy_id")
     private PointPolicy pointPolicy;
 
     @Column(name = "monthly_points")
     private Integer monthlyPoints = 0;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 }

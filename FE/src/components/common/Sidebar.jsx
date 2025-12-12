@@ -15,8 +15,8 @@ function Sidebar() {
   const location = useLocation();
 
   useEffect(() => {
-    setCurrentPath(location.pathname.split("/").pop());
-    // Lấy userName
+    setCurrentPath(location.pathname);
+
     setUserName(localStorage.getItem("userName") || "");
   }, [location]);
 
@@ -40,20 +40,63 @@ function Sidebar() {
           <p className="font-extrabold">HRSYSTEM</p>
         </div>
         {/* Content */}
-        <div className="flex flex-col px-2 py-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.title}
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
-                currentPath === item.path ? "bg-gray-400" : ""
-              }`}
-            >
-              {item.icon && <item.icon className="w-5 h-5" />}
-              <span className="font-semibold">{item.title}</span>
-            </Link>
-          ))}
-        </div>
+        {/* Nếu là manager */}
+        {role.toLowerCase() === "manager" ? (
+          <div className="flex flex-col px-2 py-4">
+            {navItems.map((item) => {
+              const sectionTitles = {
+                profile: "Tác vụ cá nhân",
+                "team-management": "Quản lý đội nhóm",
+              };
+
+              const sectionTitle = sectionTitles[item.path];
+
+              return sectionTitle ? (
+                <div key={item.title}>
+                  <p className="p-2 font-bold text-[#595959] text-sm border-t border-gray-400 mt-1">
+                    {sectionTitle}
+                  </p>
+
+                  <Link
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
+                      currentPath.includes(item.path) ? "bg-gray-400" : ""
+                    }`}
+                  >
+                    {item.icon && <item.icon className="w-5 h-5" />}
+                    <span className="font-semibold">{item.title}</span>
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  key={item.title}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
+                    currentPath.includes(item.path) ? "bg-gray-400" : ""
+                  }`}
+                >
+                  {item.icon && <item.icon className="w-5 h-5" />}
+                  <span className="font-semibold">{item.title}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col px-2 py-4">
+            {navItems.map((item) => (
+              <Link
+                key={item.title}
+                to={item.path}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-200 ${
+                  currentPath.includes(item.path) ? "bg-gray-400" : ""
+                }`}
+              >
+                {item.icon && <item.icon className="w-5 h-5" />}
+                <span className="font-semibold">{item.title}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
       {/* User - Logout */}
       <div className="flex justify-between p-4 items-center gap-3 border-t border-gray-300 ">

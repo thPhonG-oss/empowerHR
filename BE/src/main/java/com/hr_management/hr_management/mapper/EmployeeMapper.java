@@ -30,7 +30,6 @@ public interface EmployeeMapper {
     @Mapping(target = "startingDate", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "taxCode", ignore = true)
-    @Mapping(target = "pointBalance", ignore = true)
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "department", ignore = true)
     @Mapping(target = "position", ignore = true)
@@ -48,4 +47,7 @@ public interface EmployeeMapper {
 
     EmployeeCreationResponseDTO toEmployeeCreationResponseDTO(Employee employee);
     AllEmployeeResponse toEmployeeResponse(Employee employee);
+//    DepartmentResponse toDepartmentDTO(Department department);
+    PositionResponse toPositionDTO(Position position);
+    BankResponse toBankDTO(Bank bank);
 }
