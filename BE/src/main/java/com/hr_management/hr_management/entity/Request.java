@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 // update: xóa @Builder, thêm @SuperBuilder => sử dụng builder cho cả class cha và class con
 @SuperBuilder
 @DiscriminatorColumn(name = "request_type", discriminatorType = DiscriminatorType.STRING)
-public class Request {
+public class   Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")

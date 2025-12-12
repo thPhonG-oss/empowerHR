@@ -83,7 +83,7 @@ public class EmployeeController {
                 .result(attendanceService.checkout(checkOutRequest,jwtAuthenticationToken))
                 .build();
     }
-    @GetMapping("/filter-leave-days")
+    @PostMapping("/filter-leave-days")
     public ApiResponse<LeaveBalanceResponse> filterLeaveDays( @RequestBody LeaveTypeRequest leaveTypeRequest,JwtAuthenticationToken jwtAuthenticationToken){
         return ApiResponse.<LeaveBalanceResponse>builder()
                 .result(leaveBalanceService.filterLeaveDays(leaveTypeRequest,jwtAuthenticationToken))
