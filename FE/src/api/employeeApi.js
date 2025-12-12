@@ -4,9 +4,9 @@ const employeeApi = {
   getMyProfile: () => axiosClient.get("/api/v1/employee/profile"),
   updateMyProfile: (data) => axiosClient.put("/api/v1/employee/profile", data),
   getLeaveType: () => axiosClient.get("/api/v1/employee/leave-type"),
-  filterLeaveType: (data) =>
-    axiosClient.get("/api/v1/employee/filter-leave-days", {
-      leaveTypeId: leaveTypeId,
+  filterLeaveType: (leaveTypeId) =>
+    axiosClient.get(`/api/v1/employee/filter-leave-days`, {
+      params: { leaveTypeId: leaveTypeId },
     }),
   makeLeaveRequest: (data) =>
     axiosClient.post("/api/v1/employee/requests/leaves", data),

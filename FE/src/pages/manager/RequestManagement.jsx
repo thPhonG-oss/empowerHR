@@ -150,6 +150,20 @@ export default function RequestManagement() {
     setSelectedRequest(null);
   };
 
+  // Reload
+  const reloadData = async () => {
+    try {
+      setLoading(true);
+      const res = await requestApi.getUnresolved();
+      setRequests(res.result.requestResponseDTOS || []);
+    } catch (err) {
+      console.error(err);
+      setError("Không thể tải dữ liệu yêu cầu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ================================
   // UI
   // ================================
@@ -400,8 +414,7 @@ export default function RequestManagement() {
         <RequestDetailPopup
           request={selectedRequest}
           onClose={() => setSelectedRequest(null)}
-          onApprove={handleApprove}
-          onReject={handleReject}
+          reloadData={reloadData}
         />
       )}
     </div>
