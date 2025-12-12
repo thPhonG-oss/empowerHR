@@ -93,13 +93,10 @@ function LeaveRequest() {
         setDaysOff("");
         return;
       }
-      console.log(leaveTypeId);
       const fetchLeaveBalance = async () => {
         try {
           const res = await employeeApi.filterLeaveType({ leaveTypeId });
-          console.log(res);
           setDaysOff(res.result.remainingLeave || 0);
-          setDaysOff(0);
         } catch (err) {
           console.error("Fetch remaining leave error:", err);
           setDaysOff(0);

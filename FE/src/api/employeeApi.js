@@ -5,9 +5,7 @@ const employeeApi = {
   updateMyProfile: (data) => axiosClient.put("/api/v1/employee/profile", data),
   getLeaveType: () => axiosClient.get("/api/v1/employee/leave-type"),
   filterLeaveType: (leaveTypeId) =>
-    axiosClient.get(`/api/v1/employee/filter-leave-days`, {
-      params: { leaveTypeId: leaveTypeId },
-    }),
+    axiosClient.post(`/api/v1/employee/filter-leave-days`, leaveTypeId),
   makeLeaveRequest: (data) =>
     axiosClient.post("/api/v1/employee/requests/leaves", data),
   makeUpdateTimeSheetRequest: (data) =>
@@ -17,6 +15,10 @@ const employeeApi = {
       params: { page, limit },
     }),
   getMyAttendances: () => axiosClient.get("/api/v1/employee/attendances"),
+  checkIn: (data) => axiosClient.post("/api/v1/employee/checkin", data),
+  checkOut: (data) => axiosClient.post("/api/v1/employee/checkout", data),
+  getAttendanceToday: () =>
+    axiosClient.get("/api/v1/employee/time-checkin-checkout"),
 };
 
 export default employeeApi;
