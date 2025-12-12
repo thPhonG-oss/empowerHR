@@ -186,7 +186,7 @@ function AccountManagement() {
                   <option value="">Chọn phòng ban</option>
                   {departments.map((dept) => (
                     <option key={dept.departmentId} value={dept.departmentName}>
-                      {dept.name}
+                      {dept.departmentName}
                     </option>
                   ))}
                 </select>
@@ -239,11 +239,6 @@ function AccountManagement() {
                                 {employee.employeeCode}
                               </span>
                             </p>
-
-                            <p className="text-gray-600">
-                              Mật khẩu:{" "}
-                              <span className="font-semibold">●●●●●●●●</span>
-                            </p>
                           </div>
                         </div>
                       </div>
@@ -270,7 +265,7 @@ function AccountManagement() {
                             setIdBlock(employee.employeeId);
                             setIsConfirmPopupOpen(true);
                           }}
-                          className="p-2 text-green-500 hover:bg-orange-50 rounded-lg transition-colors"
+                          className="p-2 text-green-500 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"
                         >
                           <Unlock size={20} />
                         </button>
@@ -280,7 +275,7 @@ function AccountManagement() {
                           onClick={() =>
                             handleUnLockAccount(employee.employeeId)
                           }
-                          className="p-2 text-orange-500 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-orange-500 hover:bg-green-50 rounded-lg transition-colors cursor-pointer"
                         >
                           <Lock size={20} />
                         </button>
