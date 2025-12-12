@@ -101,6 +101,7 @@ public class RequestServiceImpl implements RequestService {
         Employee employeeRequest=employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).get();
         requestEntity.setEmployee(employeeRequest);
         requestEntity.setSubmitAt(LocalDateTime.now());
+        requestEntity.setStatus(RequestStatus.Pending);
         return requestEntity;
     }
 
