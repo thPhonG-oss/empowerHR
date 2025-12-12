@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: hrm-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-hrm_db}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - hrm-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Spring Boot Application
+  hrm-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hrm-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PORT: 8080
+      DATABASE_URL: jdbc:mysql://mysql:3306/${DB_NAME:-hrm_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+      DB_USERNAME: ${DB_USERNAME:-hrm_user}
+      DB_PASSWORD: ${DB_PASSWORD:-hrm_password}
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-this-in-production}
+      STRAVA_CLIENT_ID: ${STRAVA_CLIENT_ID:-your-strava-client-id}
+      STRAVA_CLIENT_SECRET: ${STRAVA_CLIENT_SECRET:-your-strava-client-secret}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "${PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hrm-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # phpMyAdmin (Optional - for database management)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: hrm-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USERNAME:-hrm_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-hrm_password}
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - hrm-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  hrm-network:
+    driver: bridge

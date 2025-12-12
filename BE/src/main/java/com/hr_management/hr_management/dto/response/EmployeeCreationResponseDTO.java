@@ -34,4 +34,5 @@ public class EmployeeCreationResponseDTO {
     private DepartmentResponseDTO department;
     private BankResponseDTO bank;
     private AccountResponseDTO account;
+    private PointAccountResponseDTO pointAccount;
 }

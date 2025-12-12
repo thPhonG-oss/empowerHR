@@ -3,6 +3,7 @@ package com.hr_management.hr_management.controller;
 import com.hr_management.hr_management.dto.request.*;
 import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
+import com.hr_management.hr_management.repository.LeaveTypeRepository;
 import com.hr_management.hr_management.service.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class EmployeeController {
     private final RequestService requestService;
     AttendanceService attendanceService;
     LeaveBalanceService leaveBalanceService;
+    LeaveTypeService leaveTypeService;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -85,6 +87,24 @@ public class EmployeeController {
     public ApiResponse<LeaveBalanceResponse> filterLeaveDays( @RequestBody LeaveTypeRequest leaveTypeRequest,JwtAuthenticationToken jwtAuthenticationToken){
         return ApiResponse.<LeaveBalanceResponse>builder()
                 .result(leaveBalanceService.filterLeaveDays(leaveTypeRequest,jwtAuthenticationToken))
+                .build();
+    }
+    @GetMapping("/leave-type")
+    public ApiResponse<List<LeaveTypeResponse>> getAll( ){
+        return ApiResponse.<List<LeaveTypeResponse>>builder()
+                .result(leaveTypeService.getAll())
+                .build();
+    }
+    @GetMapping("/time-checkin-checkout")
+    public ApiResponse<CheckinCheckoutResponse>timeCheckinCheckout(JwtAuthenticationToken jwtAuthenticationToken){
+        return ApiResponse.<CheckinCheckoutResponse>builder()
+                .result(attendanceService.timeCheckinCheckout(jwtAuthenticationToken))
+                .build();
+    }
+    @GetMapping("/attendances")
+    public ApiResponse<List<AttendanceResponse>> getAllAttendance(JwtAuthenticationToken jwtAuthenticationToken){
+        return  ApiResponse.<List<AttendanceResponse>>builder()
+                .result(attendanceService.getAll(jwtAuthenticationToken))
                 .build();
     }
 }
