@@ -16,4 +16,5 @@ public class CheckoutResponse {
     LocalTime checkoutTime;
     String ipCheckout;
     LocationStatus checkoutLocationStatus;
+    Long workingHours;
 }
