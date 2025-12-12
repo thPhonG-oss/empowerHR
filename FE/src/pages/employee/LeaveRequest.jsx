@@ -87,19 +87,16 @@ function LeaveRequest() {
 
     // Khi chọn loại nghỉ phép → gọi API lấy remainingLeave
     if (name === "leaveTypeId") {
-      const selectedId = Number(value);
+      const leaveTypeId = Number(value);
 
-      if (!selectedId) {
+      if (!leaveTypeId) {
         setDaysOff("");
         return;
       }
-
       const fetchLeaveBalance = async () => {
         try {
-          const res = await employeeApi.filterLeaveType({ selectedId });
-          console.log(res);
-          // setDaysOff(res.result.remainingLeave || 0);
-          setDaysOff(0);
+          const res = await employeeApi.filterLeaveType({ leaveTypeId });
+          setDaysOff(res.result.remainingLeave || 0);
         } catch (err) {
           console.error("Fetch remaining leave error:", err);
           setDaysOff(0);

@@ -11,15 +11,12 @@ export function AuthProvider({ children }) {
   // Login: lưu token + decode roles
   const login = (token) => {
     localStorage.setItem("token", token);
-    console.log(token);
     setToken(token);
 
     try {
       const decoded = jwtDecode(token);
-      console.log(decoded);
       const rolesFromToken = decoded.scope || [];
       const role = rolesFromToken.split(" ")[0];
-      console.log(role);
       // Cắt bỏ ký tự ROLE_
       const roleString = role.replace("ROLE_", "");
 
