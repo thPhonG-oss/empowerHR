@@ -5,6 +5,7 @@ import com.hr_management.hr_management.dto.request.TimeSheetRequestDto;
 import com.hr_management.hr_management.dto.response.LeaveRequestResponse;
 import com.hr_management.hr_management.dto.response.TimeSheetResponse;
 import com.hr_management.hr_management.entity.*;
+import com.hr_management.hr_management.enums.RequestStatus;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.LeaveRequestMapper;
@@ -116,6 +117,7 @@ public class RequestServiceImpl implements RequestService {
         Employee employeeRequest=employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).get();
         requestEntity.setEmployee(employeeRequest);
         requestEntity.setSubmitAt(LocalDateTime.now());
+        requestEntity.setStatus(RequestStatus.Pending);
         return requestEntity;
     }
 
