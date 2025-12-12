@@ -23,7 +23,6 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LeaveBalanceServiceImpl implements LeaveBalanceService {
-    LeaveTypeRepository leaveTypeRepository;
     LeaveBalanceRepository leaveBalanceRepository;
     EmployeeRepository employeeRepository;
     LeaveBalanceMapper leaveBalanceMapper;
