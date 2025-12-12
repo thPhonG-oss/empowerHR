@@ -10,6 +10,7 @@ import com.hr_management.hr_management.entity.LeaveType;
 import com.hr_management.hr_management.mapper.LeaveBalanceMapper;
 import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.repository.LeaveBalanceRepository;
+import com.hr_management.hr_management.repository.LeaveTypeRepository;
 import com.hr_management.hr_management.service.LeaveBalanceService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class LeaveBalanceServiceImpl implements LeaveBalanceService {
     LeaveBalanceRepository leaveBalanceRepository;
     EmployeeRepository employeeRepository;
     LeaveBalanceMapper leaveBalanceMapper;
+    //update: add leaveTypeRepository
+    LeaveTypeRepository leaveTypeRepository;
 
     @Override
     public LeaveBalanceResponse filterLeaveDays(LeaveTypeRequest leaveTypeRequest, JwtAuthenticationToken jwtAuthenticationToken) {
