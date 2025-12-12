@@ -41,7 +41,8 @@ public enum ErrorCode {
     REQUEST_NOT_FOUND("1017","Request not found",HttpStatus.BAD_REQUEST),
     CHECKIN_ERROR("1018","checked in today",HttpStatus.BAD_REQUEST),
     NOT_CHECKIN("1019","haven't checked in yet",HttpStatus.BAD_REQUEST),
-    CHECKOUT_ERROR("1020","checked out today ",HttpStatus.BAD_REQUEST)
+    CHECKOUT_ERROR("1020","checked out today ",HttpStatus.BAD_REQUEST),
+    LEAVE_BALANCE_NOT_FOUND("1021","LEAVE_BALANCE_NOT_FOUND",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
