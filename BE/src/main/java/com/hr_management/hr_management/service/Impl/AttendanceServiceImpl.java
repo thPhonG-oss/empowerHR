@@ -20,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -53,6 +54,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setCheckoutTime(LocalTime.now());
         attendance.setIpCheckout(checkOutRequest.getIpCheckout());
         attendance.setCheckoutLocationStatus(checkOutRequest.getCheckoutLocationStatus());
+        Duration duration = Duration.between(attendance.getCheckinTime(),attendance.getCheckoutTime());
+        long workingHours = duration.toHours();
+        attendance.setWorkingHours(workingHours);
         return attendanceMapper.toCheckoutResponse(attendanceRepository.save(attendance));
     }
 
