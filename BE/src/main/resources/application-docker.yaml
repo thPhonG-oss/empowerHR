@@ -1,0 +1,101 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  app:
+    jwtCookie: refreshToken
+  application:
+    name: hrm-backend
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_ROOT_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+security:
+  oauth2:
+    client:
+      registration:
+        strava:
+          client-id: ${STRAVA_CLIENT_ID}
+          client-secret: ${STRAVA_CLIENT_SECRET}
+          scope: read,activity:read_all
+          authorization-grant-type: authorization_code
+          redirect-uri: ${BACKEND_URL}/oauth2/callback
+      provider:
+        strava:
+          authorization-uri: https://www.strava.com/oauth/authorize
+          token-uri: https://www.strava.com/oauth/token
+          user-info-uri: https://www.strava.com/api/v3/athlete
+          user-name-attribute: id
+
+frontend:
+  url: ${FRONTEND_URL}
+
+jwt:
+  secret: ${SECRET_KEY}
+  access-token-validity-seconds: 3600
+  refresh-token-validity-seconds: 604800
+
+# Management & Monitoring (for Docker health checks)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        security: INFO
+        web: INFO
+    com:
+      hr_management: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /app/logs/application.log
+    max-size: 10MB
+    max-history: 30

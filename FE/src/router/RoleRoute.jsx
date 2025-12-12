@@ -11,7 +11,6 @@ function RoleRoute({ children, allowedRoles }) {
 
   // 2. Nếu không có quyền truy cập
   if (!allowedRoles.includes(role)) {
-    console.log("không có quyền");
     return <Navigate to="/unauthorized" replace />;
   }
 

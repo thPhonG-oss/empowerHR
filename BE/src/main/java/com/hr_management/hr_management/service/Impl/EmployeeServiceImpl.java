@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,6 +47,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     RoleRepository roleRepository;
 //    AccountRepository accountRepository;
     PasswordEncoder passwordEncoder;
+    PointAccountRepository pointAccountRepository;
+    LeaveTypeRepository leaveTypeRepository;
+    LeaveBalanceRepository leaveBalanceRepository;
 
 
     @Override
@@ -242,7 +244,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
         Bank savedBank = bankRepository.save(bank);
 
+        PointAccount pointAccount = PointAccount.builder()
+                .currentPoints(Long.valueOf(0))
+                .createdAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .build();
 
+        // create employee
         Employee employee = Employee.builder()
                 .employeeName(request.getEmployeeName())
                 .identityCard(request.getIdentityCard())
@@ -260,10 +268,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .position(existingPosition)
                 .department(existingDepartment)
                 .bank(savedBank)
+                .pointAccount(pointAccount)
                 .build();
+
 
         Employee savedEmployee = employeeRepository.save(employee);
 
+        // update point account with employee
+        pointAccount.setEmployee(employee);
+        pointAccountRepository.save(pointAccount);
+
+        // generate employee code
         String employeeCode = generateEmployeeCode(savedEmployee.getEmployeeId());
 
         savedEmployee.setEmployeeCode(employeeCode);
@@ -290,6 +305,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Account savedAccount = accountRepository.save(newAccount);
         savedEmployee.setAccount(savedAccount);
+
+        // create default leave balance for employee
+        List<LeaveType> leaveTypes = leaveTypeRepository.findAll();
+        for(LeaveType leaveType : leaveTypes){
+            LeaveBalance leaveBalance = LeaveBalance.builder()
+                    .employee(savedEmployee)
+                    .leaveType(leaveType)
+                    .year(LocalDateTime.now().getYear())
+                    .usedLeave(0)
+                    .remainingLeave(leaveType.getTotalDay())
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            leaveBalanceRepository.save(leaveBalance);
+        }
 
         return employeeMapper.toEmployeeCreationResponseDTO(employeeRepository.save(savedEmployee));
     }
@@ -331,5 +361,97 @@ public class EmployeeServiceImpl implements EmployeeService {
             roles.add(role);
         }
         return roles;
+    }
+
+    @Transactional
+    @Override
+    public Employee createDefaultMangerProfile(EmployeeProfileCreationRequestDTO request){
+
+        if(employeeRepository.existsByIdentityCard(request.getIdentityCard()) || employeeRepository.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_EXISTS);
+        }
+
+        if(bankRepository.existsByBankAccountNumber(request.getBankAccountNumber()) && bankRepository.existsByBankName(request.getBankName())){
+            throw new AppException(ErrorCode.BANK_ACCOUNT_ALREADY_EXISTS);
+        }
+
+        Department existingDepartment = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+        Position existingPosition = jobPositonRepository.findById(request.getPositionId())
+                .orElseThrow(() -> new AppException(ErrorCode.JOB_POSITION_NOT_FOUND));
+
+        Bank bank = Bank.builder()
+                .bankName(request.getBankName())
+                .branch(request.getBankBranch())
+                .bankAccountNumber(request.getBankAccountNumber())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Bank savedBank = bankRepository.save(bank);
+
+        PointAccount pointAccount = PointAccount.builder()
+                .currentPoints(Long.valueOf(0))
+                .createdAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .build();
+
+        // create employee
+        Employee employee = Employee.builder()
+                .employeeName(request.getEmployeeName())
+                .identityCard(request.getIdentityCard())
+                .address(request.getAddress())
+                .email(request.getEmail())
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .startingDate(LocalDate.now())
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .taxCode(request.getTaxCode())
+                .position(existingPosition)
+                .department(existingDepartment)
+                .bank(savedBank)
+                .pointAccount(pointAccount)
+                .build();
+
+
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        // update point account with employee
+        pointAccount.setEmployee(employee);
+        pointAccountRepository.save(pointAccount);
+
+        // generate employee code
+        String employeeCode = generateEmployeeCode(savedEmployee.getEmployeeId());
+
+        savedEmployee.setEmployeeCode(employeeCode);
+
+        if(accountRepository.existsByUsername(employeeCode)){
+            throw new AppException(ErrorCode.EMPLOYEE_ALREADY_HAS_ACCOUNT);
+        }
+
+        Set<Role> roles = new HashSet<>();
+
+        Set<String> roleNames = request.getRoles();
+        if (roleNames != null && !roleNames.isEmpty()) {
+            roles = transformRole(roleNames);
+        }
+
+        Account newAccount = Account.builder()
+                .username(employeeCode)
+                .password(passwordEncoder.encode(employeeCode))
+                .roles(roles)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+
+        Account savedAccount = accountRepository.save(newAccount);
+        savedEmployee.setAccount(savedAccount);
+
+        return employeeRepository.save(savedEmployee);
     }
 }

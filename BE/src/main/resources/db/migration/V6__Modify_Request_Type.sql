@@ -1,2 +1,0 @@
-ALTER TABLE Request
-MODIFY COLUMN request_type VARCHAR(31) NOT NULL;

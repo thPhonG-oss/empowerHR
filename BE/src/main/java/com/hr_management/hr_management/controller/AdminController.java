@@ -78,7 +78,7 @@ public class AdminController {
     // [ Admin ]
     // 1. Xem danh sách nhân viên
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/api/v1/admin/employees")
+    @GetMapping("/employees")
     public com.hr_management.hr_management.dto.request.ApiResponse<List<EmployeeResponseDTO>> getAll() {
         return com.hr_management.hr_management.dto.request.ApiResponse.<List<EmployeeResponseDTO>>builder()
                 .result(employeeService.getAll())
@@ -86,6 +86,7 @@ public class AdminController {
     }
 
     //[Admin] Block employee account
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/accounts/block/{employeeId}")
     public ResponseEntity<ApiResponse<Object>> blockEmployeeAccount(@PathVariable Integer employeeId) {
         accountService.blockAccountByEmployeeId(employeeId);
