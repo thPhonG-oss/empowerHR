@@ -71,7 +71,6 @@ function Attendance() {
             item.checkoutTime
           ),
         }));
-        console.log(formatted);
         setAttendances(formatted);
       } catch (error) {
         console.error("Failed to get attendances", error);
