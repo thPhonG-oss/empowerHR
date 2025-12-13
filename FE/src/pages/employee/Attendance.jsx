@@ -63,14 +63,15 @@ function Attendance() {
           dayOfWeek: getDayOfWeek(item.attendanceDate),
           checkIn: item.checkinTime ? item.checkinTime.slice(0, 5) : "--:--",
           checkOut: item.checkoutTime ? item.checkoutTime.slice(0, 5) : "--:--",
-          workingHours: `${item.workingHours}h`,
+          workingHours:
+            item.workingHours === null ? "--" : `${item.workingHours}h`,
           status: convertStatus(
             item.checkinLocationStatus,
             item.checkinTime,
             item.checkoutTime
           ),
         }));
-
+        console.log(formatted);
         setAttendances(formatted);
       } catch (error) {
         console.error("Failed to get attendances", error);
