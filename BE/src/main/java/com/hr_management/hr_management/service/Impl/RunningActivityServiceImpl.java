@@ -1,5 +1,7 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
+import com.hr_management.hr_management.entity.RunningActivity;
 import com.hr_management.hr_management.dto.request.RunningActivityCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
@@ -13,6 +15,10 @@ import com.hr_management.hr_management.service.RunningActivityService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +32,13 @@ public class RunningActivityServiceImpl implements RunningActivityService {
     RunningActivityMapper runningActivityMapper;
 
     @Override
+    public Page<RunningActivityResponseDTO> getAllActivities(Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("runningActivityId").descending());
+        Page<RunningActivity> activitiespage = runningActivityRepository.findAll(pageable);
+        return activitiespage.map(runningActivityMapper::toRunningActivityResponseDTO);
+    }
+
+    // Implement service methods here
     public RunningActivityResponseDTO updateActivity(Integer runningActivityId, RunningActivityUpdateRequestDTO requestDTO) {
 
         RunningActivity activity = runningActivityRepository.findById(runningActivityId)
