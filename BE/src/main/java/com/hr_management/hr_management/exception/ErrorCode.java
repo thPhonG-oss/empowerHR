@@ -50,7 +50,6 @@ public enum ErrorCode {
     ACTIVITY_START_BEFORE_REGISTRATION("1025", "Start date cannot be before registration start date", HttpStatus.BAD_REQUEST),
     ACTIVITY_TITLE_ALREADY_EXISTS("1026", "Activity title already exists", HttpStatus.BAD_REQUEST),
 
-    LEAVE_BALANCE_NOT_FOUND("1026","LEAVE_BALANCE_NOT_FOUND",HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_EXCHANGE_FAILED("1021","Strava token exchange failed",HttpStatus.BAD_REQUEST),
     STRAVA_ALREADY_CONNECTED("1022","Strava already connected",HttpStatus.BAD_REQUEST),
     INVALID_STRAVA_STATE("1023","Invalid Strava state parameter",HttpStatus.BAD_REQUEST),
