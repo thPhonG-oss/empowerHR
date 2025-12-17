@@ -49,12 +49,12 @@ public enum ErrorCode {
     ACTIVITY_REGISTRATION_END_INVALID("1024", "Registration end date must not be before registration start date", HttpStatus.BAD_REQUEST),
     ACTIVITY_START_BEFORE_REGISTRATION("1025", "Start date cannot be before registration start date", HttpStatus.BAD_REQUEST),
     ACTIVITY_TITLE_ALREADY_EXISTS("1026", "Activity title already exists", HttpStatus.BAD_REQUEST),
-
     STRAVA_TOKEN_EXCHANGE_FAILED("1021","Strava token exchange failed",HttpStatus.BAD_REQUEST),
     STRAVA_ALREADY_CONNECTED("1022","Strava already connected",HttpStatus.BAD_REQUEST),
     INVALID_STRAVA_STATE("1023","Invalid Strava state parameter",HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_REFRESH_FAILED("1024","Strava refresh token failed",HttpStatus.BAD_REQUEST),
     STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST),
+    ACTIVITY_NOT_FOUND("1028","ACTIVITY_NOT_FOUND",HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
