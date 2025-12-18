@@ -23,7 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/users/save", "/auth/log-in", "/auth/log-out","/auth/introspect", "/auth/refresh-token", "/auth/refresh","/user/*", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/v1/admin/**",
-            "/api/v1/strava/**", "/oauth2/**"
+            "/api/v1/strava/**",
     };
     private CustomJwtDecoder customJwtDecoder;
 
