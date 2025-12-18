@@ -1,12 +1,15 @@
 package com.hr_management.hr_management.controller;
-
+import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.AccountCreationRequestDTO;
+import com.hr_management.hr_management.dto.request.ActivityRequets;
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
+import com.hr_management.hr_management.dto.response.ActivityResponse;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.service.AccountService;
+import com.hr_management.hr_management.service.ActivityService;
 import com.hr_management.hr_management.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -27,6 +30,7 @@ public class AdminController {
 
     EmployeeService employeeService;
     AccountService accountService;
+    ActivityService activityService;
 
     @GetMapping("/employees/{employeeId}")
     public ResponseEntity<ApiResponse<Object>> getEmployee(@PathVariable Integer employeeId) {
@@ -93,4 +97,13 @@ public class AdminController {
         return ResponseEntity.ok()
                 .body(ApiResponse.builder().status(1000).message("Success").build());
     }
+    @PostMapping("/activitys")
+    public ApiResponse<ActivityResponse> createRunningActivity(@RequestBody ActivityRequets activityRequets){
+        return ApiResponse.<ActivityResponse>builder()
+                .status(1000)
+                .message("Success")
+                .data(activityService.createRunningActivity(activityRequets))
+                .build();
+    }
+
 }

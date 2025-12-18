@@ -11,7 +11,6 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Mapper
 @Builder
 public class CheckinResponse {
     String ipCheckin;

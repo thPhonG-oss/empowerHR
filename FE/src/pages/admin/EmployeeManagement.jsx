@@ -229,7 +229,7 @@ function StaffManagement() {
               </div>
               <button
                 onClick={() => setIsAddCardOpen(true)}
-                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
               >
                 Thêm nhân viên
               </button>
@@ -289,7 +289,7 @@ function StaffManagement() {
                             `/admin/employee-management/${staff.employeeId}`
                           )
                         }
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
                       >
                         <Edit2 className="size-4 text-gray-600" />
                       </button>
@@ -299,7 +299,7 @@ function StaffManagement() {
                             `/admin/employee-management/${staff.employeeId}`
                           )
                         }
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
                       >
                         <View className="size-4 text-gray-600" />
                       </button>

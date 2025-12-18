@@ -43,11 +43,18 @@ public enum ErrorCode {
     CHECKIN_ERROR("1018","checked in today",HttpStatus.BAD_REQUEST),
     NOT_CHECKIN("1019","haven't checked in yet",HttpStatus.BAD_REQUEST),
     CHECKOUT_ERROR("1020","checked out today ",HttpStatus.BAD_REQUEST),
+    LEAVE_BALANCE_NOT_FOUND("1021","LEAVE_BALANCE_NOT_FOUND",HttpStatus.BAD_REQUEST),
+    ACTIVITY_MAX_MUST_GREATER_THAN_MIN("1022", "Max participant must be greater than min participant", HttpStatus.BAD_REQUEST),
+    ACTIVITY_END_DATE_INVALID("1023", "End date must not be before start date", HttpStatus.BAD_REQUEST),
+    ACTIVITY_REGISTRATION_END_INVALID("1024", "Registration end date must not be before registration start date", HttpStatus.BAD_REQUEST),
+    ACTIVITY_START_BEFORE_REGISTRATION("1025", "Start date cannot be before registration start date", HttpStatus.BAD_REQUEST),
+    ACTIVITY_TITLE_ALREADY_EXISTS("1026", "Activity title already exists", HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_EXCHANGE_FAILED("1021","Strava token exchange failed",HttpStatus.BAD_REQUEST),
     STRAVA_ALREADY_CONNECTED("1022","Strava already connected",HttpStatus.BAD_REQUEST),
     INVALID_STRAVA_STATE("1023","Invalid Strava state parameter",HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_REFRESH_FAILED("1024","Strava refresh token failed",HttpStatus.BAD_REQUEST),
-    STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST)
+    STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST),
+    ACTIVITY_NOT_FOUND("1028","ACTIVITY_NOT_FOUND",HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;

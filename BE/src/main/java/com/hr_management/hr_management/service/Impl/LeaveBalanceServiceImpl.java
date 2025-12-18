@@ -4,6 +4,8 @@ import com.hr_management.hr_management.dto.request.LeaveTypeRequest;
 import com.hr_management.hr_management.dto.response.LeaveBalanceResponse;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.LeaveBalance;
+import com.hr_management.hr_management.exception.AppException;
+import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.entity.LeaveType;
 import com.hr_management.hr_management.mapper.LeaveBalanceMapper;
 import com.hr_management.hr_management.repository.EmployeeRepository;
@@ -24,15 +26,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LeaveBalanceServiceImpl implements LeaveBalanceService {
-    LeaveTypeRepository leaveTypeRepository;
     LeaveBalanceRepository leaveBalanceRepository;
     EmployeeRepository employeeRepository;
     LeaveBalanceMapper leaveBalanceMapper;
+    //update: add leaveTypeRepository
+    LeaveTypeRepository leaveTypeRepository;
 
     @Override
     public LeaveBalanceResponse filterLeaveDays(LeaveTypeRequest leaveTypeRequest, JwtAuthenticationToken jwtAuthenticationToken) {
-        Employee employee = employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).get();
-        return leaveBalanceMapper.toLeaveBalanceResponse(leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(employee.getEmployeeId(), leaveTypeRequest.getLeaveTypeId(), LocalDate.now().getYear()));
+        Employee employee = employeeRepository.findByAccount_Username(jwtAuthenticationToken.getName()).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXITS));
+        LeaveBalance leaveBalance=leaveBalanceRepository.findByEmployee_EmployeeIdAndLeaveType_LeaveTypeIdAndYear(
+                        employee.getEmployeeId(), leaveTypeRequest.getLeaveTypeId(), LocalDate.now().getYear());
+        if(leaveBalance==null)
+            throw new AppException(ErrorCode.LEAVE_BALANCE_NOT_FOUND);
+        return leaveBalanceMapper.toLeaveBalanceResponse(leaveBalance);
     }
 
     @Override

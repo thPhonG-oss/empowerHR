@@ -42,7 +42,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
       toast.success("Phê duyệt yêu cầu thành công");
     } catch (err) {
       toast.error("Phê duyệt yêu cầu thất bại");
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -55,7 +55,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
       toast.success("Từ chối yêu cầu thành công");
     } catch (err) {
       toast.error("Từ chối yêu cầu thất bại");
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -325,7 +325,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
 
       {/* Confirmation */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/30"
             onClick={() => setShowConfirm(null)}

@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,11 +29,11 @@ public class RunningActivityUpdateRequestDTO {
 
     @Schema(example = "2024-01-01")
     @NotNull(message = "registration start date must be provided")
-    LocalDate registrationStartDate;
+    LocalDateTime registrationStartDate;
 
     @Schema(example = "2024-01-31")
     @NotNull(message = "registration end date must be provided")
-    LocalDate registrationEndDate;
+    LocalDateTime registrationEndDate;
 
     @Schema(example = "2024-03-01")
     @NotNull(message = "start date must be provided")
