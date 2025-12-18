@@ -34,7 +34,7 @@ security:
           client-secret: ${STRAVA_CLIENT_SECRET}
           scope: read,activity:read_all
           authorization-grant-type: authorization_code
-          redirect-uri: ${BACKEND_URL}/oauth2/callback
+          redirect-uri: ${FRONTEND_URL}/oauth2/callback
           verify-token: ${VERIFY_TOKEN}
       provider:
         strava:
