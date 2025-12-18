@@ -35,6 +35,7 @@ security:
           scope: read,activity:read_all
           authorization-grant-type: authorization_code
           redirect-uri: ${BACKEND_URL}/oauth2/callback
+          verify-token: ${VERIFY_TOKEN}
       provider:
         strava:
           authorization-uri: https://www.strava.com/oauth/authorize
