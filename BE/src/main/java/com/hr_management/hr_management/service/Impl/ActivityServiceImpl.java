@@ -2,6 +2,7 @@ package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.dto.request.ActivityRequets;
 import com.hr_management.hr_management.dto.response.ActivityResponse;
+import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.entity.RunningActivity;
 import com.hr_management.hr_management.enums.ActivityStatus;
 import com.hr_management.hr_management.exception.AppException;
@@ -13,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +46,12 @@ public class ActivityServiceImpl implements ActivityService {
     public ActivityResponse viewDetailActivity(Integer activityId) {
         RunningActivity runningActivity=activityRepository.findById(activityId).orElseThrow(()->new AppException(ErrorCode.ACTIVITY_NOT_EXIST));
         return runningActivityMapper.toActivityResponse(runningActivity);
+    }
+
+    @Override
+    public List<RunningActivityResponseDTO> getAllActivity() {
+        return activityRepository.findAllByStatusIn(
+                List.of(ActivityStatus.Active, ActivityStatus.Completed)
+        ).stream().map(runningActivityMapper::toRunningActivityResponseDTO).toList();
     }
 }

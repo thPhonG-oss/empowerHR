@@ -2,6 +2,7 @@ package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.ApiResponse;
 import com.hr_management.hr_management.dto.response.ActivityResponse;
+import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.service.ActivityService;
 import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/activity")
@@ -33,7 +36,16 @@ public class RunningActivityController {
                 .result(activityService.viewDetailActivity(activityId))
                 .build();
     }
-    // Define REST endpoints here
+
+    //Employee
+    @GetMapping()
+    public ApiResponse<List<RunningActivityResponseDTO>> getAll(){
+        return ApiResponse.<List<RunningActivityResponseDTO>>builder()
+                .result(activityService.getAllActivity())
+                .build();
+    }
+  
+  // Define REST endpoints here
     @GetMapping("/admin/activities")
     public ApiResponse<Page<RunningActivityResponseDTO>> getAllActivities(
             @RequestParam(defaultValue = "0") Integer pageNumber,
@@ -41,9 +53,8 @@ public class RunningActivityController {
         Page<RunningActivityResponseDTO> activities = runningActivityService.getAllActivities(pageNumber, pageSize);
         return ApiResponse.<Page<RunningActivityResponseDTO>>builder()
                 .message("Get all activities successfully")
-                .data(activities)
-                .build();
-    }
+                .data(activities);
+      }
 
     // [ Admin ] Update activitiy
     @PutMapping("/admin/update-activities/{runningActivityId}")
