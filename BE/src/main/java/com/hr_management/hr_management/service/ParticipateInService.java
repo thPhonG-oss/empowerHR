@@ -7,4 +7,6 @@ public interface ParticipateInService {
 
     @Transactional
     void updateParticipantTotalRun(Integer participateInId, Integer additionalRun);
+    void deleteParticipateIn(Integer id);
 }
+
