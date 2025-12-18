@@ -4,7 +4,7 @@ import com.hr_management.hr_management.dto.request.ApiResponse;
 import com.hr_management.hr_management.dto.response.ActivityResponse;
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.service.ActivityService;
-import com.hr_management.hr_management.dto.ApiResponse;
+//import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.service.RunningActivityService;
@@ -53,7 +53,8 @@ public class RunningActivityController {
         Page<RunningActivityResponseDTO> activities = runningActivityService.getAllActivities(pageNumber, pageSize);
         return ApiResponse.<Page<RunningActivityResponseDTO>>builder()
                 .message("Get all activities successfully")
-                .data(activities);
+                .result(activities)
+                .build();
       }
 
     // [ Admin ] Update activitiy
@@ -62,7 +63,7 @@ public class RunningActivityController {
         RunningActivityResponseDTO runningActivityResponseDTO= runningActivityService.updateActivity(runningActivityId,runningActivityUpdateRequestDTO);
         return ApiResponse.<RunningActivityResponseDTO>builder()
                 .message("Update thành công")
-                .data(runningActivityResponseDTO)
+                .result(runningActivityResponseDTO)
                 .build();
     }
 }
