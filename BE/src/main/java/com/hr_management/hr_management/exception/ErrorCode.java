@@ -54,6 +54,8 @@ public enum ErrorCode {
     INVALID_STRAVA_STATE("1023","Invalid Strava state parameter",HttpStatus.BAD_REQUEST),
     STRAVA_TOKEN_REFRESH_FAILED("1024","Strava refresh token failed",HttpStatus.BAD_REQUEST),
     STRAVA_ACCOUNT_ALREADY_CONNECTED("1025","Strava account already connected",HttpStatus.BAD_REQUEST),
+    ACTIVITY_NOT_EXIST("1027","running activity not exits",HttpStatus.BAD_REQUEST),
+    PARTICIPITEIN_NOT_EXIST("1028","You haven't registered to participate.",HttpStatus.BAD_REQUEST),
     ACTIVITY_NOT_FOUND("1028","ACTIVITY_NOT_FOUND",HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {

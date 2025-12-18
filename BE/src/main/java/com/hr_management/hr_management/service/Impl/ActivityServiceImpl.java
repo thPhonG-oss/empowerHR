@@ -38,4 +38,10 @@ public class ActivityServiceImpl implements ActivityService {
         runningActivity.setStatus(ActivityStatus.Draft);
         return runningActivityMapper.toActivityResponse(activityRepository.save(runningActivity));
     }
+
+    @Override
+    public ActivityResponse viewDetailActivity(Integer activityId) {
+        RunningActivity runningActivity=activityRepository.findById(activityId).orElseThrow(()->new AppException(ErrorCode.ACTIVITY_NOT_EXIST));
+        return runningActivityMapper.toActivityResponse(runningActivity);
+    }
 }

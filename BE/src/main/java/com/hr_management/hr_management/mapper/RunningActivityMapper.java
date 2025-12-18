@@ -6,10 +6,7 @@ import com.hr_management.hr_management.dto.response.ActivityResponse;
 import com.hr_management.hr_management.entity.RunningActivity;
 import org.mapstruct.Mapper;
 import org.mapstruct.*;
-
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
-import com.hr_management.hr_management.entity.RunningActivity;
-import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface RunningActivityMapper {

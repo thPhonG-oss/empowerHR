@@ -5,4 +5,5 @@ import com.hr_management.hr_management.dto.response.ActivityResponse;
 
 public interface ActivityService {
     ActivityResponse createRunningActivity(ActivityRequets activityRequets);
+    ActivityResponse viewDetailActivity(Integer activityId);
 }

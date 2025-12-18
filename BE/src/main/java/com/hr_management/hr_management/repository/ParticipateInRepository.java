@@ -1,5 +1,9 @@
 package com.hr_management.hr_management.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+package com.hr_management.hr_management.repository;
+
 import com.hr_management.hr_management.entity.ParticipateIn;
 import com.hr_management.hr_management.enums.ActivityStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
