@@ -129,9 +129,5 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         runningActivityMapper.updateActivity(activity,requestDTO);
         runningActivityRepository.save(activity);
         return runningActivityMapper.toRunningActivityResponseDTO(activity);
-
-
-
-
     }
 }
