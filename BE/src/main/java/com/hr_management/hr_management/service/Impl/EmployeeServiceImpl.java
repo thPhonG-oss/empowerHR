@@ -8,12 +8,15 @@ import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentReque
 import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
 import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
 import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
+import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.EmployeeMapper;
+import com.hr_management.hr_management.mapper.RunningActivityMapper;
 import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.service.EmployeeService;
+import com.hr_management.hr_management.utils.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,6 +54,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     PointAccountRepository pointAccountRepository;
     LeaveTypeRepository leaveTypeRepository;
     LeaveBalanceRepository leaveBalanceRepository;
+    JwtUtils jwtUtils;
+    RunningActivityMapper runningActivityMapper;
+    ParticipateInRepository participateInRepository;
 
 
     @Override
@@ -453,5 +460,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         savedEmployee.setAccount(savedAccount);
 
         return employeeRepository.save(savedEmployee);
+    }
+
+    // Lay danh sach hoat dong da dang ky cua mot nhan vien
+    @Override
+    public List<RunningActivityResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId) {
+
+        Integer currentEmployeeId = jwtUtils.getEmployeeIdFromAuthentication();
+        if(!currentEmployeeId.equals(employeeId)){
+            throw new AppException(ErrorCode.NOT_VIEW_OTHER_EMPLOYEE_ACTIVITIES);
+        }
+
+        List<ParticipateIn> participations = participateInRepository.findByEmployee_EmployeeId(employeeId);
+        if(participations.isEmpty()){
+            throw new AppException(ErrorCode.NO_REGISTERED_ACTIVITIES);
+        }
+        else {
+            return participations.stream()
+                    .map(ParticipateIn::getRunningActivity)
+                    .map(runningActivityMapper::toRunningActivityResponseDTO)
+                    .collect(Collectors.toList());
+        }
     }
 }
