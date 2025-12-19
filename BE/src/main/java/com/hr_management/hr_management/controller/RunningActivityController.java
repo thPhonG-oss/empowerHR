@@ -31,7 +31,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/activity")
+@RequestMapping("/api/v1/activities")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RunningActivityController {
     RunningActivityService runningActivityService;
@@ -53,7 +53,7 @@ public class RunningActivityController {
     }
   
   // Define REST endpoints here
-    @GetMapping("/admin/activities")
+    @GetMapping("/admin")
     public ApiResponse<Page<RunningActivityResponseDTO>> getAllActivities(
             @RequestParam(defaultValue = "0") Integer pageNumber,
             @RequestParam(defaultValue = "10") Integer pageSize) {
@@ -87,6 +87,13 @@ public class RunningActivityController {
                 .build();
 
 
+    }
+
+    @GetMapping("/admin/{activityId}")
+    public ApiResponse<ActivityResponse> viewDetaildActivities(@PathVariable Integer activityId){
+        return ApiResponse.<ActivityResponse>builder()
+                .result(activityService.viewDetailActivity(activityId))
+                .build();
     }
 
 
