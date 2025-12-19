@@ -1,10 +1,9 @@
 package com.hr_management.hr_management.service.Impl;
 
+
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
-import com.hr_management.hr_management.entity.RunningActivity;
-import com.hr_management.hr_management.dto.request.RunningActivityCreationRequestDTO;
+import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
-import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.entity.RunningActivity;
 import com.hr_management.hr_management.enums.ActivityStatus;
 import com.hr_management.hr_management.exception.AppException;
@@ -130,4 +129,6 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         runningActivityRepository.save(activity);
         return runningActivityMapper.toRunningActivityResponseDTO(activity);
     }
+
+
 }
