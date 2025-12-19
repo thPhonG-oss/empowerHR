@@ -96,5 +96,13 @@ public class RunningActivityController {
                 .build();
     }
 
+    @DeleteMapping("/admin/{activityId}")
+    public ApiResponse<RunningActivityResponseDTO> deleteActivity(@PathVariable Integer activityId){
+        return ApiResponse.<RunningActivityResponseDTO>builder()
+                .message("Xóa thành công activity")
+                .result(runningActivityService.deleteActivity(activityId))
+                .build();
+    }
+
 
 }
