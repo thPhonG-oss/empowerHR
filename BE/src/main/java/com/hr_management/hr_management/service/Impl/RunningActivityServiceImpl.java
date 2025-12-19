@@ -9,6 +9,7 @@ import com.hr_management.hr_management.enums.ActivityStatus;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.RunningActivityMapper;
+import com.hr_management.hr_management.repository.ParticipateInRepository;
 import com.hr_management.hr_management.repository.RunningActivityRepository;
 import com.hr_management.hr_management.service.RunningActivityService;
 import lombok.AccessLevel;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ import java.time.LocalDateTime;
 public class RunningActivityServiceImpl implements RunningActivityService {
     RunningActivityRepository runningActivityRepository;
     RunningActivityMapper runningActivityMapper;
+    ParticipateInRepository participateInRepository;
 
     @Override
     public Page<RunningActivityResponseDTO> getAllActivities(Integer pageNumber, Integer pageSize) {
@@ -127,6 +131,27 @@ public class RunningActivityServiceImpl implements RunningActivityService {
 
         runningActivityMapper.updateActivity(activity,requestDTO);
         runningActivityRepository.save(activity);
+        return runningActivityMapper.toRunningActivityResponseDTO(activity);
+    }
+
+    @Override
+    public RunningActivityResponseDTO deleteActivity(Integer runningActivityId) {
+        RunningActivity activity = runningActivityRepository.findById(runningActivityId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACTIVITY_NOT_FOUND));
+
+        if (!ActivityStatus.Draft.equals(activity.getStatus())) {
+            throw new AppException(ErrorCode.ACTIVITY_DELETE_NOT_ALLOWED);
+        }
+
+        List<ParticipateIn> participations = participateInRepository.findAll()
+                .stream()
+                .filter(p -> p.getRunningActivity().getRunningActivityId().equals(runningActivityId))
+                .collect(Collectors.toList());
+        participateInRepository.deleteAll(participations);
+
+        runningActivityRepository.deleteById(runningActivityId);
+
+
         return runningActivityMapper.toRunningActivityResponseDTO(activity);
     }
 
