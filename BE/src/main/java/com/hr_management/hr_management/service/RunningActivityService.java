@@ -8,4 +8,5 @@ import org.springframework.data.domain.Page;
 public interface RunningActivityService {
     Page<RunningActivityResponseDTO> getAllActivities(Integer pageNumber, Integer pageSize);
     RunningActivityResponseDTO updateActivity(Integer runningActivityId, RunningActivityUpdateRequestDTO requestDTO);
+    RunningActivityResponseDTO deleteActivity(Integer runningActivityId);
 }
