@@ -6,4 +6,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 public interface LeaveBalanceService {
     LeaveBalanceResponse filterLeaveDays(LeaveTypeRequest leaveTypeRequest, JwtAuthenticationToken jwtAuthenticationToken);
+
+    void generateAnnualLeaveBalances();
 }

@@ -1,16 +1,15 @@
 package com.hr_management.hr_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "StravaConnections")
-@Data
+//@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -43,6 +42,13 @@ public class StravaConnections {
 
     @Column(name = "strava_athlete_id", length = 50)
     private String stravaAthleteId;
+
+    // --- THÊM MỚI ---
+    @Column(name = "last_sync_at")
+    private Long lastSyncAt; // Lưu Unix Timestamp
+
+    @Column(name = "scope", columnDefinition = "TEXT")
+    private String scope;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)

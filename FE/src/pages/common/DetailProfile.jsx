@@ -17,40 +17,6 @@ function DetailProfile({}) {
 
   const [profile, setProfile] = useState(null);
 
-  // // Nếu là admin  xem hồ sơ nhân viên khác
-  // if (safeRole === "ADMIN" || (safeRole === "MANAGER" && employeeId)) {
-  //   // Lấy thông tin nhân viên từ API theo employeeId từ params
-  //   useEffect(() => {
-  //     const fetchProfile = async () => {
-  //       try {
-  //         const res = await adminApi.getUserById(employeeId);
-  //         // Lưu nhân viên vào session
-  //         setProfile(res.data);
-  //         sessionStorage.setItem("profile", JSON.stringify(res.data));
-  //       } catch (err) {
-  //         console.error("Lỗi khi load thông tin nhân viên:", err);
-  //       }
-  //     };
-  //     fetchProfile();
-  //   }, [employeeId]);
-  // }
-
-  // // Nếu là Employee/Manager xem hồ sơ nhân viên của mình
-  // if (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)) {
-  //   useEffect(() => {
-  //     const fetchMyProfile = async () => {
-  //       try {
-  //         const res = await employeeApi.getMyProfile();
-  //         setProfile(res.result);
-  //         sessionStorage.setItem("profile", JSON.stringify(res.result));
-  //       } catch (err) {
-  //         console.error("Không thể lấy profile của mình", err);
-  //       }
-  //     };
-  //     fetchMyProfile();
-  //   }, []);
-  // }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,6 +30,7 @@ function DetailProfile({}) {
         ) {
           const res = await employeeApi.getMyProfile();
           setProfile(res.result);
+
           sessionStorage.setItem("profile", JSON.stringify(res.result));
         }
       } catch (err) {
@@ -131,7 +98,7 @@ function DetailProfile({}) {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto space-y-6">
         {/* Header */}
-        <Header title="Hồ sơ nhân viên" icon={Contact} />
+        <Header title="Hồ sơ" icon={Contact} />
         {/* Header với nút chỉnh sửa nổi bật */}
         <div className="px-8">
           <GoBackLink />
@@ -167,7 +134,7 @@ function DetailProfile({}) {
 
                 <InfoField
                   label="Tài khoản ngân hàng"
-                  value={`${profile?.bank.bankAccountNumber} - ${profile?.bank.bankName}`}
+                  value={`${profile?.bankAccountNumber} - ${profile?.bank}`}
                 />
                 <InfoField
                   label="Ngày vào làm"

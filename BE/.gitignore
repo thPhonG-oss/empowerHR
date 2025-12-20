@@ -38,4 +38,5 @@ venv/
 # ignore application configuration files
 application-*.properties
 
+# Docker files
 .env.docker

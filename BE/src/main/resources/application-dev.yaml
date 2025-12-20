@@ -34,7 +34,8 @@ security:
           client-secret: ${STRAVA_CLIENT_SECRET}
           scope: read,activity:read_all
           authorization-grant-type: authorization_code
-          redirect-uri: ${BACKEND_URL}/oauth2/callback
+          redirect-uri: ${FRONTEND_URL}/oauth2/callback
+          verify-token: ${VERIFY_TOKEN}
       provider:
         strava:
           authorization-uri: https://www.strava.com/oauth/authorize
@@ -44,8 +45,8 @@ security:
 
 jwt:
   secret:  ${SECRET_KEY}
-  access-token-validity-seconds: 300
-  refresh-token-validity-seconds: 500
+  access-token-validity-seconds: 3600
+  refresh-token-validity-seconds: 86400
 
 logging:
   level:

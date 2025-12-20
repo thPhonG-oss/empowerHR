@@ -54,7 +54,7 @@ public class RunningActivity {
     private ActivityStatus status = ActivityStatus.Draft;
 
     @Column(name = "target_distance", length = 50)
-    private String targetDistance;
+    private Integer targetDistance;
 
     @Column(name = "rules", columnDefinition = "TEXT")
     private String rules;
