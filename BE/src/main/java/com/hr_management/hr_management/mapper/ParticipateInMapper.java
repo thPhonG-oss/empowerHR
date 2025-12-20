@@ -8,6 +8,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ParticipateInMapper {
 
-    ParticipateIn toParticipateIn(ParticipateInRequest participateInRequest);
+//    ParticipateIn toParticipateIn(ParticipateInRequest participateInRequest);
     ParticipateInResponse toParticipateInResponse(ParticipateIn participateIn);
 }
