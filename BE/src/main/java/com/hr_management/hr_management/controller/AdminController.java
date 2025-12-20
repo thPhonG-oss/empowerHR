@@ -97,7 +97,7 @@ public class AdminController {
         return ResponseEntity.ok()
                 .body(ApiResponse.builder().status(1000).message("Success").build());
     }
-    @PostMapping("/activitys")
+    @PostMapping("/activities")
     public ApiResponse<ActivityResponse> createRunningActivity(@RequestBody ActivityRequets activityRequets){
         return ApiResponse.<ActivityResponse>builder()
                 .status(1000)

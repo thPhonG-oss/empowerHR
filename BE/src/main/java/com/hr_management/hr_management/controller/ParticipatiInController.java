@@ -6,10 +6,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -18,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/participateIn")
 public class ParticipatiInController {
     ParticipateInService participateInService;
-    @PostMapping("/{id}")
-    public ApiResponse<String> deleteParticipatiIn(@PathVariable Integer id){
-        participateInService.deleteParticipateIn(id);
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteParticipatiIn(@PathVariable Integer id, JwtAuthenticationToken jwtAuthenticationToken){
+        participateInService.deleteParticipateIn(id,jwtAuthenticationToken);
         return ApiResponse.<String>builder()
                 .result("Cancellation successful")
                 .build();
