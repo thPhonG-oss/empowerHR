@@ -1,7 +1,7 @@
 package com.hr_management.hr_management.service;
 
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
-import com.hr_management.hr_management.dto.response.EmployeeResponseDTO;
+import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.Role;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -12,8 +12,6 @@ import java.util.Set;
 import com.hr_management.hr_management.dto.request.EmployeeProfileCreationRequestDTO;
 import com.hr_management.hr_management.dto.request.EmployeeUpdateRequestDTO;
 import com.hr_management.hr_management.dto.request.GetAllEmployeeDepartmentRequest;
-import com.hr_management.hr_management.dto.response.EmployeeCreationResponseDTO;
-import com.hr_management.hr_management.dto.response.GetAllEmployeeDepartmentResponse;
 import jakarta.transaction.Transactional;
 
 
@@ -48,4 +46,9 @@ public interface EmployeeService {
 
     @Transactional
     Employee createDefaultMangerProfile(EmployeeProfileCreationRequestDTO request);
+
+    // Lay danh sach hoat dong da dang ky cua mot nhan vien
+    List<RunningActivityResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId);
+
+    ParticipateInDetailsResponseDTO getActivityDetailsForEmployee(Integer employeeId, Integer activityId);
 }

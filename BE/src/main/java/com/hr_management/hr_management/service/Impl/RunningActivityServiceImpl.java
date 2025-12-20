@@ -12,6 +12,7 @@ import com.hr_management.hr_management.mapper.RunningActivityMapper;
 import com.hr_management.hr_management.repository.ParticipateInRepository;
 import com.hr_management.hr_management.repository.RunningActivityRepository;
 import com.hr_management.hr_management.service.RunningActivityService;
+import com.hr_management.hr_management.utils.JwtUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -154,6 +158,4 @@ public class RunningActivityServiceImpl implements RunningActivityService {
 
         return runningActivityMapper.toRunningActivityResponseDTO(activity);
     }
-
-
 }
