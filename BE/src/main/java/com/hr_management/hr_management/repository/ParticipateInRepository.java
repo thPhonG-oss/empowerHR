@@ -9,7 +9,6 @@ import com.hr_management.hr_management.enums.ActivityStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +34,8 @@ public interface ParticipateInRepository extends JpaRepository<ParticipateIn, In
     Long countByRunningActivityAndIsCancelledFalse(RunningActivity activity);
 
     Optional<ParticipateIn> findByParticipateInIdAndEmployee_EmployeeId(Integer participateId,Integer employeeId);
+
+    Integer countByRunningActivity_RunningActivityIdAndIsCancelledFalse(Integer runningActivityId);
     List<ParticipateIn> findByEmployee_EmployeeId(Integer employeeId);
 
     Optional<ParticipateIn> findByEmployee_EmployeeIdAndRunningActivity_RunningActivityId(Integer employeeEmployeeId, Integer runningActivityRunningActivityId);
