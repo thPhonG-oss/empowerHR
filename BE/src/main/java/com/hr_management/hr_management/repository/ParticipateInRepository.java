@@ -32,4 +32,6 @@ public interface ParticipateInRepository extends JpaRepository<ParticipateIn, In
 
     // Đếm số lượng tham gia của hoạt động (chưa hủy)
     Long countByRunningActivityAndIsCancelledFalse(RunningActivity activity);
+
+    Optional<ParticipateIn> findByParticipateInIdAndEmployee_EmployeeId(Integer participateId,Integer employeeId);
 }
