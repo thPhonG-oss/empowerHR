@@ -46,3 +46,4 @@ public class ParticipateIn {
     @Column(name="is_canncelled")
     private  Boolean isCancelled=true;
 }
+
