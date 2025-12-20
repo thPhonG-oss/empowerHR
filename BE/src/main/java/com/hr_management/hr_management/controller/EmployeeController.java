@@ -126,4 +126,21 @@ public class EmployeeController {
                         .build()
         );
     }
+
+    // Xem ket qua chi tiet mot hoat dong da dang ky
+    @Operation(
+            summary = "Get Activity Details for Employee",
+            description = "API for employees to retrieve detailed results of a specific activity they have registered for."
+    )
+    @GetMapping("/{employeeId}/activities/{activityId}")
+    public ResponseEntity<ApiResponse<ParticipateInDetailsResponseDTO>> getActivityDetails(
+            @PathVariable Integer employeeId,
+            @PathVariable Integer activityId) {
+        return ResponseEntity.ok(
+                ApiResponse.<ParticipateInDetailsResponseDTO>builder()
+                        .message("Activity details retrieved successfully")
+                        .result(employeeService.getActivityDetailsForEmployee(employeeId, activityId))
+                        .build()
+        );
+    }
 }
