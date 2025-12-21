@@ -15,6 +15,7 @@ import com.hr_management.hr_management.service.ParticipateInService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import com.hr_management.hr_management.entity.ParticipateIn;
@@ -43,8 +44,10 @@ public class ParticipateInServiceImpl implements ParticipateInService {
     ParticipateInMapper participateInMapper;
   
     @Override
-    public void deleteParticipateIn(Integer id) {
-        ParticipateIn participateIn=participateInRepository.findById( id).orElseThrow(()-> new AppException(ErrorCode.PARTICIPITEIN_NOT_EXIST));
+    public void deleteParticipateIn(Integer id, JwtAuthenticationToken jwtAuthenticationToken) {
+        String username= jwtAuthenticationToken.getName();
+        Integer employeeId=employeeRepository.findByAccount_Username(username).get().getEmployeeId();
+        ParticipateIn participateIn=participateInRepository.findByParticipateInIdAndEmployee_EmployeeId( id,employeeId).orElseThrow(()-> new AppException(ErrorCode.PARTICIPITEIN_NOT_EXIST));
         participateIn.setIsCancelled(true);
         participateInRepository.save(participateIn);
         return;
@@ -128,7 +131,8 @@ public class ParticipateInServiceImpl implements ParticipateInService {
         ParticipateIn saved = participateInRepository.save(participateIn);
         ParticipateInResponse participateInResponse = participateInMapper.toParticipateInResponse(saved);
         participateInResponse.setEmployeeId(saved.getEmployee().getEmployeeId());
-        participateInResponse.setRunningActivityId(saved.getRunningActivity().getRunningActivityId());
+        participateInResponse.setEmployeeName(saved.getEmployee().getEmployeeName());
+        participateInResponse.setRunningActivity(saved.getRunningActivity());
         return participateInResponse;
     }
 }

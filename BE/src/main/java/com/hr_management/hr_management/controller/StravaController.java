@@ -21,6 +21,7 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/api/v1/strava")
 public class StravaController {
+
     StravaService stravaService;
     StravaWebhookService stravaWebhookService;
 

@@ -62,8 +62,9 @@ public enum ErrorCode {
     ACTIVITY_ALREADY_REGISTERED("1031","ACTIVITY_ALREADY_REGISTERED", HttpStatus.BAD_REQUEST),
     ACTIVITY_PARTICIPANT_LIMIT_REACHED("1032", "ACTIVITY_PARTICIPANT_LIMIT_REACHED", HttpStatus.BAD_REQUEST),
     EMPLOYEE_INACTIVED("1033","EMPLOYEE_INACTIVE", HttpStatus.BAD_REQUEST),
-    ACTIVITY_DELETE_NOT_ALLOWED("1034", "Only activities with Draft status can be deleted", HttpStatus.BAD_REQUEST)
-    ;
+    ACTIVITY_DELETE_NOT_ALLOWED("1034", "Only activities with Draft status can be deleted", HttpStatus.BAD_REQUEST),
+    NO_REGISTERED_ACTIVITIES("1035", "No registered activities found for the employee", HttpStatus.BAD_REQUEST),
+    NOT_VIEW_OTHER_EMPLOYEE_ACTIVITIES("1036", "Cannot view activities of other employees", HttpStatus.BAD_REQUEST);
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;

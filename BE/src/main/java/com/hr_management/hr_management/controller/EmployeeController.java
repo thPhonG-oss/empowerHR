@@ -5,8 +5,10 @@ import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
 import com.hr_management.hr_management.repository.LeaveTypeRepository;
 import com.hr_management.hr_management.service.*;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-@RequestMapping("api/v1/employee")
+@RequestMapping("/api/v1/employees")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,6 +34,7 @@ public class EmployeeController {
     AttendanceService attendanceService;
     LeaveBalanceService leaveBalanceService;
     LeaveTypeService leaveTypeService;
+    private final RunningActivityService runningActivityService;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -106,5 +109,38 @@ public class EmployeeController {
         return  ApiResponse.<List<AttendanceResponse>>builder()
                 .result(attendanceService.getAll(jwtAuthenticationToken))
                 .build();
+    }
+
+    // Xem danh sách hoạt động đã đăng ký
+    @Operation(
+            summary = "Get Registered Activities for Employee",
+            description = "API for employees to retrieve the list of activities they have registered for."
+    )
+    @GetMapping("/{employeeId}/activities")
+    public ResponseEntity<ApiResponse<List<RunningActivityResponseDTO>>> getRegisteredActivities(@PathVariable Integer employeeId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<RunningActivityResponseDTO>>builder()
+                        .message("Registered activities retrieved successfully")
+                        .result(employeeService.getRegisteredActivitiesByEmployee(employeeId))
+                        .build()
+        );
+    }
+
+    // Xem ket qua chi tiet mot hoat dong da dang ky
+    @Operation(
+            summary = "Get Activity Details for Employee",
+            description = "API for employees to retrieve detailed results of a specific activity they have registered for."
+    )
+    @GetMapping("/{employeeId}/activities/{activityId}")
+    public ResponseEntity<ApiResponse<ParticipateInDetailsResponseDTO>> getActivityDetails(
+            @PathVariable Integer employeeId,
+            @PathVariable Integer activityId) {
+        return ResponseEntity.ok(
+                ApiResponse.<ParticipateInDetailsResponseDTO>builder()
+                        .message("Activity details retrieved successfully")
+                        .result(employeeService.getActivityDetailsForEmployee(employeeId, activityId))
+                        .build()
+        );
     }
 }
