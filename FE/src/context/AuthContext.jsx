@@ -17,8 +17,8 @@ export function AuthProvider({ children }) {
       const decoded = jwtDecode(token);
       const rolesFromToken = decoded.scope || [];
       const role = rolesFromToken.split(" ")[0];
-      // Cắt bỏ ký tự ROLE_
-      const roleString = role.replace("ROLE_", "");
+
+      const roleString = role.replace("ROLE_", "").toLowerCase();
 
       localStorage.setItem("role", roleString);
       setRole(roleString);
