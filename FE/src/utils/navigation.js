@@ -133,7 +133,9 @@ const navConfig = [
 ];
 
 export const getNavByRole = (role) => {
-  const prefix = `/${role}/`;
+  // ép role thành chữ thường
+
+  const prefix = `/${role.toLowerCase()}/`;
 
   return navConfig
     .filter((item) => item.roles.includes(role))
