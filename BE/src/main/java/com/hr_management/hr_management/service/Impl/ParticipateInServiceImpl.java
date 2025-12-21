@@ -131,7 +131,8 @@ public class ParticipateInServiceImpl implements ParticipateInService {
         ParticipateIn saved = participateInRepository.save(participateIn);
         ParticipateInResponse participateInResponse = participateInMapper.toParticipateInResponse(saved);
         participateInResponse.setEmployeeId(saved.getEmployee().getEmployeeId());
-        participateInResponse.setRunningActivityId(saved.getRunningActivity().getRunningActivityId());
+        participateInResponse.setEmployeeName(saved.getEmployee().getEmployeeName());
+        participateInResponse.setRunningActivity(saved.getRunningActivity());
         return participateInResponse;
     }
 }

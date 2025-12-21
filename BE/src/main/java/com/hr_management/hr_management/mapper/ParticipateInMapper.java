@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ParticipateInMapper {
 
-    ParticipateIn toParticipateIn(ParticipateInRequest participateInRequest);
+//    ParticipateIn toParticipateIn(ParticipateInRequest participateInRequest);
     ParticipateInResponse toParticipateInResponse(ParticipateIn participateIn);
 
     @Mapping(target = "employeeId", source = "employee.employeeId")
