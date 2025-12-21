@@ -28,7 +28,6 @@ const adminRoutes = [
         path: "activity-management",
         element: <RunningActivityManagement />,
       },
-      // thêm các route admin khác ở đây
     ],
   },
 ];
