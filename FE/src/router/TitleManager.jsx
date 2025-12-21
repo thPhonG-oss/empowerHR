@@ -20,9 +20,11 @@ const navSimple = [
   { title: "Hồ sơ của tôi", path: "profile" },
   { title: "Nghỉ phép", path: "leave" },
   { title: "Chấm công", path: "attendance" },
-  { title: "Hoạt động, chiến dịch", path: "campaigns" },
+  { title: "Hoạt động, chiến dịch đang diễn ra", path: "activities-openning" },
+  { title: "Hoạt động, chiến dịch đã diễn ra", path: "activities-history" },
   { title: "Điểm thưởng", path: "rewards" },
   { title: "Lịch sử yêu cầu", path: "request-history" },
+
 
   // EMPLOYEE ONLY
   { title: "Lịch sử lương", path: "salary-history" },
