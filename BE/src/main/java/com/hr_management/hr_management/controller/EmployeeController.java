@@ -2,9 +2,16 @@ package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.*;
 import com.hr_management.hr_management.dto.response.*;
+import com.hr_management.hr_management.entity.Employee;
+import com.hr_management.hr_management.entity.StravaConnections;
+import com.hr_management.hr_management.exception.AppException;
+import com.hr_management.hr_management.exception.ErrorCode;
+import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.repository.LeaveRequestRepository;
 import com.hr_management.hr_management.repository.LeaveTypeRepository;
+import com.hr_management.hr_management.repository.StravaConnectionRepository;
 import com.hr_management.hr_management.service.*;
+import com.hr_management.hr_management.utils.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +42,8 @@ public class EmployeeController {
     LeaveBalanceService leaveBalanceService;
     LeaveTypeService leaveTypeService;
     private final RunningActivityService runningActivityService;
+    private final JwtUtils jwtUtils;
+    private final EmployeeRepository employeeRepository;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -140,6 +149,18 @@ public class EmployeeController {
                 ApiResponse.<ParticipateInDetailsResponseDTO>builder()
                         .message("Activity details retrieved successfully")
                         .result(employeeService.getActivityDetailsForEmployee(employeeId, activityId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{employeeId}/connection")
+    public ResponseEntity<ApiResponse<StravaConnectionsResponseDTO>> getStravaConnection(
+            @PathVariable Integer employeeId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<StravaConnectionsResponseDTO>builder()
+                        .message("Strava connection retrieved successfully")
+                        .result(employeeService.getStravaConnection(employeeId))
                         .build()
         );
     }
