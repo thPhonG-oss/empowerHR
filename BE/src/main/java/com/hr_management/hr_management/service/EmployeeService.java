@@ -51,4 +51,6 @@ public interface EmployeeService {
     List<RunningActivityResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId);
 
     ParticipateInDetailsResponseDTO getActivityDetailsForEmployee(Integer employeeId, Integer activityId);
+
+    StravaConnectionsResponseDTO getStravaConnection(Integer employeeId);
 }

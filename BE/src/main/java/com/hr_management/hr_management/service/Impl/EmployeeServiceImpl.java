@@ -12,6 +12,7 @@ import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.EmployeeMapper;
 import com.hr_management.hr_management.mapper.ParticipateInMapper;
 import com.hr_management.hr_management.mapper.RunningActivityMapper;
+import com.hr_management.hr_management.mapper.StravaConnectionMapper;
 import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.service.EmployeeService;
 import com.hr_management.hr_management.utils.JwtUtils;
@@ -56,6 +57,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     RunningActivityMapper runningActivityMapper;
     ParticipateInRepository participateInRepository;
     ParticipateInMapper participateInMapper;
+    StravaConnectionRepository stravaConnectionRepository;
+    private final StravaConnectionMapper stravaConnectionMapper;
 
 
     @Override
@@ -495,5 +498,24 @@ public class EmployeeServiceImpl implements EmployeeService {
             ParticipateIn participation = participationOpt.get();
             return participateInMapper.toParticipateInDetailsResponseDTO(participation);
         }
+    }
+
+    @Override
+    public StravaConnectionsResponseDTO getStravaConnection(Integer employeeId) {
+
+        Integer currentEmployeeId = jwtUtils.getEmployeeIdFromAuthentication();
+        if (!currentEmployeeId.equals(employeeId)) {
+            throw new AppException(ErrorCode.NOT_VIEW_OTHER_EMPLOYEE_STRAVA_CONNECTION);
+        }
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        StravaConnections connections = stravaConnectionRepository.findByEmployee_EmployeeId(employeeId);
+        if(connections == null){
+            throw new AppException(ErrorCode.CONNECTION_NOT_FOUND);
+        }
+
+        return stravaConnectionMapper.stravaConnectionsResponseDTO(connections);
     }
 }
