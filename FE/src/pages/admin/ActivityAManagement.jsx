@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Fuse from "fuse.js";
 import runningActivityApi from "../../api/runningActivityApi";
 import Header from "../../components/common/Header";
 import {
@@ -10,6 +11,7 @@ import {
   GripHorizontal,
 } from "lucide-react";
 import CreateActivityOverlay from "../../components/admin/CreateActivityOverlay";
+import DetailActivityOverlay from "../../components/admin/DetailActivityOverlay";
 
 export default function RunningActivityManagement() {
   const [activities, setActivities] = useState([]);
@@ -20,10 +22,25 @@ export default function RunningActivityManagement() {
   const [loading, setLoading] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
 
+  // 🔥 overlay detail
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
   // Search + sort + status
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc"); // desc: gần nhất → xa nhất
+  const [sortOrder, setSortOrder] = useState("desc");
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+  // 🔍 Fuse config (KHÔNG ảnh hưởng logic khác)
+  const fuseOptions = {
+    keys: [
+      { name: "title", weight: 0.7 },
+      { name: "description", weight: 0.3 },
+    ],
+    threshold: 0.4,
+    ignoreLocation: true,
+    minMatchCharLength: 2,
+  };
 
   const fetchActivities = async (page = 0) => {
     setLoading(true);
@@ -45,30 +62,25 @@ export default function RunningActivityManagement() {
     fetchActivities(0);
   }, []);
 
-  // 🔥 Search + Status + Sort
+  // 🔍 Search (Fuse) + Filter + Sort
   useEffect(() => {
     let result = [...activities];
 
-    // Search
+    // 👉 FUZZY SEARCH
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (a) =>
-          a.title?.toLowerCase().includes(term) ||
-          a.description?.toLowerCase().includes(term)
-      );
+      const fuse = new Fuse(result, fuseOptions);
+      result = fuse.search(searchTerm).map((r) => r.item);
     }
 
-    // Status filter
+    // 👉 FILTER STATUS
     if (statusFilter !== "ALL") {
       result = result.filter((a) => a.status === statusFilter);
     }
 
-    // Sort theo startDate
+    // 👉 SORT DATE
     result.sort((a, b) => {
       const dateA = new Date(a.startDate);
       const dateB = new Date(b.startDate);
-
       return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
     });
 
@@ -82,7 +94,6 @@ export default function RunningActivityManagement() {
       <div className="p-6 space-y-6">
         {/* Bộ lọc */}
         <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-          {/* Search */}
           <div className="flex items-center gap-2 border border-gray-300 rounded-md px-4 py-2 bg-gwhite focus-within:ring-2 focus-within:ring-blue-500 transition w-full lg:w-1/2">
             <Search className="w-4 h-4 text-gray-400" />
             <input
@@ -94,8 +105,7 @@ export default function RunningActivityManagement() {
             />
           </div>
 
-          <div className="flex  flex-col lg:flex-row lg:items-end gap-3">
-            {/* Status filter */}
+          <div className="flex flex-col lg:flex-row lg:items-end gap-3">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -107,7 +117,6 @@ export default function RunningActivityManagement() {
               <option value="Cancelled">Đã hủy</option>
             </select>
 
-            {/* Sort */}
             <button
               onClick={() =>
                 setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
@@ -118,7 +127,6 @@ export default function RunningActivityManagement() {
               {sortOrder === "desc" ? "Gần nhất" : "Xa nhất"}
             </button>
 
-            {/* Tạo hoạt động mới */}
             <button
               onClick={() => setOpenCreate(true)}
               className="flex items-center gap-2 px-4 rounded-md bg-black text-sm text-white hover:bg-gray-800 transition h-9 cursor-pointer"
@@ -145,7 +153,11 @@ export default function RunningActivityManagement() {
               {filteredActivities.map((act) => (
                 <div
                   key={act.runningActivityId}
-                  className="group bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden"
+                  onClick={() => {
+                    setSelectedActivity(act);
+                    setOpenDetail(true);
+                  }}
+                  className="group bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden cursor-pointer"
                 >
                   <img
                     src={act.image}
@@ -202,14 +214,7 @@ export default function RunningActivityManagement() {
             {/* Phân trang */}
             <div className="flex justify-center items-center gap-3 mt-8">
               <button
-                className="
-                  px-4 py-2 rounded-md bg-blue-600 text-white text-sm
-                  hover:bg-blue-600/80
-                  transition
-                  cursor-pointer
-                  disabled:bg-blue-600/50
-                  disabled:cursor-not-allowed
-                "
+                className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-600/80 transition cursor-pointer disabled:bg-blue-600/50 disabled:cursor-not-allowed"
                 onClick={() => fetchActivities(pageNumber - 1)}
                 disabled={pageNumber === 0}
               >
@@ -221,14 +226,7 @@ export default function RunningActivityManagement() {
               </span>
 
               <button
-                className="
-                  px-4 py-2 rounded-md bg-blue-600 text-white text-sm
-                  hover:bg-blue-600/80
-                  transition
-                  cursor-pointer
-                  disabled:bg-blue-600/50
-                  disabled:cursor-not-allowed
-                "
+                className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-600/80 transition cursor-pointer disabled:bg-blue-600/50 disabled:cursor-not-allowed"
                 onClick={() => fetchActivities(pageNumber + 1)}
                 disabled={pageNumber + 1 >= totalPages}
               >
@@ -238,9 +236,19 @@ export default function RunningActivityManagement() {
           </>
         )}
       </div>
+
+      {/* Overlay Create */}
       <CreateActivityOverlay
         open={openCreate}
         onClose={() => setOpenCreate(false)}
+        onSuccess={() => fetchActivities(0)}
+      />
+
+      {/* Overlay Detail */}
+      <DetailActivityOverlay
+        open={openDetail}
+        onClose={() => setOpenDetail(false)}
+        activity={selectedActivity}
         onSuccess={() => fetchActivities(0)}
       />
     </div>
