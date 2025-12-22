@@ -64,7 +64,9 @@ public enum ErrorCode {
     EMPLOYEE_INACTIVED("1033","EMPLOYEE_INACTIVE", HttpStatus.BAD_REQUEST),
     ACTIVITY_DELETE_NOT_ALLOWED("1034", "Only activities with Draft status can be deleted", HttpStatus.BAD_REQUEST),
     NO_REGISTERED_ACTIVITIES("1035", "No registered activities found for the employee", HttpStatus.BAD_REQUEST),
-    NOT_VIEW_OTHER_EMPLOYEE_ACTIVITIES("1036", "Cannot view activities of other employees", HttpStatus.BAD_REQUEST);
+    NOT_VIEW_OTHER_EMPLOYEE_ACTIVITIES("1036", "Cannot view activities of other employees", HttpStatus.BAD_REQUEST),
+    NOT_VIEW_OTHER_EMPLOYEE_STRAVA_CONNECTION("1037", "Cannot view Strava connection of other employees", HttpStatus.BAD_REQUEST),
+    CONNECTION_NOT_FOUND("1038", "Strava connection not found for the employee", HttpStatus.BAD_REQUEST);
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;
