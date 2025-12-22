@@ -2,9 +2,7 @@ package com.hr_management.hr_management.controller;
 
 import com.cloudinary.Api;
 import com.hr_management.hr_management.dto.request.ApiResponse;
-import com.hr_management.hr_management.dto.response.ActivityResponse;
-import com.hr_management.hr_management.dto.response.ParticipateInResponse;
-import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
+import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.entity.ParticipateIn;
 import com.hr_management.hr_management.service.ActivityService;
 //import com.hr_management.hr_management.dto.ApiResponse;
@@ -44,8 +42,8 @@ public class RunningActivityController {
 
     //Employee
     @GetMapping()
-    public ApiResponse<List<RunningActivityResponseDTO>> getAll(){
-        return ApiResponse.<List<RunningActivityResponseDTO>>builder()
+    public ApiResponse<List<ActivityResponseDto>> getAll(){
+        return ApiResponse.<List<ActivityResponseDto>>builder()
                 .result(activityService.getAllActivity())
                 .build();
     }
