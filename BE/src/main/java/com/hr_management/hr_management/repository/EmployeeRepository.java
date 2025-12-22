@@ -39,4 +39,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Page<Employee> findAllEmployeesByDepartmentId(Integer departmentId, Pageable pageable);
 
     Optional<Employee> findByAccount(Account account);
+
+    Employee findByEmployeeId(Integer employeeId);
 }
