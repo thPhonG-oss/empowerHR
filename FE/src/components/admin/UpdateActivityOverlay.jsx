@@ -1,21 +1,21 @@
+// UpdateActivityOverlay.jsx
 import { X, SquareActivity } from "lucide-react";
 import { useState, useEffect } from "react";
-import adminApi from "../../api/adminApi";
+import runningActivityApi from "../../api/runningActivityApi";
 import toast from "react-hot-toast";
 
 const today = new Date().toISOString().split("T")[0];
 
-function CreateActivityOverlay({
+export default function UpdateActivityOverlay({
   open,
   onClose,
-  onSuccess,
   activity,
-  mode = "create",
+  onSuccess,
 }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const defaultForm = {
+  const emptyForm = {
     title: "",
     image: "",
     description: "",
@@ -28,13 +28,16 @@ function CreateActivityOverlay({
     targetDistance: "",
     rules: "",
     completionBonus: "",
+    top1Bonus: "",
+    top2Bonus: "",
+    top3Bonus: "",
   };
 
-  const [form, setForm] = useState(defaultForm);
+  const [form, setForm] = useState(emptyForm);
 
-  // Load activity vào form khi edit
+  /* ================= LOAD DATA ================= */
   useEffect(() => {
-    if (activity && mode === "edit") {
+    if (open && activity) {
       setForm({
         title: activity.title || "",
         image: activity.image || "",
@@ -49,17 +52,19 @@ function CreateActivityOverlay({
         targetDistance: activity.targetDistance ?? "",
         rules: activity.rules || "",
         completionBonus: activity.completionBonus ?? "",
+        top1Bonus: activity.top1Bonus ?? "",
+        top2Bonus: activity.top2Bonus ?? "",
+        top3Bonus: activity.top3Bonus ?? "",
       });
-    } else if (mode === "create") {
-      setForm(defaultForm);
     }
-  }, [activity, mode]);
-  if (!open) return null;
+  }, [open, activity]);
+
+  if (!open || !activity) return null;
 
   const baseInput =
     "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition";
 
-  /* ================= IMAGE UPLOAD ================= */
+  /* ================= UPLOAD IMAGE ================= */
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -76,20 +81,13 @@ function CreateActivityOverlay({
         `https://api.cloudinary.com/v1_1/${
           import.meta.env.VITE_CLOUD_NAME
         }/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
+        { method: "POST", body: formData }
       );
 
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-
-      setForm((prev) => ({
-        ...prev,
-        image: data.secure_url,
-      }));
+      setForm((prev) => ({ ...prev, image: data.secure_url }));
 
       toast.success("Upload ảnh thành công 📸");
     } catch (err) {
@@ -100,80 +98,81 @@ function CreateActivityOverlay({
     }
   };
 
-  /* ================= FORM ================= */
+  /* ================= HANDLE CHANGE ================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const payload = {
-      ...form,
+      title: form.title,
+      image: form.image,
+      description: form.description,
+      rules: form.rules,
+
+      registrationStartDate: new Date(form.registrationStartDate).toISOString(),
+      registrationEndDate: new Date(form.registrationEndDate).toISOString(),
+      startDate: new Date(form.startDate).toISOString(),
+      endDate: new Date(form.endDate).toISOString(),
+
       minParticipant:
         form.minParticipant === "" ? null : Number(form.minParticipant),
       maxParticipant:
         form.maxParticipant === "" ? null : Number(form.maxParticipant),
       targetDistance:
         form.targetDistance === "" ? null : Number(form.targetDistance),
+
       completionBonus:
-        form.completionBonus === "" ? null : Number(form.completionBonus),
-      registrationStartDate: new Date(form.registrationStartDate).toISOString(),
-      registrationEndDate: new Date(form.registrationEndDate).toISOString(),
+        form.completionBonus === "" ? 0 : Number(form.completionBonus),
+      top1Bonus: form.top1Bonus === "" ? 0 : Number(form.top1Bonus),
+      top2Bonus: form.top2Bonus === "" ? 0 : Number(form.top2Bonus),
+      top3Bonus: form.top3Bonus === "" ? 0 : Number(form.top3Bonus),
     };
 
     try {
-      if (mode === "edit") {
-        await adminApi.updateActivity(activity.runningActivityId, payload);
-        toast.success("Cập nhật hoạt động thành công ✨");
-      } else {
-        await adminApi.createActivity(payload);
-        toast.success("Tạo hoạt động thành công 🎉");
-      }
+      await runningActivityApi.updateActivity(
+        activity.runningActivityId,
+        payload
+      );
 
+      toast.success("Cập nhật hoạt động thành công ✨");
       onSuccess?.();
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error(
-        mode === "edit" ? "Cập nhật thất bại ❌" : "Tạo hoạt động thất bại ❌"
-      );
+      toast.error("Cập nhật thất bại ❌");
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= UI ================= */
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 shadow-sm">
           <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
-            <SquareActivity size={22} />{" "}
-            {mode === "edit" ? "Cập nhật hoạt động" : "Tạo hoạt động mới"}
+            <SquareActivity size={22} /> Cập nhật hoạt động
           </h2>
           <button
-            onClick={() => {
-              onClose();
-              if (mode === "create") setForm(defaultForm);
-            }}
-            className="p-2 rounded-md hover:bg-red-100 transition"
+            onClick={onClose}
+            className="p-2 rounded-md hover:bg-red-100 transition cursor-pointer hover:opacity-80"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Form */}
         <form
           onSubmit={handleSubmit}
           className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
         >
+          {/* title */}
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-700">
               Tiêu đề hoạt động
@@ -187,23 +186,13 @@ function CreateActivityOverlay({
             />
           </div>
 
-          {/* Upload image */}
+          {/* upload image */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Hình ảnh hoạt động
             </label>
 
-            <label
-              className={`relative flex items-center justify-center w-full h-48
-                rounded-xl cursor-pointer overflow-hidden transition
-                ${
-                  uploading
-                    ? "border-2 border-dashed border-gray-300 bg-gray-50"
-                    : form.image
-                    ? "border border-gray-300"
-                    : "border-2 border-dashed border-gray-300 hover:border-black"
-                }`}
-            >
+            <label className="relative flex items-center justify-center w-full h-48 rounded-xl cursor-pointer overflow-hidden border-2 border-dashed border-gray-300">
               <input
                 type="file"
                 accept="image/*"
@@ -211,34 +200,17 @@ function CreateActivityOverlay({
                 className="hidden"
               />
 
-              {!form.image && !uploading && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Click để tải ảnh lên</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG</p>
-                </div>
-              )}
-
-              {uploading && (
-                <p className="text-sm text-gray-500">Đang upload ảnh...</p>
-              )}
-
-              {form.image && !uploading && (
-                <>
-                  <img
-                    src={form.image}
-                    alt="preview"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center">
-                    <span className="px-4 py-2 bg-white text-sm rounded-md">
-                      Đổi ảnh khác
-                    </span>
-                  </div>
-                </>
+              {form.image && (
+                <img
+                  src={form.image}
+                  alt="preview"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
               )}
             </label>
           </div>
 
+          {/* description */}
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-700">
               Mô tả hoạt động
@@ -251,7 +223,7 @@ function CreateActivityOverlay({
             />
           </div>
 
-          {/* Registration */}
+          {/* registration dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm text-gray-600">Bắt đầu đăng ký</label>
@@ -261,7 +233,6 @@ function CreateActivityOverlay({
                 value={form.registrationStartDate}
                 onChange={handleChange}
                 min={today}
-                max={form.registrationEndDate}
                 className={`${baseInput} mt-1`}
                 required
               />
@@ -280,7 +251,7 @@ function CreateActivityOverlay({
             </div>
           </div>
 
-          {/* Activity time */}
+          {/* activity dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm text-gray-600">Ngày bắt đầu</label>
@@ -289,8 +260,6 @@ function CreateActivityOverlay({
                 name="startDate"
                 value={form.startDate}
                 onChange={handleChange}
-                min={today}
-                max={form.endDate}
                 className={`${baseInput} mt-1`}
                 required
               />
@@ -302,13 +271,13 @@ function CreateActivityOverlay({
                 name="endDate"
                 value={form.endDate}
                 onChange={handleChange}
-                min={form.startDate || today}
                 className={`${baseInput} mt-1`}
                 required
               />
             </div>
           </div>
 
+          {/* participants */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">
@@ -337,6 +306,7 @@ function CreateActivityOverlay({
             </div>
           </div>
 
+          {/* distance */}
           <div>
             <label className="text-sm font-medium text-gray-700">
               Cự ly mục tiêu (km)
@@ -347,18 +317,53 @@ function CreateActivityOverlay({
               value={form.targetDistance}
               onChange={handleChange}
               className={baseInput}
-              placeholder="10"
             />
           </div>
 
+          {/* rules */}
           <textarea
             name="rules"
-            placeholder="Luật tham gia"
             value={form.rules}
             onChange={handleChange}
             className={`${baseInput} h-20 resize-none`}
+            placeholder="Luật tham gia"
           />
 
+          {/* bonuses */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 1</label>
+              <input
+                type="number"
+                name="top1Bonus"
+                value={form.top1Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 2</label>
+              <input
+                type="number"
+                name="top2Bonus"
+                value={form.top2Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 3</label>
+              <input
+                type="number"
+                name="top3Bonus"
+                value={form.top3Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+          </div>
+
+          {/* completion bonus */}
           <div>
             <label className="text-sm font-medium text-gray-700">
               Thưởng hoàn thành
@@ -369,32 +374,24 @@ function CreateActivityOverlay({
               value={form.completionBonus}
               onChange={handleChange}
               className={baseInput}
-              placeholder="200"
             />
           </div>
 
+          {/* buttons */}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer"
+              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer "
             >
               Hủy
             </button>
             <button
-              disabled={loading || uploading}
               type="submit"
-              className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition cursor-pointer"
+              disabled={loading || uploading}
+              className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition cursor-pointer hover:opacity-90"
             >
-              {loading
-                ? mode === "edit"
-                  ? "Đang cập nhật..."
-                  : "Đang tạo..."
-                : uploading
-                ? "Đang upload ảnh..."
-                : mode === "edit"
-                ? "Cập nhật hoạt động"
-                : "Tạo hoạt động"}
+              {loading ? "Đang cập nhật..." : "Cập nhật hoạt động"}
             </button>
           </div>
         </form>
@@ -402,5 +399,3 @@ function CreateActivityOverlay({
     </div>
   );
 }
-
-export default CreateActivityOverlay;

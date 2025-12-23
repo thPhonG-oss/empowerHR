@@ -6,8 +6,6 @@ import Attendance from "../../pages/employee/Attendance";
 import LeaveRequest from "../../pages/employee/LeaveRequest";
 import HistoryRequests from "../../pages/employee/HistoryRequests";
 
-
-
 import RoleRoute from "../RoleRoute";
 import ActivitiesOpening from "../../pages/employee/ActivitiesOpening";
 
@@ -26,8 +24,7 @@ const employeeRoutes = [
       { path: "attendance", element: <Attendance /> },
       { path: "leavee", element: <LeaveRequest /> },
       { path: "request-history", element: <HistoryRequests /> },
-      { path: "activities", element: <ActivitiesOpening/> },
-      
+      { path: "activities", element: <ActivitiesOpening /> },
     ],
   },
 ];
