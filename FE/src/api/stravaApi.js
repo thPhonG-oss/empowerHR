@@ -3,7 +3,10 @@ import axiosClient from "./axiosClient";
 const stravaApi = {
 
   
-//   getStatusconnetion: () => axiosClient.get(`/api/v1/activities`)
+getStatusconnetion: (employeeId) => axiosClient.get(`/api/v1/employees/${employeeId}/connection`,{
+    params:{employeeId}
+  }),
+
 RedirectURL: () => axiosClient.get(`/api/v1/strava/connect`),
 
 Oauth2: ({ state, code, scope }) =>
@@ -13,7 +16,9 @@ Oauth2: ({ state, code, scope }) =>
         code,
         scope,
       },
-    })
+    }),
+
+
 
 };
 

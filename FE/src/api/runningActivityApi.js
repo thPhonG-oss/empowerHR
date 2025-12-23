@@ -21,6 +21,10 @@ const runningActivityApi = {
     axiosClient.delete(`/api/v1/participateIn/${activityId}`,{
       params:{activityId}
     }),
+
+  employeeGetResultActivities: (employeeId, activityId) => axiosClient.get(`/api/v1/employees/${employeeId}/activities/${activityId}`,{
+    params:{employeeId, activityId}
+  }),
 };
 
 export default runningActivityApi;
