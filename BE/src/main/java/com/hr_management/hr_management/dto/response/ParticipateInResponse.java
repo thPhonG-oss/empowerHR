@@ -25,7 +25,7 @@ public class ParticipateInResponse {
     private String employeeName;
     private Integer employeeId;
     private Boolean isCancelled;
-    private RunningActivity runningActivity;
+    private RunningActivityResponseDTO runningActivityResponseDTO;
     private Integer totalRun;
     private Boolean isCompleted ;
     LocalDateTime completedDate;
