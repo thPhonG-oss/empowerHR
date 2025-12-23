@@ -3,6 +3,7 @@ package com.hr_management.hr_management.service;
 import com.hr_management.hr_management.dto.request.UpdateEmployeeProfileRequest;
 import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.entity.Employee;
+import com.hr_management.hr_management.entity.ParticipateIn;
 import com.hr_management.hr_management.entity.Role;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -48,7 +49,7 @@ public interface EmployeeService {
     Employee createDefaultMangerProfile(EmployeeProfileCreationRequestDTO request);
 
     // Lay danh sach hoat dong da dang ky cua mot nhan vien
-    List<RunningActivityResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId);
+    List<ParticipateInDetailsResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId);
 
     ParticipateInDetailsResponseDTO getActivityDetailsForEmployee(Integer employeeId, Integer activityId);
 }

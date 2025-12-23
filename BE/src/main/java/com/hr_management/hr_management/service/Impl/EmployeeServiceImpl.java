@@ -462,7 +462,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // Lay danh sach hoat dong da dang ky cua mot nhan vien
     @Override
-    public List<RunningActivityResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId) {
+    public List<ParticipateInDetailsResponseDTO> getRegisteredActivitiesByEmployee(Integer employeeId) {
 
         Integer currentEmployeeId = jwtUtils.getEmployeeIdFromAuthentication();
         if (!currentEmployeeId.equals(employeeId)) {
@@ -474,8 +474,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AppException(ErrorCode.NO_REGISTERED_ACTIVITIES);
         } else {
             return participations.stream()
-                    .map(ParticipateIn::getRunningActivity)
-                    .map(runningActivityMapper::toRunningActivityResponseDTO)
+                    .map(participateInMapper::toParticipateInDetailsResponseDTO)
                     .collect(Collectors.toList());
         }
     }

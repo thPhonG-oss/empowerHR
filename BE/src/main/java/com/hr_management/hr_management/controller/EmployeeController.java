@@ -117,10 +117,10 @@ public class EmployeeController {
             description = "API for employees to retrieve the list of activities they have registered for."
     )
     @GetMapping("/{employeeId}/activities")
-    public ResponseEntity<ApiResponse<List<RunningActivityResponseDTO>>> getRegisteredActivities(@PathVariable Integer employeeId) {
+    public ResponseEntity<ApiResponse<List<ParticipateInDetailsResponseDTO>>> getRegisteredActivities(@PathVariable Integer employeeId) {
 
         return ResponseEntity.ok(
-                ApiResponse.<List<RunningActivityResponseDTO>>builder()
+                ApiResponse.<List<ParticipateInDetailsResponseDTO>>builder()
                         .message("Registered activities retrieved successfully")
                         .result(employeeService.getRegisteredActivitiesByEmployee(employeeId))
                         .build()
