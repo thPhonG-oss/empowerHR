@@ -3,27 +3,8 @@ import { Calendar, MapPin, Users, Clock, Award, Target } from "lucide-react"
 import stravaApi from "../../api/stravaApi"
 import runningActivityApi from "../../api/runningActivityApi"
 import employeeApi from "../../api/employeeApi"
-
-const CustomButton = ({ children, onClick, disabled = false, variant = "primary", className = "" }) => {
-  const baseStyles =
-    "px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-
-  const variants = {
-    primary:
-      "bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed focus:ring-gray-500",
-    secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300",
-    danger: "bg-white text-red-500 border border-red-500 hover:bg-red-50 focus:ring-red-300",
-    orange: "bg-orange-500 text-white hover:bg-orange-600 focus:ring-orange-400",
-    green: "bg-green-500 text-white hover:bg-green-600 focus:ring-green-400",
-    link: "text-blue-600 hover:text-blue-700 hover:underline p-0",
-  }
-
-  return (
-    <button onClick={onClick} disabled={disabled} className={`${baseStyles} ${variants[variant]} ${className}`}>
-      {children}
-    </button>
-  )
-}
+import CustomButton from "../../components/common/Button"
+import CustomDialog from "../../components/common/CustomDialog"
 
 const CustomCard = ({ children, className = "" }) => {
   return (
@@ -32,35 +13,10 @@ const CustomCard = ({ children, className = "" }) => {
     </div>
   )
 }
-
-const CustomDialog = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
-
-      {/* Dialog Content */}
-      <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto m-4 animate-[scale-in_0.2s_ease-out]">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {children}
-      </div>
-    </div>
-  )
-}
-
+//sua
 export default function ActivitiesOpening() {
   const [loading, setLoading] = useState(false)
+  const [employeeID, setEmployeeID] = useState(null)
   const [redirect_uri, setRedirect_uri] = useState("")
   const [error, setError] = useState(null)
   const [connectedStrava, setConnectedStrava] = useState(false)
@@ -69,24 +25,48 @@ export default function ActivitiesOpening() {
   const [registeredActivities, setRegisteredActivities] = useState([])
   const [selectedActivity, setSelectedActivity] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [activityResults, setActivityResults] = useState(null)
+  const [resultsLoading, setResultsLoading] = useState(false)
+  const [resultsError, setResultsError] = useState(null)
+
+
+  //Lay ID nhan vien
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileRes = await employeeApi.getMyProfile();
+        setEmployeeID(profileRes.result.employeeId);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setError(error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   // Kiem tra ket noi Strava
-  // useffect(() => {
-  //   // Check Strava connection status
-  //   //stravaApi.connectedStrava().then((response) => {
-  //     // Assuming response contains a field 'connected' indicating connection status
-  //     //setConnectedStrava(true)
-  //   // }
-  //   // ).catch((error) => {
-  //   //   console.error("Error checking Strava connection:", error)
-  //   //   setError(error)
-  //   // })
-  //   setConnectedStrava(true);
-
-  // },[])
-
-  // Fetch active activities
   useEffect(() => {
+    if (!employeeID) return;
+    const checkStravaConnection = async () => {
+      try {
+        
+        // Check Strava connection status
+        const connectionRes = await stravaApi.getStatusconnetion(employeeID);
+        setConnectedStrava(connectionRes.result.connectionStatus);
+      } catch (error) {
+        console.error("Error checking Strava connection:", error);
+        setError(error);
+      }
+    };
+
+    checkStravaConnection();
+  }, [employeeID]);
+
+
+  // Fetch active activities and registered activities
+  useEffect(() => {
+    if (!employeeID) return;
     const fetchActivities = async () => {
       setLoading(true)
       try {
@@ -94,15 +74,34 @@ export default function ActivitiesOpening() {
       const response = await runningActivityApi.employeeGetAllOpeningActivity();
       const fitlterActivities= response.result.filter((activity) => activity.status === "Active");
       setActivities(fitlterActivities || [])
-  
-      
-      // Lay ID nhan vien
-      const profileRes = await employeeApi.getMyProfile();
-      const employeeID = profileRes.result.employeeId;
 
       // Lay danh sach hoat dong da dang ky
       const registeredResponse = await runningActivityApi.employeeGetAllRegisteredActivity(employeeID);
-      setRegisteredActivities(registeredResponse.result || []);
+      const registered = registeredResponse.result || [];
+
+      // For each registered activity, check if there is a result for this employee
+      const registeredWithResults = await Promise.all(
+        registered.map(async (act) => {
+          try {
+            const res = await runningActivityApi.employeeGetResultActivities(employeeID, act.runningActivityId);
+            const r = res && res.result;
+            const hasResult = !!(r && (r.participateInId || r.totalRun || r.isCompleted));
+            return { ...act, hasResult };
+          } catch (e) {
+            return { ...act, hasResult: false };
+          }
+        }),
+      );
+
+      setRegisteredActivities(registeredWithResults);
+
+      // Merge registration/result flags into activities list
+      setActivities((prev) =>
+        (prev || []).map((a) => {
+          const match = registeredWithResults.find((r) => r.runningActivityId === a.runningActivityId);
+          return match ? { ...a, isRegistered: 1, hasResult: match.hasResult } : a;
+        }),
+      );
       } catch (error) {
       console.error("Error fetching activities:", error);
       setError(error);
@@ -111,31 +110,32 @@ export default function ActivitiesOpening() {
       }
     }
     fetchActivities()
-  }, []);
+  }, [employeeID]);
 
   
   
-  // Cap nhat trang thai da dang ky cho tung hoat dong
+  // Cập nhật trạng thái đã đăng ký cho từng hoạt động
   useEffect(() => {
-    if (activities.length === 0 || registeredActivities.length === 0) return;
-    
-    const registeredIds = registeredActivities.map(item => item.activityId);
-    
-    const updatedActivities = activities.map(activity => ({
-      ...activity,
-      isRegistered: registeredIds.includes(activity.id)
-    }));
-    
+    if (!activities.length || !registeredActivities.length) return;
+    const registeredIds = registeredActivities.map(item => item.runningActivityId);
+    const updatedActivities = activities.map(activity => {
+      const isRegistered = registeredIds.includes(activity.runningActivityId) ? 1 : 0;
+      return {
+        ...activity,
+        isRegistered: isRegistered
+      };
+    });
     setActivities(updatedActivities);
-  }, []);
-  
+    
+  }, [registeredActivities]); 
+
+  console.log("Strava Connected:", connectedStrava);
   console.log("Registered Activities:", registeredActivities);
   console.log("All Activities:", activities);
-
+  
   const handleRegister = (activityId) => {
     // TODO: Call API to register
-    // fetch(`/api/activities/${activityId}/register`, { method: 'POST' })
-
+    runningActivityApi.employeeRegisterActivity(activityId);
     setActivities((prev) =>
       prev.map((a) =>
         a.runningActivityId === activityId ? { ...a, isRegistered: true, curParticipant: a.curParticipant + 1 } : a,
@@ -145,7 +145,7 @@ export default function ActivitiesOpening() {
 
   const handleUnregister = (activityId) => {
     // TODO: Call API to unregister
-    // fetch(`/api/activities/${activityId}/unregister`, { method: 'POST' })
+    runningActivityApi.employeeUnregisterActivity(activityId);
 
     setActivities((prev) =>
       prev.map((a) =>
@@ -159,6 +159,26 @@ export default function ActivitiesOpening() {
   const openDetails = (activity) => {
     setSelectedActivity(activity)
     setIsDialogOpen(true)
+
+    // Reset previous results
+    setActivityResults(null)
+    setResultsError(null)
+
+    // Load results for this activity (if employeeID available)
+    const loadResults = async () => {
+      if (!employeeID) return
+      setResultsLoading(true)
+      try {
+        const res = await fetchActivityResults(employeeID, activity.runningActivityId)
+        setActivityResults(res)
+      } catch (err) {
+        setResultsError(err)
+      } finally {
+        setResultsLoading(false)
+      }
+    }
+
+    loadResults()
   }
 
   const isFull = (activity) => {
@@ -171,23 +191,69 @@ export default function ActivitiesOpening() {
   }
 
   const renderContent = () => {
-    if (currentView === "results") {
-      return (
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">📊</div>
-          <h2 className="text-2xl font-bold text-gray-700">Trang Kết quả</h2>
-          <p className="text-gray-500 mt-2">Chức năng đang được phát triển</p>
-        </div>
-      )
-    }
-
     if (currentView === "registered") {
       return (
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">📝</div>
-          <h2 className="text-2xl font-bold text-gray-700">Danh sách đã đăng ký</h2>
-          <p className="text-gray-500 mt-2">Chức năng đang được phát triển</p>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {registeredActivities.map((activity) => (
+          <CustomCard key={activity.runningActivityId}>
+            <div className="relative h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+              <img
+                src={activity.image || "/placeholder.svg?height=200&width=400&query=running event"}
+                alt={activity.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-4">
+              <h3 className="font-semibold text-lg mb-3 text-gray-900">{activity.title}</h3>
+
+              <div className="space-y-2 text-sm text-gray-600 mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    {formatDate(activity.startDate)} - {formatDate(activity.endDate)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span>Quãng đường {activity.targetDistance} km</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    Tham gia tối đa {activity.maxParticipant} người
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 flex-shrink-0" />
+                  <span>Đăng kí: {formatDate(activity.registrationStartDate)} - {formatDate(activity.registrationEndDate)}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <CustomButton variant="link" className="w-full text-center" onClick={() => openDetails(activity)}>
+                  Xem chi tiết
+                </CustomButton>
+
+                {activity.status === "Completed" ? (
+                  <CustomButton variant="secondary" className="w-full" disabled>
+                    Đã tham gia
+                  </CustomButton>
+                ) : (
+                  <CustomButton variant="danger" className="w-full" onClick={() => handleUnregister(activity.runningActivityId)}>
+                    Hủy đăng ký
+                  </CustomButton>
+                )}
+
+                
+              </div>
+            </div>
+          </CustomCard>
+        ))}
+      </div>
       )
     }
 
@@ -239,13 +305,19 @@ export default function ActivitiesOpening() {
                 </CustomButton>
 
                 {activity.isRegistered ? (
-                  <CustomButton
-                    variant="danger"
-                    className="w-full"
-                    onClick={() => handleUnregister(activity.runningActivityId)}
-                  >
-                    Hủy đăng ký
-                  </CustomButton>
+                  activity.status === "Completed" ? (
+                    <CustomButton variant="secondary" className="w-full" disabled>
+                      Đã tham gia
+                    </CustomButton>
+                  ) : (
+                    <CustomButton
+                      variant="danger"
+                      className="w-full"
+                      onClick={() => handleUnregister(activity.runningActivityId)}
+                    >
+                      Hủy đăng ký
+                    </CustomButton>
+                  )
                 ) : (
                   <CustomButton
                     variant="primary"
@@ -258,6 +330,7 @@ export default function ActivitiesOpening() {
                 )}
               </div>
             </div>
+            
           </CustomCard>
         ))}
       </div>
@@ -285,6 +358,36 @@ export default function ActivitiesOpening() {
       redirect_uri
     )
   }
+  
+  // hàm lấy kết quả hoạt động
+  const fetchActivityResults = async (employeeId, activityId) => {
+    try {
+      const resultsRes = await runningActivityApi.employeeGetResultActivities(employeeId, activityId);
+      return resultsRes.result;
+    } catch (error) {
+      console.error("Error fetching activity results:", error);
+      setError(error);
+      return null;
+    }
+  }
+  
+  const formatKey = (key) => {
+    // Convert camelCase or snake_case to readable label
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/[_-]/g, ' ')
+      .replace(/^./, (str) => str.toUpperCase())
+  }
+
+  const formatValue = (val) => {
+    if (val === null || val === undefined) return '-'
+    if (typeof val === 'number') return val.toLocaleString('vi-VN')
+    if (typeof val === 'string') return val
+    if (typeof val === 'object') return JSON.stringify(val)
+    return String(val)
+  }
+ //a
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -302,7 +405,7 @@ export default function ActivitiesOpening() {
 
           <div className="flex gap-3">
             <CustomButton variant="orange" onClick={handleStravaConnect}>
-              Đã nối với STRAVA
+              {connectedStrava ? "Đã nối với STRAVA" : "Kết nối STRAVA"}
             </CustomButton>
             <CustomButton
               variant={currentView === "active" ? "green" : "secondary"}
@@ -325,6 +428,7 @@ export default function ActivitiesOpening() {
       <div className="max-w-7xl mx-auto px-4 py-8">{renderContent()}</div>
 
       <CustomDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+        {/* Lấy kết quả hiển thị chi tiết hoạt động */}
         {selectedActivity && (
           <div className="p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2 pr-8">{selectedActivity.title}</h2>
@@ -366,7 +470,13 @@ export default function ActivitiesOpening() {
                   Số lượng
                 </h4>
                 <p className="text-sm text-gray-600">
-                  {selectedActivity.curParticipant}/{selectedActivity.maxParticipant} người
+                  {selectedActivity.numberRegistered !== undefined ? (
+                  // Trường hợp có numberRegistered (Danh sách tất cả hoạt động)
+                  `${selectedActivity.numberRegistered}/${selectedActivity.maxParticipant} người`
+                  ) : (
+                  // Trường hợp không có numberRegistered (Danh sách đã đăng ký)
+                  `${selectedActivity.maxParticipant} người`
+                )}
                 </p>
               </div>
 
@@ -419,18 +529,71 @@ export default function ActivitiesOpening() {
               </div>
             )}
 
+            {/* Kết quả hoạt động */}
+            <div className="mb-6">
+              <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                <Award className="w-4 h-4" />
+                Kết quả hoạt động
+              </h4>
+
+              {resultsLoading ? (
+                <p className="text-sm text-gray-600">Đang tải kết quả...</p>
+              ) : resultsError ? (
+                <p className="text-sm text-red-600">Lỗi tải kết quả</p>
+              ) : activityResults ? (
+                <div className="text-sm text-gray-700 bg-white border rounded-lg p-3">
+                  {/* Only show required fields */}
+                  {(() => {
+                    const r = activityResults;
+                    const get = (obj, names) => {
+                      for (const n of names) {
+                        if (obj[n] !== undefined) return obj[n];
+                      }
+                      return null;
+                    };
+
+                    const fields = [
+                      { names: ['totalRun', 'TotalRun', 'Total Run', 'total_run'], label: 'Đã chạy' },
+                      { names: ['isCompleted', 'IsCompleted', 'Is Completed', 'is_completed'], label: 'Hoàn thành' },
+                      { names: ['completedDate', 'CompletedDate', 'Completed Date', 'completed_date'], label: 'Ngày hoàn thành' },
+                      { names: ['rankPosition', 'RankPosition', 'Rank Position', 'rank_position'], label: 'Xếp hạng' },
+                      { names: ['rewardPoints', 'RewardPoints', 'Reward Points', 'reward_points'], label: 'Điểm thưởng' },
+                    ];
+
+                    return fields.map((f) => {
+                      const value = get(r, f.names);
+                      return (
+                        <div className="flex justify-between py-1 border-b last:border-b-0" key={f.label}>
+                          <div className="text-gray-600">{f.label}</div>
+                          <div className="font-medium">{formatValue(value)}</div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600">Chưa có kết quả cho hoạt động này.</p>
+              )}
+            </div>
+
             <div className="flex gap-3 pt-4 border-t">
               {selectedActivity.isRegistered ? (
-                <CustomButton
-                  variant="danger"
-                  className="flex-1"
-                  onClick={() => {
-                    handleUnregister(selectedActivity.runningActivityId)
-                    setIsDialogOpen(false)
-                  }}
-                >
-                  Hủy đăng ký
-                </CustomButton>
+                selectedActivity.status === "Completed" ? (
+                  <CustomButton variant="secondary" className="flex-1" disabled>
+                    Đã tham gia
+                  </CustomButton>
+                ) : (
+                  <CustomButton
+                    variant="danger"
+                    className="flex-1"
+                    onClick={() => {
+                      handleUnregister(selectedActivity.runningActivityId)
+                      setIsDialogOpen(false)
+                    }}
+                  >
+                    Hủy đăng ký
+                  </CustomButton>
+                )
               ) : (
                 <CustomButton
                   variant="primary"
@@ -446,21 +609,9 @@ export default function ActivitiesOpening() {
               )}
             </div>
           </div>
+
         )}
       </CustomDialog>
-
-      {/* <style jsx global>{`
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style> */}
     </div>
   )
 }
