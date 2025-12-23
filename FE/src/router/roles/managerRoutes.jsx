@@ -10,7 +10,7 @@ import HistoryRequests from "../../pages/employee/HistoryRequests";
 import RoleRoute from "../RoleRoute";
 import RequestManagement from "../../pages/manager/RequestManagement";
 import RequestManagementHistory from "../../pages/manager/RequestManagementHistory";
-
+import ActivitiesOpening from "../../pages/employee/ActivitiesOpening";
 const managerRoutes = [
   {
     path: "/manager",
@@ -33,6 +33,7 @@ const managerRoutes = [
         path: "request-management/history",
         element: <RequestManagementHistory />,
       },
+      { path: "activities", element: <ActivitiesOpening /> },
     ],
   },
 ];

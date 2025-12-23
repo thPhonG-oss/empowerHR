@@ -125,21 +125,25 @@ export default function DetailActivityOverlay({
 
             {/* Actions */}
             <div className="flex justify-end gap-3 mt-8">
-              <button
-                onClick={() => setOpenEdit(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 cursor-pointer hover:opacity-80"
-              >
-                <Pencil size={16} />
-                Cập nhật
-              </button>
-
-              <button
-                onClick={() => setOpenConfirm(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded flex items-center gap-2 cursor-pointer hover:opacity-80"
-              >
-                <Trash2 size={16} />
-                Xóa
-              </button>
+              {activity.status != "Cancelled" &&
+                activity.status != "Completed" && (
+                  <button
+                    onClick={() => setOpenEdit(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 cursor-pointer hover:opacity-80"
+                  >
+                    <Pencil size={16} />
+                    Cập nhật
+                  </button>
+                )}
+              {activity.status != "Completed" && (
+                <button
+                  onClick={() => setOpenConfirm(true)}
+                  className="px-4 py-2 bg-red-600 text-white rounded flex items-center gap-2 cursor-pointer hover:opacity-80"
+                >
+                  <Trash2 size={16} />
+                  Xóa
+                </button>
+              )}
             </div>
           </div>
         </div>
