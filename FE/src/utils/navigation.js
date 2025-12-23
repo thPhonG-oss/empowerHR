@@ -74,7 +74,7 @@ const navConfig = [
   },
   {
     title: "Nghỉ phép",
-    path: "leave",
+    path: "leavee",
     icon: CalendarX,
     roles: ["employee", "manager"],
   },

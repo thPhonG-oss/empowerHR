@@ -6,7 +6,7 @@ import NotFoundPage from "../pages/auth/NotFoundPage";
 import adminRoutes from "./roles/adminRoutes";
 import managerRoutes from "./roles/managerRoutes";
 import employeeRoutes from "./roles/employeeRoutes";
-
+import OAuthCallbackStrava from "../pages/employee/OauthCallbackStrava";
 export default function AppRouter() {
   return (
     <Routes>
@@ -39,6 +39,7 @@ export default function AppRouter() {
         </Route>
       ))}
 
+      <Route path="/oauth2/callback" element={<OAuthCallbackStrava />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
