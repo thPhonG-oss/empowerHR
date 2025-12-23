@@ -64,10 +64,11 @@ export default function ActivitiesOpening() {
   //=====================================================
   useEffect(() => {
     if (!employeeID) return;
-
+    console.log("kết nối strava");
     const checkStravaConnection = async () => {
       try {
         const connectionRes = await stravaApi.getStatusconnetion(employeeID);
+
         setConnectedStrava(connectionRes.result.connectionStatus);
       } catch (error) {
         setError(error);
@@ -75,6 +76,29 @@ export default function ActivitiesOpening() {
     };
     checkStravaConnection();
   }, [employeeID]);
+
+  const handleStravaConnect = async () => {
+    if (connectedStrava) {
+      toast.success("Bạn đã kết nối Strava rồi");
+      return;
+    }
+
+    try {
+      const response = await stravaApi.RedirectURL();
+      console.log(response);
+      const redirectUrl = response.redirectUrl;
+      if (redirectUrl) {
+        setRedirect_uri(redirectUrl);
+
+        console.log(redirectUrl);
+
+        window.open(redirectUrl, "_blank");
+      }
+    } catch (error) {
+      console.error("Error getting Strava redirect URL:", error);
+      setError(error);
+    }
+  };
 
   //=====================================================
   // FETCH OPENING ACTIVITIES
@@ -105,6 +129,7 @@ export default function ActivitiesOpening() {
   //=====================================================
   const handleRegister = async (activity) => {
     try {
+      console.log("ID hoạt động", activity.runningActivityId);
       await runningActivityApi.employeeRegisterActivity(
         activity.runningActivityId
       );
@@ -139,19 +164,17 @@ export default function ActivitiesOpening() {
     }
   };
 
-  const handleUnregister = (activityId) => {
-    runningActivityApi.employeeUnregisterActivity(activityId);
-    setActivities((prev) =>
-      prev.map((a) =>
-        a.runningActivityId === activityId
-          ? {
-              ...a,
-              isRegistered: false,
-              curParticipant: Math.max(0, a.curParticipant - 1),
-            }
-          : a
-      )
-    );
+  const handleUnregister = async (participateInId) => {
+    try {
+      const res = await runningActivityApi.employeeUnregisterActivity(
+        participateInId
+      );
+      console.log(res);
+      toast.success("Hủy đăng ký hoạt động thành công");
+    } catch (error) {
+      console.error("Hủy đăng ký thất bại", error);
+      toast.error("Hủy đăng ký hoạt động không thành công");
+    }
   };
 
   //=====================================================
@@ -172,6 +195,7 @@ export default function ActivitiesOpening() {
           employeeID,
           activity.runningActivityId
         );
+
         setActivityResults(res?.result);
       } catch (err) {
         setResultsError(err);
@@ -187,7 +211,8 @@ export default function ActivitiesOpening() {
   // MISC
   //=====================================================
   const isFull = (activity) =>
-    activity.numberRegistered >= activity.maxParticipant;
+    activity.runningActivity?.numberRegistered >=
+    activity.runningActivity?.maxParticipant;
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("vi-VN");
@@ -196,7 +221,7 @@ export default function ActivitiesOpening() {
   // SEARCH + SORT (ACTIVE)
   //=====================================================
   const fuseActivities = new Fuse(activities, {
-    keys: ["title"],
+    keys: ["runningActivity.title"],
     threshold: 0.3,
   });
 
@@ -205,15 +230,18 @@ export default function ActivitiesOpening() {
       ? activities
       : fuseActivities.search(searchQuery).map((r) => r.item);
 
-  if (sortType === "nearest") {
-    filteredActivities = [...filteredActivities].sort(
-      (a, b) => new Date(a.startDate) - new Date(b.startDate)
-    );
-  } else {
-    filteredActivities = [...filteredActivities].sort(
-      (a, b) => new Date(b.startDate) - new Date(a.startDate)
-    );
-  }
+  filteredActivities =
+    sortType === "nearest"
+      ? [...filteredActivities].sort(
+          (a, b) =>
+            new Date(a.runningActivity?.startDate) -
+            new Date(b.runningActivity?.startDate)
+        )
+      : [...filteredActivities].sort(
+          (a, b) =>
+            new Date(b.runningActivity?.startDate) -
+            new Date(a.runningActivity?.startDate)
+        );
 
   //=====================================================
   // RENDER
@@ -247,7 +275,7 @@ export default function ActivitiesOpening() {
           </div>
 
           <div className="flex justify-between gap-3">
-            <CustomButton variant="orange">
+            <CustomButton variant="orange" onClick={handleStravaConnect}>
               {connectedStrava ? "Đã nối với STRAVA" : "Kết nối STRAVA"}
             </CustomButton>
 
@@ -350,17 +378,7 @@ export default function ActivitiesOpening() {
                           Xem chi tiết
                         </CustomButton>
 
-                        {activity.isRegistered ? (
-                          <CustomButton
-                            variant="danger"
-                            onClick={() =>
-                              handleUnregister(activity.runningActivityId)
-                            }
-                            className="w-full cursor-pointer"
-                          >
-                            Hủy đăng ký
-                          </CustomButton>
-                        ) : (
+                        {activity.isRegistered && (
                           <CustomButton
                             variant="primary"
                             disabled={isFull(activity)}
@@ -394,6 +412,7 @@ export default function ActivitiesOpening() {
         handleRegister={handleRegister}
         handleUnregister={handleUnregister}
         isFull={isFull}
+        isHistory={currentView === "registered" ? true : false}
       />
     </div>
   );

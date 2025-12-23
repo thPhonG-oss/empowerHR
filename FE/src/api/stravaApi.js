@@ -2,9 +2,7 @@ import axiosClient from "./axiosClient";
 
 const stravaApi = {
   getStatusconnetion: (employeeId) =>
-    axiosClient.get(`/api/v1/employees/${employeeId}/connection`, {
-      params: { employeeId },
-    }),
+    axiosClient.get(`/api/v1/employees/${employeeId}/connection`),
 
   RedirectURL: () => axiosClient.get(`/api/v1/strava/connect`),
 

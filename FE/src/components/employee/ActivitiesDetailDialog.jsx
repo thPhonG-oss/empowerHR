@@ -1,7 +1,7 @@
 import { Calendar, Users, Target, Award, X } from "lucide-react";
 import CustomButton from "../../components/common/Button";
 import CustomDialog from "../../components/common/CustomDialog";
-
+import { useState, useEffect } from "react";
 export default function ActivitiesDetailDialog({
   isOpen,
   onClose,
@@ -13,7 +13,16 @@ export default function ActivitiesDetailDialog({
   handleRegister,
   handleUnregister,
   isFull,
+  isHistory = false,
 }) {
+  const [isCancelled, setIsCancelled] = useState(null);
+
+  useEffect(() => {
+    setIsCancelled(activityResults?.isCancelled);
+    console.log(1, isCancelled);
+  }, [activityResults]);
+  console.log(2, isCancelled);
+
   if (!selectedActivity) return null;
 
   return (
@@ -207,35 +216,39 @@ export default function ActivitiesDetailDialog({
           </div>
 
           {/* FOOTER (SCROLL CÙNG NỘI DUNG) */}
-          <div className="flex gap-3 p-6 border-t bg-white mt-6">
-            {selectedActivity.isRegistered ? (
-              selectedActivity.status === "Completed" ? (
+          <div className="flex gap-3 pt-6 border-t bg-white mt-6">
+            {isHistory ? (
+              isCancelled ? (
                 <CustomButton
                   variant="secondary"
-                  className="flex-1 cursor-pointer"
-                  disabled
+                  className="flex-1 cursor-not-allowed"
                 >
-                  Đã tham gia
+                  Đã hủy đăng ký
                 </CustomButton>
               ) : (
                 <CustomButton
                   variant="danger"
-                  className="flex-1 cursor-pointer"
-                  onClick={() => {
-                    handleUnregister(selectedActivity.runningActivityId);
-                    onClose();
-                  }}
+                  onClick={handleUnregister}
+                  className="cursor-pointer w-full"
                 >
                   Hủy đăng ký
                 </CustomButton>
               )
+            ) : selectedActivity.isRegistered ? (
+              <CustomButton
+                variant="secondary"
+                className="flex-1 cursor-not-allowed"
+                disabled
+              >
+                Đã tham gia
+              </CustomButton>
             ) : (
               <CustomButton
                 variant="primary"
                 className="flex-1 cursor-pointer"
                 disabled={isFull(selectedActivity)}
                 onClick={() => {
-                  handleRegister(selectedActivity.runningActivityId);
+                  handleRegister(selectedActivity);
                   onClose();
                 }}
               >
