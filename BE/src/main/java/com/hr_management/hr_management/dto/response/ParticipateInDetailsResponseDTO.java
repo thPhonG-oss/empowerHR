@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.dto.response;
 
+import com.hr_management.hr_management.entity.RunningActivity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class ParticipateInDetailsResponseDTO {
     Integer participateInId;
     Integer employeeId;
-    Integer runningActivityId;
+    RunningActivityResponseDTO runningActivity;
     String employeeName;
     String activityTitle;
     Integer totalRun;
