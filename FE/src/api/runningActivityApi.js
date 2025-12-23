@@ -8,28 +8,17 @@ const runningActivityApi = {
 
   employeeGetAllOpeningActivity: () => axiosClient.get(`/api/v1/activities`),
 
-  employeeGetAllRegisteredActivity: (employeeID) =>
-    axiosClient.get(`/api/v1/employees/${employeeID}/activities`, {
-      params: { employeeID },
-    }),
+  employeeGetAllRegisteredActivity: (employeeId) =>
+    axiosClient.get(`/api/v1/employees/${employeeId}/activities`),
 
   employeeRegisterActivity: (activityId) =>
-    axiosClient.post(`/api/v1/participateIn/register/${activityId}`, {
-      params: { activityId },
-    }),
+    axiosClient.post(`/api/v1/participateIn/register/${activityId}`),
 
   employeeUnregisterActivity: (activityId) =>
-    axiosClient.delete(`/api/v1/participateIn/${activityId}`, {
-      params: { activityId },
-    }),
+    axiosClient.delete(`/api/v1/participateIn/${activityId}`),
 
   employeeGetResultActivities: (employeeId, activityId) =>
-    axiosClient.get(
-      `/api/v1/employees/${employeeId}/activities/${activityId}`,
-      {
-        params: { employeeId, activityId },
-      }
-    ),
+    axiosClient.get(`/api/v1/employees/${employeeId}/activities/${activityId}`),
   updateActivity: (runningActivityId, data) =>
     axiosClient.put(
       `/api/v1/activities/admin/update-activities/${runningActivityId}`,

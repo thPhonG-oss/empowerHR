@@ -112,6 +112,7 @@ export default function RunningActivityManagement() {
               className="border border-gray-300 rounded-md px-3 py-2 text-sm h-9 focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="ALL">Tất cả</option>
+              <option value="Draft">Chuẩn bị</option>
               <option value="Active">Đang mở</option>
               <option value="Completed">Đã kết thúc</option>
               <option value="Cancelled">Đã hủy</option>
@@ -121,7 +122,7 @@ export default function RunningActivityManagement() {
               onClick={() =>
                 setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
               }
-              className="flex items-center gap-2 px-4 rounded-md bg-black text-sm text-white hover:bg-gray-800 transition h-9 cursor-pointer"
+              className="w-32 flex items-center gap-2 px-4 rounded-md bg-black text-sm text-white hover:bg-gray-800 transition h-9 cursor-pointer"
             >
               <ArrowUpDown size={16} />
               {sortOrder === "desc" ? "Gần nhất" : "Xa nhất"}

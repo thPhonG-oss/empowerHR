@@ -1,29 +1,89 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8081", // Chưa có API
+  baseURL: "http://localhost:8081",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request Interceptor → tự gắn token
+// =====================
+// LẤY TOKEN
+// =====================
+const getAccessToken = () => localStorage.getItem("token");
+const getRefreshToken = () => localStorage.getItem("refreshToken");
+
+// =====================
+// REQUEST → Gắn accessToken
+// =====================
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Response Interceptor
+// =====================
+// RESPONSE → Tự Refresh Token
+// =====================
+let isRefreshing = false;
+let queue = [];
+
 axiosClient.interceptors.response.use(
   (response) => response?.data ?? response,
-  (error) => {
-    // Nếu token hết hạn → chuyển về login
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu accessToken hết hạn
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // ===== Nếu chưa refresh → refresh
+      if (!isRefreshing) {
+        isRefreshing = true;
+
+        try {
+          const res = await axios.post(
+            "http://localhost:8081/auth/refresh-token",
+            {
+              refreshToken: getRefreshToken(),
+            }
+          );
+
+          const newAccessToken = res.data?.accessToken;
+          localStorage.setItem("token", newAccessToken);
+
+          // Chạy lại các request đang đợi
+          queue.forEach((cb) => cb(newAccessToken));
+          queue = [];
+
+          isRefreshing = false;
+
+          // Retry lại request ban đầu
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return axiosClient(originalRequest);
+        } catch (err) {
+          isRefreshing = false;
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+
+          // Tuỳ bạn: điều hướng về login
+          window.location.href = "/login";
+
+          return Promise.reject(err);
+        }
+      }
+
+      // ===== Nếu refresh đang chạy → đợi
+      return new Promise((resolve) => {
+        queue.push((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(axiosClient(originalRequest));
+        });
+      });
     }
+
     return Promise.reject(error);
   }
 );

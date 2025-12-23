@@ -107,11 +107,11 @@ function Sidebar() {
           <div>
             <p className="font-bold">{userName}</p>
             <p>
-              {role === "EMPLOYEE"
+              {role === "employee"
                 ? "Nhân viên"
-                : role === "MANAGER"
+                : role === "manager"
                 ? "Quản lý"
-                : role === "ADMIN"
+                : role === "admin"
                 ? "Admin"
                 : ""}
             </p>

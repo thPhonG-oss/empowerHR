@@ -85,7 +85,7 @@ const navConfig = [
     roles: ["employee", "manager"],
   },
   {
-    title: "Hoạt động, chiến dịch",
+    title: "Hoạt động",
     path: "activities",
     icon: Target,
     roles: ["employee", "manager"],
