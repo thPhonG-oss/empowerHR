@@ -44,6 +44,6 @@ public class ParticipateIn {
     @Column(name = "reward_points")
     private Integer rewardPoints = 0;
     @Column(name="is_canncelled")
-    private  Boolean isCancelled=true;
+    private  Boolean isCancelled=false;
 }
 
