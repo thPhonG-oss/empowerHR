@@ -47,10 +47,12 @@ public class ParticipateInServiceImpl implements ParticipateInService {
     public void deleteParticipateIn(Integer id, JwtAuthenticationToken jwtAuthenticationToken) {
         String username= jwtAuthenticationToken.getName();
         Integer employeeId=employeeRepository.findByAccount_Username(username).get().getEmployeeId();
-        ParticipateIn participateIn=participateInRepository.findByParticipateInIdAndEmployee_EmployeeId( id,employeeId).orElseThrow(()-> new AppException(ErrorCode.PARTICIPITEIN_NOT_EXIST));
+        RunningActivity runningActivity=runningActivityRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.ACTIVITY_NOT_EXIST));
+        ParticipateIn participateIn=participateInRepository.findByEmployee_EmployeeIdAndRunningActivity_RunningActivityId(
+                employeeId,runningActivity.getRunningActivityId())
+                .orElseThrow(()->new AppException(ErrorCode.PARTICIPITEIN_NOT_EXIST));
         participateIn.setIsCancelled(true);
         participateInRepository.save(participateIn);
-        return;
     }
 
     @Override
@@ -131,7 +133,8 @@ public class ParticipateInServiceImpl implements ParticipateInService {
         ParticipateIn saved = participateInRepository.save(participateIn);
         ParticipateInResponse participateInResponse = participateInMapper.toParticipateInResponse(saved);
         participateInResponse.setEmployeeId(saved.getEmployee().getEmployeeId());
-        participateInResponse.setRunningActivityId(saved.getRunningActivity().getRunningActivityId());
+        participateInResponse.setEmployeeName(saved.getEmployee().getEmployeeName());
+        participateInResponse.setRunningActivity(saved.getRunningActivity());
         return participateInResponse;
     }
 }

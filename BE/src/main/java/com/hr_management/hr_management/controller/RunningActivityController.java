@@ -8,7 +8,6 @@ import com.hr_management.hr_management.service.ActivityService;
 //import com.hr_management.hr_management.dto.ApiResponse;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
-import com.hr_management.hr_management.service.ParticipateInService;
 import com.hr_management.hr_management.service.RunningActivityService;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -34,7 +33,6 @@ import java.util.List;
 public class RunningActivityController {
     RunningActivityService runningActivityService;
     ActivityService activityService;
-    ParticipateInService participateInService;
     @GetMapping("/{activityId}")
     public ApiResponse<ActivityResponse> viewDetaildActivity(@PathVariable Integer activityId){
         return ApiResponse.<ActivityResponse>builder()
@@ -70,21 +68,6 @@ public class RunningActivityController {
                 .message("Update thành công")
                 .result(runningActivityResponseDTO)
                 .build();
-    }
-
-    @PostMapping("/{activityId}/register")
-    public ApiResponse<ParticipateInResponse> registerActivity(
-            @PathVariable Integer activityId,
-            JwtAuthenticationToken jwtToken) {
-
-        String username = jwtToken.getName();
-        ParticipateInResponse result = participateInService.registerActivity(activityId, username);
-        return ApiResponse.<ParticipateInResponse>builder()
-                .message("Đăng ký thành công hoạt động")
-                .result(result)
-                .build();
-
-
     }
 
     @GetMapping("/admin/{activityId}")
