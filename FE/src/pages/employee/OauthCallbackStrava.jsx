@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import stravaApi from "../../api/stravaApi";
+import toast from "react-hot-toast";
 
 export default function OAuthCallbackStrava() {
   const [searchParams] = useSearchParams();
@@ -27,13 +28,22 @@ export default function OAuthCallbackStrava() {
       await stravaApi.Oauth2({
         state: state,
         code: code,
-        scope: scope
+        scope: scope,
       });
-
-      alert("Kết nối Strava thành công!");
+      toast.success("Kết nối Strava thành công, đang quay lại...", {
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        window.close();
+      }, 2100);
     } catch (error) {
       console.error(error);
-      alert("Kết nối Strava thất bại");
+      toast.error("Kết nối Strava thất bại, đang quay lại...", {
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        window.close();
+      }, 2100);
     } finally {
       setLoading(false);
     }
@@ -49,17 +59,23 @@ export default function OAuthCallbackStrava() {
           {/* Bên trái */}
           <div className="flex-1 space-y-4 text-sm">
             <div className="flex gap-2 items-start">
-              <span className="w-6 h-6 rounded-full bg-orange-500 text-center">1</span>
+              <span className="w-6 h-6 rounded-full bg-orange-500 text-center">
+                1
+              </span>
               <p>Xác thực tài khoản Strava</p>
             </div>
 
             <div className="flex gap-2 items-start">
-              <span className="w-6 h-6 rounded-full bg-orange-500 text-center">2</span>
+              <span className="w-6 h-6 rounded-full bg-orange-500 text-center">
+                2
+              </span>
               <p>Kết nối và đồng bộ hoạt động</p>
             </div>
 
             <div className="flex gap-2 items-start text-gray-400">
-              <span className="w-6 h-6 rounded-full bg-gray-600 text-center">3</span>
+              <span className="w-6 h-6 rounded-full bg-gray-600 text-center">
+                3
+              </span>
               <p>Hoàn tất</p>
             </div>
           </div>
