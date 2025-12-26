@@ -41,8 +41,22 @@ public class RunningActivityServiceImpl implements RunningActivityService {
     @Override
     public Page<RunningActivityResponseDTO> getAllActivities(Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("runningActivityId").descending());
-        Page<RunningActivity> activitiespage = runningActivityRepository.findAll(pageable);
-        return activitiespage.map(runningActivityMapper::toRunningActivityResponseDTO);
+        Page<RunningActivity> activitiesPage = runningActivityRepository.findAll(pageable);
+        Page<RunningActivityResponseDTO> dtoPage =
+                activitiesPage.map(activity -> {
+                    RunningActivityResponseDTO dto =
+                            runningActivityMapper.toRunningActivityResponseDTO(activity);
+
+                    Integer numberRegistered =
+                            participateInRepository
+                                    .countByRunningActivity_RunningActivityIdAndIsCancelledFalse(
+                                            activity.getRunningActivityId()
+                                    );
+
+                    dto.setNumberRegistered(numberRegistered);
+                    return dto;
+                });
+        return dtoPage;
     }
 
     // Implement service methods here
@@ -55,27 +69,25 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         ActivityStatus currentStatus = activity.getStatus();
 
         // Check permissions based on status
-        if (currentStatus == ActivityStatus.Completed || currentStatus == ActivityStatus.Cancelled) {
+        if (currentStatus == ActivityStatus.Completed || currentStatus == ActivityStatus.Cancelled ||  currentStatus == ActivityStatus.Active) {
             throw new IllegalStateException("Cannot edit activity that has completed");
         }
 
-        if (currentStatus == ActivityStatus.Active) {
-
-            activity.setDescription(requestDTO.getDescription());
-            activity.setImage(requestDTO.getImage());
-            activity.setRules(requestDTO.getRules());
-            activity.setRegistrationEndDate(requestDTO.getRegistrationEndDate());
-
-            RunningActivity updatedActivity = runningActivityRepository.save(activity);
-            return runningActivityMapper.toRunningActivityResponseDTO(updatedActivity);
-        }
+//        if (currentStatus == ActivityStatus.Active) {
+//
+//            activity.setDescription(requestDTO.getDescription());
+//            activity.setImage(requestDTO.getImage());
+//            activity.setRules(requestDTO.getRules());
+//            activity.setRegistrationEndDate(requestDTO.getRegistrationEndDate());
+//
+//            RunningActivity updatedActivity = runningActivityRepository.save(activity);
+//            return runningActivityMapper.toRunningActivityResponseDTO(updatedActivity);
+//        }
 
 
         LocalDate today = LocalDate.now();
         LocalDateTime today_1 = LocalDateTime.now();
-        if (requestDTO.getRegistrationStartDate().isBefore(today_1)) {
-            throw new IllegalArgumentException("Ngày bắt đăng kí không được ở trong quá khứ");
-        }
+
         if (requestDTO.getRegistrationEndDate().isBefore(today_1)) {
             throw new IllegalArgumentException("Ngày kết thúc đăng kí không được ở trong quá khứ");
         }
@@ -85,9 +97,7 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         if (requestDTO.getEndDate().isBefore(today)) {
             throw new IllegalArgumentException("Ngày kết thúc hoạt động không được ở quá khứ");
         }
-        if (requestDTO.getRegistrationStartDate().isAfter(requestDTO.getRegistrationEndDate())) {
-            throw new IllegalArgumentException("Ngày bắt đầu đăng ký phải trước hoặc bằng ngày kết thúc đăng ký");
-        }
+
         LocalDateTime startDateTime = requestDTO.getStartDate().atStartOfDay();
 
         if (requestDTO.getRegistrationEndDate().isAfter(startDateTime)) {
