@@ -1,7 +1,12 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.request.CashOutRequestDTO;
 import com.hr_management.hr_management.dto.request.PerformancePointGivenRequestDTO;
+import com.hr_management.hr_management.dto.response.CashOutTransactionResponseDTO;
+import com.hr_management.hr_management.dto.response.PointPolicyResponseDTO;
 import com.hr_management.hr_management.entity.*;
+import com.hr_management.hr_management.enums.TransactionType;
+import com.hr_management.hr_management.mapper.PointPolicyMapper;
 import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.service.RewardService;
 import com.hr_management.hr_management.utils.JwtUtils;
@@ -10,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,6 +29,17 @@ public class RewardServiceImpl implements RewardService {
     JwtUtils jwtUtils;
     DepartmentRepository departmentRepository;
     TransactionRepository transactionRepository;
+    PointPolicyMapper pointPolicyMapper;
+
+    // get current Point Policy, which is being applied(active)
+    @Override
+    public PointPolicyResponseDTO getCurrentPointPolicy() {
+        PointPolicy activePolicy = pointPolicyRepository.findActivePolicy();
+        if (activePolicy == null) {
+            throw new IllegalStateException("No active point policy found.");
+        }
+        return pointPolicyMapper.toPointPolicyResponseDTO(activePolicy);
+    }
 
 
     // This method can be scheduled to run at specific intervals using @Scheduled annotation
@@ -53,6 +70,7 @@ public class RewardServiceImpl implements RewardService {
         List<PointAccount> accounts = pointAccountRepository.findAll();
         for (PointAccount account : accounts) {
             account.setCurrentPoints(0L);
+            pointAccountRepository.save(account);
         }
     }
 
@@ -101,6 +119,58 @@ public class RewardServiceImpl implements RewardService {
 
         transactionRepository.save(reward);
         return true;
+    }
+
+    @Transactional
+    @Override
+    public CashOutTransactionResponseDTO cashOutPoints(CashOutRequestDTO request) {
+        // Implementation for cashing out points
+        PointPolicy pointPolicy = pointPolicyRepository.findActivePolicy();
+        if(pointPolicy == null){
+            throw new IllegalStateException("No active point policy found");
+        }
+
+        // check existence of employee and point account
+        Integer employeeId = jwtUtils.getEmployeeIdFromAuthentication();
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new IllegalStateException("Employee not found"));
+        PointAccount pointAccount = pointAccountRepository.findByEmployee_EmployeeId(employeeId);
+        if(pointAccount == null || !employee.getIsActive()){
+            throw new IllegalStateException("Point account not found");
+        }
+
+        // check valid of cash out request
+        if(pointAccount.getCurrentPoints() < request.getPointsToCashOut()){
+            throw new IllegalStateException("Not enough points to cash out");
+        }
+
+        if(request.getPointsToCashOut() < pointPolicy.getMinPoints() || request.getPointsToCashOut() > pointPolicy.getMaxPoints()){
+            throw new IllegalStateException("Points to cash out must be between " + pointPolicy.getMinPoints() + " and " + pointPolicy.getMaxPoints());
+        }
+
+        // proceed to cash out
+        pointAccount.setCurrentPoints(pointAccount.getCurrentPoints() - request.getPointsToCashOut());
+        Long cashAmount = Math.round(request.getPointsToCashOut() * pointPolicy.getConversionRate());
+        pointAccountRepository.save(pointAccount);
+
+        CashOut cashOut = CashOut.builder()
+                .points(request.getPointsToCashOut().longValue())
+                .cashAmount(cashAmount)
+                .pointAccount(pointAccount)
+                .createAt(LocalDateTime.now())
+                .build();
+        transactionRepository.save(cashOut);
+
+        CashOutTransactionResponseDTO responseDTO = CashOutTransactionResponseDTO.builder()
+                .transactionId(cashOut.getTransactionId())
+                .points(cashOut.getPoints())
+                .cashAmount(cashAmount)
+                .transactionType(TransactionType.CashOut)
+                .transactionDate(cashOut.getCreateAt())
+                .employeeId(employeeId)
+                .pointAccountId(employee.getPointAccount().getPointAccountId())
+                .build();
+
+        return responseDTO;
     }
 
 }
