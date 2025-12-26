@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @PrimaryKeyJoinColumn(name = "transaction_id")
 //Update: Thêm annotation @SuperBuilder
 @SuperBuilder
+@DiscriminatorValue("PerformanceReward")
 public class PerformanceReward extends Transaction {
     @Column(name = "message", columnDefinition = "TEXT")
     private String message;
