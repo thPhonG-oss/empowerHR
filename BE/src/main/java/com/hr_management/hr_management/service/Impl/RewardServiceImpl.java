@@ -9,7 +9,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 
@@ -44,6 +43,16 @@ public class RewardServiceImpl implements RewardService {
                 }
             }
             pointAccountRepository.save(account);
+        }
+    }
+
+    // auto refresh expired points of employees
+    @Override
+    public void refreshExpiredPoints() {
+        // Get all point accounts
+        List<PointAccount> accounts = pointAccountRepository.findAll();
+        for (PointAccount account : accounts) {
+            account.setCurrentPoints(0L);
         }
     }
 

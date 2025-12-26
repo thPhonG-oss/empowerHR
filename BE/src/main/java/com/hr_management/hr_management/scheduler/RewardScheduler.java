@@ -19,5 +19,9 @@ public class RewardScheduler {
         rewardService.automateMonthlyRewards();
     }
 
-
+    // Refresh points of employees at the start of each year
+    @Scheduled(cron = "0 0 0 1 1 ?", zone = "Asia/Ho_Chi_Minh") // Runs at midnight on January 1st every year
+    public void refreshExpiredPoints() {
+        rewardService.refreshExpiredPoints();
+    }
 }
