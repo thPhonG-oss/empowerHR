@@ -30,6 +30,9 @@ public class RewardServiceImpl implements RewardService {
     DepartmentRepository departmentRepository;
     TransactionRepository transactionRepository;
     PointPolicyMapper pointPolicyMapper;
+    DepartmentBudgetRepository departmentBudgetRepository;
+
+
 
     // get current Point Policy, which is being applied(active)
     @Override
@@ -39,6 +42,19 @@ public class RewardServiceImpl implements RewardService {
             throw new IllegalStateException("No active point policy found.");
         }
         return pointPolicyMapper.toPointPolicyResponseDTO(activePolicy);
+    }
+
+    // Automate refresh budget points for departments can be added here if needed
+    @Override
+    public void automateRefreshDepartmentBudgets() {
+        PointPolicy activePolicy = pointPolicyRepository.findActivePolicy();
+        // Implementation for refreshing department budgets
+        List<Department> departments = departmentRepository.findAll();
+        for (Department department : departments) {
+            Integer budgetPoints = departmentBudgetRepository.findBudgetPointsByDepartmentIdAndPointPolicyId(department.getDepartmentId(), activePolicy.getPointPolicyId());
+            department.setPointBalance(budgetPoints.longValue());
+            departmentRepository.save(department);
+        }
     }
 
 

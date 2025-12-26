@@ -6,6 +6,9 @@ import com.hr_management.hr_management.dto.response.CashOutTransactionResponseDT
 import com.hr_management.hr_management.dto.response.PointPolicyResponseDTO;
 
 public interface RewardService {
+    // Automate refresh budget points for departments can be added here if needed
+    void automateRefreshDepartmentBudgets();
+
     // get current Point Policy, which is being applied(active)
     PointPolicyResponseDTO getCurrentPointPolicy();
 

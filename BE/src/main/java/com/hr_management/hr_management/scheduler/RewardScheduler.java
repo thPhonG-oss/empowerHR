@@ -24,4 +24,10 @@ public class RewardScheduler {
     public void refreshExpiredPoints() {
         rewardService.refreshExpiredPoints();
     }
+
+    // Refresh department budgets at the start of each month
+    @Scheduled(cron = "0 0 0 1 * ?") // Runs at midnight on the first day of every month
+    public void refreshDepartmentBudgets() {
+        rewardService.automateRefreshDepartmentBudgets();
+    }
 }
