@@ -12,5 +12,6 @@ public interface ParticipateInService {
     void deleteParticipateIn(Integer id, JwtAuthenticationToken jwtAuthenticationToken);
 
     ParticipateInResponse registerActivity(Integer activityId, String username);
+
 }
 

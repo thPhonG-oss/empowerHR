@@ -61,7 +61,7 @@ public class RunningActivityController {
       }
 
     // [ Admin ] Update activitiy
-    @PutMapping("/admin/update-activities/{runningActivityId}")
+    @PutMapping("/{runningActivityId}")
     ApiResponse<RunningActivityResponseDTO> updateActivity(@PathVariable Integer runningActivityId, @Valid @RequestBody RunningActivityUpdateRequestDTO runningActivityUpdateRequestDTO){
         RunningActivityResponseDTO runningActivityResponseDTO= runningActivityService.updateActivity(runningActivityId,runningActivityUpdateRequestDTO);
         return ApiResponse.<RunningActivityResponseDTO>builder()
@@ -77,7 +77,7 @@ public class RunningActivityController {
                 .build();
     }
 
-    @DeleteMapping("/admin/{activityId}")
+    @DeleteMapping("/{activityId}")
     public ApiResponse<RunningActivityResponseDTO> deleteActivity(@PathVariable Integer activityId){
         return ApiResponse.<RunningActivityResponseDTO>builder()
                 .message("Xóa thành công activity")
