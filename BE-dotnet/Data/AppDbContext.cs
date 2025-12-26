@@ -79,11 +79,13 @@ namespace EmpowerHR.Data
                     .IsRequired(false)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasOne(e => e.PointAccount)
-                    .WithOne()
-                    .HasForeignKey<Employee>(e => e.PointAccountId)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.SetNull);
+
+
+                    entity.HasOne(e => e.PointAccount)
+                        .WithOne(p => p.Employee)
+                        .HasForeignKey<Employee>(e => e.PointAccountId)  // ← QUAN TRỌNG: chỉ định Employee là owning side
+                        .IsRequired(false)
+                        .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasMany(e => e.Requests)
                     .WithOne(r => r.Employee)
@@ -228,14 +230,13 @@ namespace EmpowerHR.Data
             {
                 entity.ToTable("PointAccount");
                 entity.HasKey(pa => pa.PointAccountId);
-
                 entity.Property(pa => pa.PointAccountId).HasColumnName("point_account_id");
-                entity.Property(pa => pa.EmployeeId).HasColumnName("employee_id");
                 entity.Property(pa => pa.CurrentPoints).HasColumnName("current_points");
-                entity.Property(pa => pa.TotalPointsEarned).HasColumnName("total_points_earned");
-                entity.Property(pa => pa.TotalPointsSpent).HasColumnName("total_points_spent");
+                entity.Property(pa => pa.TotalPointsEarned).HasColumnName("total_earns");
+                entity.Property(pa => pa.TotalPointsSpent).HasColumnName("total_transferred");
                 entity.Property(pa => pa.CreatedAt).HasColumnName("created_at");
-                entity.Property(pa => pa.UpdatedAt).HasColumnName("updated_at");
+                entity.Property(pa => pa.UpdatedAt).HasColumnName("update_at");
+            
             });
 
             // ========== Role Configuration ==========
@@ -276,6 +277,8 @@ namespace EmpowerHR.Data
                 entity.Property(lt => lt.LeaveTypeId).HasColumnName("leave_type_id");
                 entity.Property(lt => lt.LeaveTypeName).HasColumnName("leave_type_name");
             });
+
+            // ==== Point Account ==
         }
     }
 }
