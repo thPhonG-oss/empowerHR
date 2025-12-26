@@ -1,0 +1,401 @@
+// UpdateActivityOverlay.jsx
+import { X, SquareActivity } from "lucide-react";
+import { useState, useEffect } from "react";
+import runningActivityApi from "../../api/runningActivityApi";
+import toast from "react-hot-toast";
+
+const today = new Date().toISOString().split("T")[0];
+
+export default function UpdateActivityOverlay({
+  open,
+  onClose,
+  activity,
+  onSuccess,
+}) {
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const emptyForm = {
+    title: "",
+    image: "",
+    description: "",
+    registrationStartDate: "",
+    registrationEndDate: "",
+    startDate: "",
+    endDate: "",
+    minParticipant: "",
+    maxParticipant: "",
+    targetDistance: "",
+    rules: "",
+    completionBonus: "",
+    top1Bonus: "",
+    top2Bonus: "",
+    top3Bonus: "",
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
+  /* ================= LOAD DATA ================= */
+  useEffect(() => {
+    if (open && activity) {
+      setForm({
+        title: activity.title || "",
+        image: activity.image || "",
+        description: activity.description || "",
+        registrationStartDate:
+          activity.registrationStartDate?.split("T")[0] || "",
+        registrationEndDate: activity.registrationEndDate?.split("T")[0] || "",
+        startDate: activity.startDate?.split("T")[0] || "",
+        endDate: activity.endDate?.split("T")[0] || "",
+        minParticipant: activity.minParticipant ?? "",
+        maxParticipant: activity.maxParticipant ?? "",
+        targetDistance: activity.targetDistance ?? "",
+        rules: activity.rules || "",
+        completionBonus: activity.completionBonus ?? "",
+        top1Bonus: activity.top1Bonus ?? "",
+        top2Bonus: activity.top2Bonus ?? "",
+        top3Bonus: activity.top3Bonus ?? "",
+      });
+    }
+  }, [open, activity]);
+
+  if (!open || !activity) return null;
+
+  const baseInput =
+    "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition";
+
+  /* ================= UPLOAD IMAGE ================= */
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET);
+    formData.append("folder", import.meta.env.VITE_CLOUD_FOLDER);
+
+    try {
+      setUploading(true);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${
+          import.meta.env.VITE_CLOUD_NAME
+        }/image/upload`,
+        { method: "POST", body: formData }
+      );
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      setForm((prev) => ({ ...prev, image: data.secure_url }));
+
+      toast.success("Upload ảnh thành công 📸");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload ảnh thất bại ❌");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /* ================= HANDLE CHANGE ================= */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /* ================= SUBMIT ================= */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const payload = {
+      title: form.title,
+      image: form.image,
+      description: form.description,
+      rules: form.rules,
+
+      registrationStartDate: new Date(form.registrationStartDate).toISOString(),
+      registrationEndDate: new Date(form.registrationEndDate).toISOString(),
+      startDate: new Date(form.startDate).toISOString(),
+      endDate: new Date(form.endDate).toISOString(),
+
+      minParticipant:
+        form.minParticipant === "" ? null : Number(form.minParticipant),
+      maxParticipant:
+        form.maxParticipant === "" ? null : Number(form.maxParticipant),
+      targetDistance:
+        form.targetDistance === "" ? null : Number(form.targetDistance),
+
+      completionBonus:
+        form.completionBonus === "" ? 0 : Number(form.completionBonus),
+      top1Bonus: form.top1Bonus === "" ? 0 : Number(form.top1Bonus),
+      top2Bonus: form.top2Bonus === "" ? 0 : Number(form.top2Bonus),
+      top3Bonus: form.top3Bonus === "" ? 0 : Number(form.top3Bonus),
+    };
+
+    try {
+      await runningActivityApi.updateActivity(
+        activity.runningActivityId,
+        payload
+      );
+
+      toast.success("Cập nhật hoạt động thành công ✨");
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error("Cập nhật thất bại ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= UI ================= */
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 shadow-sm">
+          <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
+            <SquareActivity size={22} /> Cập nhật hoạt động
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-md hover:bg-red-100 transition cursor-pointer hover:opacity-80"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+        >
+          {/* title */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">
+              Tiêu đề hoạt động
+            </label>
+            <input
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              className={baseInput}
+              required
+            />
+          </div>
+
+          {/* upload image */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Hình ảnh hoạt động
+            </label>
+
+            <label className="relative flex items-center justify-center w-full h-48 rounded-xl cursor-pointer overflow-hidden border-2 border-dashed border-gray-300">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+
+              {form.image && (
+                <img
+                  src={form.image}
+                  alt="preview"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+            </label>
+          </div>
+
+          {/* description */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">
+              Mô tả hoạt động
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className={`${baseInput} h-24 resize-none`}
+            />
+          </div>
+
+          {/* registration dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-600">Bắt đầu đăng ký</label>
+              <input
+                type="date"
+                name="registrationStartDate"
+                value={form.registrationStartDate}
+                onChange={handleChange}
+                min={today}
+                className={`${baseInput} mt-1`}
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600">Kết thúc đăng ký</label>
+              <input
+                type="date"
+                name="registrationEndDate"
+                value={form.registrationEndDate}
+                onChange={handleChange}
+                min={form.registrationStartDate || today}
+                className={`${baseInput} mt-1`}
+                required
+              />
+            </div>
+          </div>
+
+          {/* activity dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-600">Ngày bắt đầu</label>
+              <input
+                type="date"
+                name="startDate"
+                value={form.startDate}
+                onChange={handleChange}
+                className={`${baseInput} mt-1`}
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600">Ngày kết thúc</label>
+              <input
+                type="date"
+                name="endDate"
+                value={form.endDate}
+                onChange={handleChange}
+                className={`${baseInput} mt-1`}
+                required
+              />
+            </div>
+          </div>
+
+          {/* participants */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Số người tối thiểu
+              </label>
+              <input
+                type="number"
+                name="minParticipant"
+                value={form.minParticipant}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Số người tối đa
+              </label>
+              <input
+                type="number"
+                name="maxParticipant"
+                value={form.maxParticipant}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+          </div>
+
+          {/* distance */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Cự ly mục tiêu (km)
+            </label>
+            <input
+              type="number"
+              name="targetDistance"
+              value={form.targetDistance}
+              onChange={handleChange}
+              className={baseInput}
+            />
+          </div>
+
+          {/* rules */}
+          <textarea
+            name="rules"
+            value={form.rules}
+            onChange={handleChange}
+            className={`${baseInput} h-20 resize-none`}
+            placeholder="Luật tham gia"
+          />
+
+          {/* bonuses */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 1</label>
+              <input
+                type="number"
+                name="top1Bonus"
+                value={form.top1Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 2</label>
+              <input
+                type="number"
+                name="top2Bonus"
+                value={form.top2Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Top 3</label>
+              <input
+                type="number"
+                name="top3Bonus"
+                value={form.top3Bonus}
+                onChange={handleChange}
+                className={baseInput}
+              />
+            </div>
+          </div>
+
+          {/* completion bonus */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Thưởng hoàn thành
+            </label>
+            <input
+              type="number"
+              name="completionBonus"
+              value={form.completionBonus}
+              onChange={handleChange}
+              className={baseInput}
+            />
+          </div>
+
+          {/* buttons */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer "
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={loading || uploading}
+              className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition cursor-pointer hover:opacity-90"
+            >
+              {loading ? "Đang cập nhật..." : "Cập nhật hoạt động"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -74,7 +74,7 @@ const navConfig = [
   },
   {
     title: "Nghỉ phép",
-    path: "leave",
+    path: "leavee",
     icon: CalendarX,
     roles: ["employee", "manager"],
   },
@@ -85,8 +85,8 @@ const navConfig = [
     roles: ["employee", "manager"],
   },
   {
-    title: "Hoạt động, chiến dịch",
-    path: "campaigns",
+    title: "Hoạt động",
+    path: "activities",
     icon: Target,
     roles: ["employee", "manager"],
   },
@@ -133,7 +133,9 @@ const navConfig = [
 ];
 
 export const getNavByRole = (role) => {
-  const prefix = `/${role}/`;
+  // ép role thành chữ thường
+
+  const prefix = `/${role.toLowerCase()}/`;
 
   return navConfig
     .filter((item) => item.roles.includes(role))

@@ -8,6 +8,7 @@ const adminApi = {
   addUser: (newUser) => axiosClient.post("/api/v1/admin/employees", newUser),
   setStateAccount: (id) =>
     axiosClient.patch(`/api/v1/admin/accounts/block/${id}`),
+  createActivity: (data) => axiosClient.post("/api/v1/admin/activities", data),
 };
 
 export default adminApi;

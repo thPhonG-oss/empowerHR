@@ -14,7 +14,7 @@ function DetailProfile({}) {
   const { role } = useContext(AuthContext);
   const { employeeId } = useParams();
   const safeRole = typeof role === "string" ? role.toUpperCase() : "";
-
+  console.log(safeRole);
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
@@ -29,6 +29,8 @@ function DetailProfile({}) {
           (safeRole === "MANAGER" && !employeeId)
         ) {
           const res = await employeeApi.getMyProfile();
+          console.log(res.result);
+
           setProfile(res.result);
 
           sessionStorage.setItem("profile", JSON.stringify(res.result));

@@ -8,6 +8,7 @@ import com.hr_management.hr_management.enums.ActivityStatus;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.ParticipateInMapper;
+import com.hr_management.hr_management.mapper.RunningActivityMapper;
 import com.hr_management.hr_management.repository.EmployeeRepository;
 import com.hr_management.hr_management.repository.ParticipateInRepository;
 import com.hr_management.hr_management.repository.RunningActivityRepository;
@@ -42,6 +43,7 @@ public class ParticipateInServiceImpl implements ParticipateInService {
     EmployeeRepository employeeRepository;
     RunningActivityRepository runningActivityRepository;
     ParticipateInMapper participateInMapper;
+    RunningActivityMapper runningActivityMapper;
   
     @Override
     public void deleteParticipateIn(Integer id, JwtAuthenticationToken jwtAuthenticationToken) {
@@ -134,7 +136,9 @@ public class ParticipateInServiceImpl implements ParticipateInService {
         ParticipateInResponse participateInResponse = participateInMapper.toParticipateInResponse(saved);
         participateInResponse.setEmployeeId(saved.getEmployee().getEmployeeId());
         participateInResponse.setEmployeeName(saved.getEmployee().getEmployeeName());
-        participateInResponse.setRunningActivity(saved.getRunningActivity());
+        participateInResponse.setRunningActivityResponseDTO(
+                runningActivityMapper.toRunningActivityResponseDTO(saved.getRunningActivity())
+        );
         return participateInResponse;
     }
 }

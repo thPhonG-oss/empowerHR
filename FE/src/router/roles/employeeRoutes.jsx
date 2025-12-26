@@ -7,6 +7,7 @@ import LeaveRequest from "../../pages/employee/LeaveRequest";
 import HistoryRequests from "../../pages/employee/HistoryRequests";
 
 import RoleRoute from "../RoleRoute";
+import ActivitiesOpening from "../../pages/employee/ActivitiesOpening";
 
 const employeeRoutes = [
   {
@@ -21,8 +22,9 @@ const employeeRoutes = [
       { path: "profile", element: <DetailProfile /> },
       { path: "profile/edit", element: <EditProfile /> },
       { path: "attendance", element: <Attendance /> },
-      { path: "leave", element: <LeaveRequest /> },
+      { path: "leavee", element: <LeaveRequest /> },
       { path: "request-history", element: <HistoryRequests /> },
+      { path: "activities", element: <ActivitiesOpening /> },
     ],
   },
 ];

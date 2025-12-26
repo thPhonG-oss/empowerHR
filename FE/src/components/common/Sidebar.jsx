@@ -30,7 +30,7 @@ function Sidebar() {
   };
 
   return (
-    <div className="sticky top-0 w-full h-screen flex flex-col justify-between">
+    <div className="sticky top-0 w-full h-screen flex flex-col justify-between shadow-xl">
       <div>
         {/* Header */}
         <div className="max-h-20 flex p-4 items-center gap-3 border-b border-gray-300">
@@ -107,11 +107,11 @@ function Sidebar() {
           <div>
             <p className="font-bold">{userName}</p>
             <p>
-              {role === "EMPLOYEE"
+              {role === "employee"
                 ? "Nhân viên"
-                : role === "MANAGER"
+                : role === "manager"
                 ? "Quản lý"
-                : role === "ADMIN"
+                : role === "admin"
                 ? "Admin"
                 : ""}
             </p>

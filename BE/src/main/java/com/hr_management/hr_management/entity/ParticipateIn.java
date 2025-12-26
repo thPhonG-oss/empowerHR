@@ -1,10 +1,7 @@
 package com.hr_management.hr_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +24,7 @@ public class ParticipateIn {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_activity_id", nullable = false)
+    @ToString.Exclude
     private RunningActivity runningActivity;
 
     @Column(name = "total_run")
