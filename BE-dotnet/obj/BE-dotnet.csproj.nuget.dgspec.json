@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CNTT_HCMUS\\HocKy7\\Information_Systems_Development\\Labs\\EmpowerHR\\BE-dotnet\\BE-dotnet.csproj": {}
+    "C:\\Users\\admin\\Downloads\\PTUDHTTT\\empowerHR\\BE-dotnet\\BE-dotnet.csproj": {}
   },
   "projects": {
-    "D:\\CNTT_HCMUS\\HocKy7\\Information_Systems_Development\\Labs\\EmpowerHR\\BE-dotnet\\BE-dotnet.csproj": {
+    "C:\\Users\\admin\\Downloads\\PTUDHTTT\\empowerHR\\BE-dotnet\\BE-dotnet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CNTT_HCMUS\\HocKy7\\Information_Systems_Development\\Labs\\EmpowerHR\\BE-dotnet\\BE-dotnet.csproj",
+        "projectUniqueName": "C:\\Users\\admin\\Downloads\\PTUDHTTT\\empowerHR\\BE-dotnet\\BE-dotnet.csproj",
         "projectName": "BE-dotnet",
-        "projectPath": "D:\\CNTT_HCMUS\\HocKy7\\Information_Systems_Development\\Labs\\EmpowerHR\\BE-dotnet\\BE-dotnet.csproj",
-        "packagesPath": "C:\\Users\\PHONG\\.nuget\\packages\\",
-        "outputPath": "D:\\CNTT_HCMUS\\HocKy7\\Information_Systems_Development\\Labs\\EmpowerHR\\BE-dotnet\\obj\\",
+        "projectPath": "C:\\Users\\admin\\Downloads\\PTUDHTTT\\empowerHR\\BE-dotnet\\BE-dotnet.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\admin\\Downloads\\PTUDHTTT\\empowerHR\\BE-dotnet\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\PHONG\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -71,6 +71,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.22, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.10, )"
             },
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
@@ -100,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
