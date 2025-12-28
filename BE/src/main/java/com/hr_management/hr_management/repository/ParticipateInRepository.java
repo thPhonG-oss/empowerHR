@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.hr_management.hr_management.entity.ParticipateIn;
 import com.hr_management.hr_management.enums.ActivityStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,4 +42,10 @@ public interface ParticipateInRepository extends JpaRepository<ParticipateIn, In
     List<ParticipateIn> findByEmployee_EmployeeId(Integer employeeId);
 
     Optional<ParticipateIn> findByEmployee_EmployeeIdAndRunningActivity_RunningActivityId(Integer employeeEmployeeId, Integer runningActivityRunningActivityId);
+
+    @Query("SELECT p FROM ParticipateIn p WHERE p.runningActivity = :activity AND p.rewardPoints = 0 AND p.isCompleted = false AND p.isCancelled = false")
+    List<ParticipateIn> findByActivityAndNotRewarded(RunningActivity activity);
+
+    @Query("SELECT p FROM ParticipateIn p WHERE p.runningActivity = :activity ORDER BY p.totalRun DESC")
+    List<ParticipateIn> findByActivityOrderByTotalRunDesc(RunningActivity activity);
 }
