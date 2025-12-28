@@ -11,4 +11,5 @@ public interface TransactionRepository extends JpaRepository<Transaction,Integer
 
     List<Transaction> findByPointAccount_PointAccountIdOrderByCreateAtDesc(Integer pointAccountId);
 
+
 }
