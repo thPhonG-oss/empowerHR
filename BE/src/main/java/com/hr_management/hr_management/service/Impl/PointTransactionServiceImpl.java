@@ -119,6 +119,7 @@ public class PointTransactionServiceImpl implements PointTransactionService {
                     createTransaction(
                             pointAccount,
                             activity.getCompletionBonus().longValue(),
+                            activity,
                             TransactionType.ActivityReward
                     );
                     System.out.println("  ➕ Completion Bonus: " + activity.getCompletionBonus() + " points");
@@ -132,6 +133,7 @@ public class PointTransactionServiceImpl implements PointTransactionService {
                     createTransaction(
                             pointAccount,
                             activity.getTop1Bonus().longValue(),
+                            activity,
                             TransactionType.ActivityReward
                     );
                     System.out.println("  🥇 Top 1 Bonus: " + activity.getTop1Bonus() + " points");
@@ -141,6 +143,7 @@ public class PointTransactionServiceImpl implements PointTransactionService {
                     createTransaction(
                             pointAccount,
                             activity.getTop2Bonus().longValue(),
+                            activity,
                             TransactionType.ActivityReward
                     );
                     System.out.println("  🥈 Top 2 Bonus: " + activity.getTop2Bonus() + " points");
@@ -150,6 +153,7 @@ public class PointTransactionServiceImpl implements PointTransactionService {
                     createTransaction(
                             pointAccount,
                             activity.getTop3Bonus().longValue(),
+                            activity,
                             TransactionType.ActivityReward
                     );
                     System.out.println("  🥉 Top 3 Bonus: " + activity.getTop3Bonus() + " points");
@@ -177,17 +181,22 @@ public class PointTransactionServiceImpl implements PointTransactionService {
     /**
      * Tạo giao dịch điểm cho employee
      */
+
     @Transactional
     public Transaction createTransaction(
             PointAccount pointAccount,
             Long points,
+            RunningActivity activity,
             TransactionType type) {
 
-        Transaction transaction = Transaction.builder()
+
+        ActivityReward transaction = ActivityReward.builder()
                 .pointAccount(pointAccount)
                 .points(points)
-                .transactionType(type)
                 .createAt(LocalDateTime.now())
+                .earnedPoints(points.intValue())
+                .message("Activity Reward")
+                .runningActivity(activity)
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);

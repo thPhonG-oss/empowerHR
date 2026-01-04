@@ -9,5 +9,5 @@ import com.hr_management.hr_management.enums.TransactionType;
 public interface PointTransactionService {
     void processActivityRewardsForCompletedActivities();
     void processActivityRewards(RunningActivity activity);
-    Transaction createTransaction(PointAccount pointAccount, Long points, TransactionType type);
+    Transaction createTransaction(PointAccount pointAccount, Long points, RunningActivity activity,TransactionType type);
 }
