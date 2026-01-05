@@ -5,6 +5,7 @@ import com.hr_management.hr_management.dto.response.TransactionResponse;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.RunningActivity;
 import com.hr_management.hr_management.entity.Transaction;
+import com.hr_management.hr_management.enums.TransactionType;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.TransactionMapper;
@@ -54,6 +55,9 @@ public class TransactionServiceImpl implements TransactionService {
             res.setEmployeeName(
                     transaction.getPointAccount().getEmployee().getEmployeeName()
             );
+            res.setTransactionType(
+                    TransactionType.valueOf(transaction.getClass().getSimpleName())
+            );
 
             return res;
         });
@@ -84,6 +88,9 @@ public class TransactionServiceImpl implements TransactionService {
                     res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
                     res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
                     res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
+                    res.setTransactionType(
+                            TransactionType.valueOf(transaction.getClass().getSimpleName())
+                    );
 
                     return res;
                 })
