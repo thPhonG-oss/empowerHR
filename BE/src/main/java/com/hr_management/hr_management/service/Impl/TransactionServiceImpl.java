@@ -95,7 +95,36 @@ public class TransactionServiceImpl implements TransactionService {
                     return res;
                 })
                 .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<TransactionResponse> getTransactionById(Integer employeeId) {
+        // Find employee by ID
+        Employee employee = employeeRepository
+                .findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
+        // Get point account ID from employee
+        Integer pointAccountId = employee.getPointAccount().getPointAccountId();
+
+        // Get transactions for this employee's point account
+        List<Transaction> transactions = transactionRepository
+                .findByPointAccount_PointAccountIdOrderByCreateAtDesc(pointAccountId);
+
+        // Map to TransactionResponse
+        return transactions.stream()
+                .map(transaction -> {
+                    TransactionResponse res = transactionMapper.toTransactionResponse(transaction);
+
+                    res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
+                    res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
+                    res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
+                    res.setTransactionType(
+                            TransactionType.valueOf(transaction.getClass().getSimpleName())
+                    );
+
+                    return res;
+                })
+                .collect(Collectors.toList());
     }
 }
