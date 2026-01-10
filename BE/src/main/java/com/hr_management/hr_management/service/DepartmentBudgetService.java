@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface DepartmentBudgetService {
     List<DepartmentBudgetResponseDTO> getDepartmentBudgets();
+    DepartmentBudgetResponseDTO getDepartmentBudgetById(Integer id);
+    List<DepartmentBudgetResponseDTO> getDepartmentBudgetsByDepartmentId(Integer departmentId);
+
 }
