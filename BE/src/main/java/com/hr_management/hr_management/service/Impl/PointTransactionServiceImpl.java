@@ -191,11 +191,9 @@ public class PointTransactionServiceImpl implements PointTransactionService {
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
-        System.out.println("    📝 Transaction created: ID=" + savedTransaction.getTransactionId() +
+        System.out.println("📝 Transaction created: ID=" + savedTransaction.getTransactionId() +
                 ", Points=" + points + ", Type=" + type);
 
         return savedTransaction;
     }
-
-
 }
