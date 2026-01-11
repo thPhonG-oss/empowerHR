@@ -28,12 +28,7 @@ const navConfig = [
   },
 
   // ──────────────────────────────── ADMIN ONLY ────────────────────────────────
-  {
-    title: "Quản lý gian hàng",
-    path: "store-management",
-    icon: ShoppingCart,
-    roles: ["admin"],
-  },
+
   {
     title: "Điểm thưởng",
     path: "rewards",
