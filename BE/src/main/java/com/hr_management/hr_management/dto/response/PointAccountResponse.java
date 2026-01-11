@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PointAccountResponse {
     String employeeName;
+
+    String departmentName;
+    Integer departmentId;
+    String positionName;
+    Integer positionId;
+
     Integer pointAccountId;
     Long currentPoints;
     Integer totalEarns;
