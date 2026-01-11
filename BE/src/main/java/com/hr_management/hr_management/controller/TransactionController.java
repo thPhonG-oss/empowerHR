@@ -27,11 +27,9 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping("")
-    public ApiResponse<Page<TransactionResponse>> getAllTransactions(
-            @RequestParam(defaultValue = "0") Integer pageNumber,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
-        Page<TransactionResponse> transactions = transactionService.getAllTransaction(pageNumber, pageSize);
-        return ApiResponse.<Page<TransactionResponse>>builder()
+    public ApiResponse<List<TransactionResponse>> getAllTransactions() {
+        List<TransactionResponse> transactions = transactionService.getAllTransaction();
+        return ApiResponse.<List<TransactionResponse>>builder()
                 .message("Get all transactions successfully")
                 .result(transactions)
                 .build();

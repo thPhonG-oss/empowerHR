@@ -37,31 +37,31 @@ public class TransactionServiceImpl implements TransactionService {
     EmployeeRepository employeeRepository;
     EmployeeService employeeService;
     @Override
-    public Page<TransactionResponse> getAllTransaction(Integer pageNumber, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createAt").descending());
-        Page<Transaction> transactionPage = transactionRepository.findAll(pageable);
-        Page<TransactionResponse> transactionResponsePage = transactionPage.map(transaction -> {
-            TransactionResponse res =
-                    transactionMapper.toTransactionResponse(transaction);
+    public List<TransactionResponse> getAllTransaction() {
 
-            res.setPointAccountId(
-                    transaction.getPointAccount().getPointAccountId()
-            );
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions.stream()
+                .map(transaction -> {
+                    TransactionResponse res =
+                            transactionMapper.toTransactionResponse(transaction);
 
-            res.setEmployeeId(
-                    transaction.getPointAccount().getEmployee().getEmployeeId()
-            );
+                    res.setPointAccountId(
+                            transaction.getPointAccount().getPointAccountId()
+                    );
 
-            res.setEmployeeName(
-                    transaction.getPointAccount().getEmployee().getEmployeeName()
-            );
-            res.setTransactionType(
-                    TransactionType.valueOf(transaction.getClass().getSimpleName())
-            );
+                    res.setEmployeeId(
+                            transaction.getPointAccount().getEmployee().getEmployeeId()
+                    );
 
-            return res;
-        });
-        return transactionResponsePage;
+                    res.setEmployeeName(
+                            transaction.getPointAccount().getEmployee().getEmployeeName()
+                    );
+
+                    res.setTransactionType(getTransactionType(transaction));
+
+                    return res;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -88,9 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
                     res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
                     res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
                     res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
-                    res.setTransactionType(
-                            TransactionType.valueOf(transaction.getClass().getSimpleName())
-                    );
+                    res.setTransactionType(getTransactionType(transaction));
 
                     return res;
                 })
@@ -119,12 +117,15 @@ public class TransactionServiceImpl implements TransactionService {
                     res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
                     res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
                     res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
-                    res.setTransactionType(
-                            TransactionType.valueOf(transaction.getClass().getSimpleName())
-                    );
+                    res.setTransactionType(getTransactionType(transaction));
 
                     return res;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private TransactionType getTransactionType(Transaction transaction) {
+        String className = transaction.getClass().getSimpleName();
+        return TransactionType.valueOf(className);
     }
 }
