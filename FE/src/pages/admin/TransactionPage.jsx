@@ -1,79 +1,17 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Search, Calendar } from "lucide-react"
 
-export default function TransactionPage() {
-  const mockTransactions = [
-    {
-      transactionId: 19,
-      transactionType: "CashOut",
-      points: 500,
-      pointAccountId: 5,
-      employeeId: 5,
-      employeeName: "Nguyễn Dev A",
-      createAt: "2026-01-04T23:04:56",
-    },
-    {
-      transactionId: 20,
-      transactionType: "ActivityReward",
-      points: 250,
-      pointAccountId: 6,
-      employeeId: 6,
-      employeeName: "Trần Dev B",
-      createAt: "2026-01-04T23:04:56",
-    },
-    {
-      transactionId: 21,
-      transactionType: "AdminGift",
-      points: 500,
-      pointAccountId: 13,
-      employeeId: 13,
-      employeeName: "Dương HR B",
-      createAt: "2026-01-04T23:04:56",
-    },
-    {
-      transactionId: 22,
-      transactionType: "CashOut",
-      points: 300,
-      pointAccountId: 7,
-      employeeId: 7,
-      employeeName: "Lê Dev C",
-      createAt: "2025-10-10T14:30:00",
-    },
-    {
-      transactionId: 23,
-      transactionType: "ActivityReward",
-      points: 150,
-      pointAccountId: 8,
-      employeeId: 8,
-      employeeName: "Phạm Dev D",
-      createAt: "2025-10-10T14:30:00",
-    },
-    {
-      transactionId: 24,
-      transactionType: "AdminGift",
-      points: 1000,
-      pointAccountId: 9,
-      employeeId: 9,
-      employeeName: "Vũ HR A",
-      createAt: "2025-09-10T14:30:00",
-    },
-    {
-      transactionId: 25,
-      transactionType: "CashOut",
-      points: 700,
-      pointAccountId: 10,
-      employeeId: 10,
-      employeeName: "Hoàng Dev E",
-      createAt: "2025-09-10T14:30:00",
-    },
-  ]
+import pointApi from "../../api/pointApi"
 
-  // State 
+export default function TransactionPage() {
+
+  // State
   const [filterType, setFilterType] = useState("Tất cả")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [transactions, setTransactions] = useState([])
   const itemsPerPage = 5
 
   // Format date ngày
@@ -97,7 +35,7 @@ export default function TransactionPage() {
     return typeMap[type] || type
   }
 
-  // Format 
+  // Format
   const getTransactionTypeColor = (type) => {
     const colorMap = {
       CashOut: " text-red-800",
@@ -112,32 +50,57 @@ export default function TransactionPage() {
     return points > 0 ? "text-green-600" : "text-red-600"
   }
 
-  // Lọc
+
+
+  // Fetch transactions
+    useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const response = await pointApi.getAllTransactions(currentPage - 1, 10)
+        const data = response.result.content 
+        console.log("All Transactions:", data)
+        setTransactions(data)
+        console.log("trans:",transactions);
+      } catch (error) {
+        console.error("Failed to fetch transactions:", error)
+      }
+    }
+    fetchTransactions()
+  }, [transactions.length])
+
   const filteredTransactions = useMemo(() => {
-    return mockTransactions.filter((transaction) => {
-      // Lọc theo type
-      if (filterType !== "Tất cả" && transaction.transactionType !== filterType) {
-        return false
-      }
+  return transactions.filter((transaction) => {
+    if (filterType !== "Tất cả" && transaction.transactionType !== filterType) {
+      return false
+    }
 
-      // Filter theo ngày
-      if (startDate) {
-        const transactionDate = new Date(transaction.createAt).toISOString().split("T")[0]
-        if (transactionDate < startDate) return false
-      }
-      if (endDate) {
-        const transactionDate = new Date(transaction.createAt).toISOString().split("T")[0]
-        if (transactionDate > endDate) return false
-      }
+    if (startDate) {
+      const transactionDate = new Date(transaction.createAt)
+        .toISOString()
+        .split("T")[0]
+      if (transactionDate < startDate) return false
+    }
 
-      // Filter tên nhân viên
-      if (searchTerm && !transaction.employeeName.toLowerCase().includes(searchTerm.toLowerCase())) {
-        return false
-      }
+    if (endDate) {
+      const transactionDate = new Date(transaction.createAt)
+        .toISOString()
+        .split("T")[0]
+      if (transactionDate > endDate) return false
+    }
 
-      return true
-    })
-  }, [filterType, startDate, endDate, searchTerm])
+    if (
+      searchTerm &&
+      !transaction.employeeName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    ) {
+      return false
+    }
+
+    return true
+  })
+}, [transactions, filterType, startDate, endDate, searchTerm])
+
 
   // Pagination
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
@@ -158,33 +121,15 @@ export default function TransactionPage() {
     setCurrentPage(1)
   }
 
-  // Mock API call (commented out for demo)
-  // const fetchTransactions = async () => {
-  //   try {
-  //     const response = await axios.get("/api/transactions", {
-  //       params: {
-  //         transactionType: filterType === "Tất cả" ? null : filterType,
-  //         startDate,
-  //         endDate,
-  //         search: searchTerm,
-  //         page: currentPage,
-  //         limit: itemsPerPage,
-  //       },
-  //     })
-  //     // Handle response: setTransactions(response.data.result.content)
-  //   } catch (error) {
-  //     console.error("Error fetching transactions:", error)
-  //   }
-  // }
 
   return (
     <div className="p-6 bg-white">
-     
+
 
       {/* Filter Section */}
       <div className="mb-6 p-4 rounded-lg border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
+
           {/* Loại giao dịch */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -223,7 +168,7 @@ export default function TransactionPage() {
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" />
             </div>
           </div>
-          
+
           <div></div>
 
           {/* Mô tả */}
@@ -307,13 +252,14 @@ export default function TransactionPage() {
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${getTransactionTypeColor(transaction.transactionType)}`}
                     >
-                      {getTransactionTypeName(transaction.transactionType)}
+                      {getTransactionTypeName(transaction.transactionType
+)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {transaction.transactionType === "CashOut" && "Dối tiền thưởng từ điểm tích lũy"}
-                    {transaction.transactionType === "ActivityReward" && "Quy đổi điểm sang tiền thưởng"}
-                    {transaction.transactionType === "AdminGift" && "Thưởng hoạt động chào bổ"}
+                    {transaction.transactionType === "CashOut" && "Đổi tiền thưởng từ điểm tích lũy"}
+                    {transaction.transactionType === "ActivityReward" && "Điểm thưởng từ hoạt động"}
+                    {transaction.transactionType === "AdminGift" && "Quản lý thưởng điểm cho nhân viên"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{transaction.employeeName}</td>
                   <td
