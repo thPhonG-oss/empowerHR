@@ -48,6 +48,12 @@ public class PointAccountServiceImpl implements PointAccountService {
                         dto.setEmployeeName(pointAccount.getEmployee().getEmployeeName());
                     }
 
+                    dto.setDepartmentName(pointAccount.getEmployee().getDepartment().getDepartmentName());
+                    dto.setDepartmentId(pointAccount.getEmployee().getDepartment().getDepartmentId());
+                    dto.setPositionName(pointAccount.getEmployee().getPosition().getPositionName());
+                    dto.setPositionId(pointAccount.getEmployee().getPosition().getPositionId());
+
+
                     return dto;
                 })
                 .collect(Collectors.toList());
