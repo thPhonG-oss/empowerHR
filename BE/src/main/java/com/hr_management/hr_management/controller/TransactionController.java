@@ -45,4 +45,12 @@ public class TransactionController {
                 .result(transactions)
                 .build();
     }
+    @GetMapping("/{id}")
+    public ApiResponse<List<TransactionResponse>> getTransactionByEmployee(Integer employeeId){
+        List<TransactionResponse> transactions = transactionService.getTransactionById(employeeId);
+        return ApiResponse.<List<TransactionResponse>>builder()
+                .message("Get transactions successfully")
+                .result(transactions)
+                .build();
+    }
 }
