@@ -1,5 +1,10 @@
 import { useState } from "react";
 
+import{
+  PencilIcon,
+  TrashIcon,
+} from 'lucide-react';
+
 export default function MonthlyPointPage() {
   const [positionData] = useState([
     { id: 1, name: "Nhân viên", point: 50, amount: 50000 },
@@ -60,18 +65,13 @@ export default function MonthlyPointPage() {
   );
 }
 
-/* =====================
-      COMPONENTS
-===================== */
+
 
 function Section({ title, actionLabel, children }) {
   return (
     <div className="bg-white border rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-semibold text-sm">{title}</h2>
-        {/* <button className="bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700">
-          + {actionLabel}
-        </button> */}
       </div>
       {children}
     </div>
@@ -96,10 +96,7 @@ function Table({ headers, data, renderRow }) {
             {renderRow(item)}
             <td className="px-4 py-2 flex gap-2">
               <button className="text-blue-600 hover:underline">
-                ✏️
-              </button>
-              <button className="text-red-500 hover:underline">
-                🗑️
+                <PencilIcon className="w-4 h-4" />
               </button>
             </td>
           </tr>

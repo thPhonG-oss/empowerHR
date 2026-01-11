@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
-// import axios from "axios"; 
+import pointApi from "../../api/pointApi";
 
 import Input from "../../components/common/Input";
 import Field from "../../components/common/Field";
+import{
+  PencilIcon,
+} from 'lucide-react';  
+
 
 const initialData = {
-  exchangeRate: 1000,
-  minPoint: 100,
-  maxPoint: 10000,
-  expiredTime: "1_year",
+  exchangeRate: 0,
+  minPoint: 0,
+  maxPoint: 0,
+  expiredTime: 0,
 };
 
 export default function RatePage() {
@@ -18,25 +22,28 @@ export default function RatePage() {
   const [errors, setErrors] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
 
-  /* ======================
-      MOCK FETCH DATA
-  ====================== */
-  useEffect(() => {
-    // async function fetchData() {
-    //   const res = await axios.get("/api/reward-policy/rate");
-    //   setFormData(res.data);
-    //   setOriginData(res.data);
-    // }
-    // fetchData();
 
-    // mock
-    setFormData(initialData);
-    setOriginData(initialData);
+  // Call api
+  useEffect(() => {
+    async function fetchData() {
+      const res = await pointApi.getCurrentPolicy();
+      const policy = res.result;
+      console.log("policy:", policy);
+
+      const mappedData = {
+      exchangeRate: policy.conversionRate,
+      minPoint: policy.minPoints,
+      maxPoint: policy.maxPoints,
+      expiredTime: policy.expiry,
+    };
+
+      setFormData(mappedData);
+      setOriginData(mappedData);
+    }
+    fetchData();
   }, []);
 
-  /* ======================
-        HANDLERS
-  ====================== */
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -92,9 +99,7 @@ export default function RatePage() {
     setIsEdit(false);
   };
 
-  /* ======================
-          RENDER
-  ====================== */
+
   return (
     <>
       <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-5xl">
@@ -109,7 +114,7 @@ export default function RatePage() {
               onClick={() => setIsEdit(true)}
               className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
             >
-              ✏️ Cập nhật
+              <PencilIcon className="w-4 h-4 mr-1 inline" /> Cập nhật
             </button>
           ) : (
             <div className="flex gap-2">
@@ -154,9 +159,9 @@ export default function RatePage() {
               disabled={!isEdit}
               className="w-full border border-gray-200 rounded px-3 py-2 disabled:bg-transparent hover:border-gray-400 focus:border-black-500 transition"
             >
-              <option value="6_month">6 tháng</option>
-              <option value="1_year">Một năm</option>
-              <option value="2_year">Hai năm</option>
+              <option value="180">6 tháng</option>
+              <option value="365">Một năm</option>
+              <option value="730">Hai năm</option>
             </select>
           </Field>
 
