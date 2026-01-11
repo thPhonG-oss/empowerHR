@@ -5,6 +5,7 @@ import com.hr_management.hr_management.dto.response.TransactionResponse;
 import com.hr_management.hr_management.entity.Employee;
 import com.hr_management.hr_management.entity.RunningActivity;
 import com.hr_management.hr_management.entity.Transaction;
+import com.hr_management.hr_management.enums.TransactionType;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.TransactionMapper;
@@ -54,6 +55,9 @@ public class TransactionServiceImpl implements TransactionService {
             res.setEmployeeName(
                     transaction.getPointAccount().getEmployee().getEmployeeName()
             );
+            res.setTransactionType(
+                    TransactionType.valueOf(transaction.getClass().getSimpleName())
+            );
 
             return res;
         });
@@ -84,11 +88,43 @@ public class TransactionServiceImpl implements TransactionService {
                     res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
                     res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
                     res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
+                    res.setTransactionType(
+                            TransactionType.valueOf(transaction.getClass().getSimpleName())
+                    );
 
                     return res;
                 })
                 .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<TransactionResponse> getTransactionById(Integer employeeId) {
+        // Find employee by ID
+        Employee employee = employeeRepository
+                .findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
+        // Get point account ID from employee
+        Integer pointAccountId = employee.getPointAccount().getPointAccountId();
+
+        // Get transactions for this employee's point account
+        List<Transaction> transactions = transactionRepository
+                .findByPointAccount_PointAccountIdOrderByCreateAtDesc(pointAccountId);
+
+        // Map to TransactionResponse
+        return transactions.stream()
+                .map(transaction -> {
+                    TransactionResponse res = transactionMapper.toTransactionResponse(transaction);
+
+                    res.setPointAccountId(transaction.getPointAccount().getPointAccountId());
+                    res.setEmployeeId(transaction.getPointAccount().getEmployee().getEmployeeId());
+                    res.setEmployeeName(transaction.getPointAccount().getEmployee().getEmployeeName());
+                    res.setTransactionType(
+                            TransactionType.valueOf(transaction.getClass().getSimpleName())
+                    );
+
+                    return res;
+                })
+                .collect(Collectors.toList());
     }
 }
