@@ -1,6 +1,7 @@
 import { useState } from "react";
 import employeeApi from "../../api/employeeApi";
 import toast from "react-hot-toast";
+import { X } from "lucide-react";
 
 function UpdateTimeSheetCard({ data, onClose }) {
   const [newCheckIn, setNewCheckIn] = useState(
@@ -42,77 +43,120 @@ function UpdateTimeSheetCard({ data, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* overlay */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/60" onClick={onClose}></div>
 
-      {/* popup */}
-      <div className="relative bg-white rounded-xl p-6 w-[430px] shadow-lg animate-fadeIn">
-        <h2 className="text-xl font-bold mb-4">Yêu cầu chỉnh sửa chấm công</h2>
+      {/* Modal */}
+      <div className="relative w-[440px] rounded-2xl bg-white p-6 shadow-xl animate-fadeIn">
+        <div className="flex justify-between items-center px-4 py-3 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Yêu cầu chỉnh sửa chấm công
+          </h2>
+          <button
+            className="p-2 rounded-lg hover:bg-red-50 transition cursor-pointer"
+            aria-label="Đóng"
+            onClick={onClose}
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        {/* Thông tin hiện tại */}
-        <div className="bg-gray-100 p-4 rounded-lg border border-gray-400 text-sm">
+        {/* Current info */}
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm space-y-1">
           <p>
-            <strong>Ngày:</strong> {data.date}
+            <span className="font-medium text-gray-600">Ngày:</span>{" "}
+            <span className="text-gray-900">{data.date}</span>
           </p>
           <p>
-            <strong>Check-in:</strong> {data.checkIn}
+            <span className="font-medium text-gray-600">Check-in:</span>{" "}
+            <span className="text-gray-900">{data.checkIn}</span>
           </p>
           <p>
-            <strong>Check-out:</strong> {data.checkOut}
+            <span className="font-medium text-gray-600">Check-out:</span>{" "}
+            <span className="text-gray-900">{data.checkOut}</span>
           </p>
         </div>
 
-        {/* Form chỉnh sửa */}
-        <div className="mt-4">
-          <h3 className="font-semibold mb-2 text-sm">Thông tin mới</h3>
+        {/* Form */}
+        <div className="mt-5">
+          <h3 className="mb-3 text-sm font-semibold text-gray-800">
+            Thông tin mới
+          </h3>
 
-          <div className="flex flex-col gap-3 text-sm">
+          <div className="space-y-4 text-sm">
             <div>
-              <label className="font-medium">Check-in</label>
+              <label className="mb-1 block font-medium text-gray-700">
+                Check-in
+              </label>
               <input
                 type="time"
-                className="border w-full p-2 rounded-md border-gray-400"
+                className="
+              w-full rounded-lg border border-gray-300 px-3 py-2
+              text-gray-900 outline-none
+              focus:border-black focus:ring-1 focus:ring-black
+            "
                 value={newCheckIn}
                 onChange={(e) => setNewCheckIn(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="font-medium">Check-out</label>
+              <label className="mb-1 block font-medium text-gray-700">
+                Check-out
+              </label>
               <input
                 type="time"
-                className="border w-full p-2 rounded-md border-gray-400"
+                className="
+              w-full rounded-lg border border-gray-300 px-3 py-2
+              text-gray-900 outline-none
+              focus:border-black focus:ring-1 focus:ring-black
+            "
                 value={newCheckOut}
                 onChange={(e) => setNewCheckOut(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="font-medium">Lý do</label>
+              <label className="mb-1 block font-medium text-gray-700">
+                Lý do
+              </label>
               <textarea
                 placeholder="Ví dụ: Quên chấm công, thiết bị lỗi..."
-                className="border w-full p-2 rounded-md h-20 border-gray-400"
+                className="
+              h-20 w-full resize-none rounded-lg border border-gray-300 px-3 py-2
+              text-gray-900 outline-none
+              focus:border-black focus:ring-1 focus:ring-black
+            "
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-              ></textarea>
+              />
             </div>
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-3 mt-5">
+        {/* Actions */}
+        <div className="mt-6 flex justify-end gap-3">
           <button
-            className="px-4 py-2 border border-gray-400 rounded-md hover:bg-gray-100"
             onClick={onClose}
             disabled={loading}
+            className="
+          rounded-lg border border-gray-300 px-4 py-2
+          text-sm font-medium text-gray-700
+          hover:bg-gray-100 transition cursor-pointer
+        "
           >
             Hủy
           </button>
 
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             onClick={handleSubmit}
             disabled={loading}
+            className="
+          rounded-lg bg-black px-4 py-2
+          text-sm font-medium text-white
+          hover:bg-gray-800 transition
+          disabled:opacity-50 cursor-pointer
+        "
           >
             {loading ? "Đang gửi..." : "Gửi yêu cầu"}
           </button>

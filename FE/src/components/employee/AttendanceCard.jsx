@@ -100,43 +100,59 @@ function AttendanceCard() {
 
   return (
     <>
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <div className="mb-4">
-          <h1 className="font-bold text-lg">Chấm công hôm nay</h1>
-          <p className="text-[#595959] text-sm">
+      <div className="rounded-2xl bg-white p-6 shadow-md border border-gray-100">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="font-semibold text-xl text-gray-900">
+            Chấm công hôm nay
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
             {dayOfWeek}, {day} tháng {month}, {year}
           </p>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center gap-6">
+          {/* Time info */}
           <div className="flex gap-4">
-            <div>
-              <p>Check-in</p>
-              <p className="inline-flex items-center gap-2">
-                <span>
-                  <Clock size={20} className="text-[#595959]" />
+            {/* Check-in */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 min-w-[120px]">
+              <p className="text-xs text-gray-500 mb-1">Check-in</p>
+              <div className="flex items-center gap-2">
+                <Clock size={18} className="text-gray-400" />
+                <span className="text-lg font-semibold text-gray-900">
+                  {checkInTime}
                 </span>
-                <span className="font-extrabold">{checkInTime}</span>
-              </p>
+              </div>
             </div>
-            <div>
-              <p>Check-out</p>
-              <p className="inline-flex items-center gap-2">
-                <span>
-                  <Clock size={20} className="text-[#595959]" />
+
+            {/* Check-out */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 min-w-[120px]">
+              <p className="text-xs text-gray-500 mb-1">Check-out</p>
+              <div className="flex items-center gap-2">
+                <Clock size={18} className="text-gray-400" />
+                <span className="text-lg font-semibold text-gray-900">
+                  {checkOutTime}
                 </span>
-                <span className="font-extrabold">{checkOutTime}</span>
-              </p>
+              </div>
             </div>
           </div>
 
+          {/* Action button */}
           <div>
             {isIn && !isOut && (
               <button
                 onClick={handleCheckIn}
-                className="inline-flex justify-center items-center gap-2 text-white bg-black p-2 rounded-lg cursor-pointer hover:opacity-80"
+                className="
+                inline-flex items-center gap-2
+                bg-black text-white
+                px-4 py-2.5 rounded-xl
+                font-medium
+                hover:bg-gray-800
+                active:scale-95
+                transition-all
+              "
               >
-                <LogIn />
+                <LogIn size={18} />
                 <span>Check-in</span>
               </button>
             )}
@@ -144,9 +160,18 @@ function AttendanceCard() {
             {!isIn && isOut && (
               <button
                 onClick={handleCheckOut}
-                className="inline-flex justify-center items-center gap-2 border text-black bg-white p-2 rounded-lg cursor-pointer hover:opacity-80"
+                className="
+                inline-flex items-center gap-2
+                bg-white text-gray-900
+                border border-gray-300
+                px-4 py-2.5 rounded-xl
+                font-medium
+                hover:bg-gray-100
+                active:scale-95
+                transition-all
+              "
               >
-                <LogOut />
+                <LogOut size={18} />
                 <span>Check-out</span>
               </button>
             )}

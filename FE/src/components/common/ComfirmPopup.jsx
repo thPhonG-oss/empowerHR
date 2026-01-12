@@ -3,10 +3,7 @@ function ConfirmPopup({ isOpen, onClose, message, onConfirm }) {
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-gray-600/10 backdrop-blur-xs z-50"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-gray-600/10 z-50" onClick={onClose} />
 
       <div className="fixed inset-0 flex items-center justify-center z-60 px-4">
         <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
