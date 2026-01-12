@@ -118,7 +118,8 @@ export default function ActivitiesRegistered({
                 Xem chi tiết
               </CustomButton>
 
-              {activity.runningActivity.status === "Active" &&
+              {(activity.runningActivity.status === "Active" ||
+                activity.runningActivity.status === "Open") &&
               !activity.isCancelled ? (
                 <CustomButton
                   variant="danger"
@@ -145,7 +146,7 @@ export default function ActivitiesRegistered({
                 </CustomButton>
               ) : activity.runningActivity.status === "Cancelled" ? (
                 <CustomButton
-                  variant="secondary"
+                  variant="orange2"
                   className="w-full cursor-not-allowed"
                 >
                   Hoạt động đã bị hủy

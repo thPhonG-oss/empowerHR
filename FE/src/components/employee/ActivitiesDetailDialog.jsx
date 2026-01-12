@@ -24,7 +24,7 @@ export default function ActivitiesDetailDialog({
     <CustomDialog isOpen={isOpen} onClose={onClose}>
       <div className="relative flex flex-col h-full max-h-[90vh] w-full max-w-4xl bg-white rounded-xl shadow-2xl">
         {/* HEADER STICKY */}
-        <div className="p-6 shadow-lg bg-gradient-to-r from-gray-900 to-gray-800 sticky top-0 z-20 flex justify-between items-start rounded-t-xl">
+        <div className="p-6 shadow-lg bg-black sticky top-0 z-20 flex justify-between items-start rounded-t-xl">
           <div className="flex-1 pr-4">
             <h2 className="text-2xl font-bold text-white mb-2 leading-tight">
               {selectedActivity.title}
@@ -35,7 +35,7 @@ export default function ActivitiesDetailDialog({
           </div>
           <button
             onClick={onClose}
-            className="hover:bg-white/10 p-2 rounded-lg cursor-pointer transition-all duration-200 flex-shrink-0 text-white hover:rotate-90 transform"
+            className="hover:bg-white/10 p-2 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-white hover:rotate-90 transform"
           >
             <X className="w-5 h-5" />
           </button>
@@ -47,7 +47,10 @@ export default function ActivitiesDetailDialog({
           {selectedActivity.image && (
             <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
               <img
-                src={selectedActivity.image || "/placeholder.svg"}
+                src={
+                  selectedActivity.image ||
+                  "https://res.cloudinary.com/dznocieoi/image/upload/v1766487761/istockphoto-1396814518-612x612_upvria.jpg"
+                }
                 alt={selectedActivity.title}
                 className="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500 grayscale-0 hover:grayscale-0"
               />
@@ -110,51 +113,53 @@ export default function ActivitiesDetailDialog({
           </div>
 
           {/* Rewards */}
-          <div className="mb-6 p-5 bg-white rounded-xl shadow-sm border border-gray-200">
-            <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800 text-lg">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Award className="w-5 h-5 text-gray-700" />
-              </div>
-              Phần thưởng
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border-2 border-gray-700 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                <div className="font-medium text-white mb-1 text-lg">
-                  🥇 Giải nhất
+          {isHistory && (
+            <div className="mb-6 p-5 bg-white rounded-xl shadow-sm border border-gray-200">
+              <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800 text-lg">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Award className="w-5 h-5 text-gray-700" />
                 </div>
-                <div className="text-gray-200 font-bold text-xl">
-                  {selectedActivity.top1Bonus} điểm
+                Phần thưởng
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-4 bg-gray-900  rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                  <div className="font-medium text-white mb-1 text-lg">
+                    Giải nhất
+                  </div>
+                  <div className="text-gray-200 font-bold text-xl">
+                    {selectedActivity.top1Bonus} điểm
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-4 bg-gradient-to-br from-gray-700 to-gray-600 rounded-xl border-2 border-gray-500 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                <div className="font-medium text-white mb-1 text-lg">
-                  🥈 Giải nhì
+                <div className="p-4 bg-gray-700 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                  <div className="font-medium text-white mb-1 text-lg">
+                    Giải nhì
+                  </div>
+                  <div className="text-gray-200 font-bold text-xl">
+                    {selectedActivity.top2Bonus} điểm
+                  </div>
                 </div>
-                <div className="text-gray-200 font-bold text-xl">
-                  {selectedActivity.top2Bonus} điểm
-                </div>
-              </div>
 
-              <div className="p-4 bg-gradient-to-br from-gray-500 to-gray-400 rounded-xl border-2 border-gray-400 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                <div className="font-medium text-white mb-1 text-lg">
-                  🥉 Giải ba
+                <div className="p-4 bg-gray-500 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                  <div className="font-medium text-white mb-1 text-lg">
+                    Giải ba
+                  </div>
+                  <div className="text-gray-100 font-bold text-xl">
+                    {selectedActivity.top3Bonus} điểm
+                  </div>
                 </div>
-                <div className="text-gray-100 font-bold text-xl">
-                  {selectedActivity.top3Bonus} điểm
-                </div>
-              </div>
 
-              <div className="p-4 bg-gradient-to-br from-gray-200 to-gray-100 rounded-xl border-2 border-gray-300 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                <div className="font-medium text-gray-900 mb-1 text-lg">
-                  ✅ Hoàn thành
-                </div>
-                <div className="text-gray-700 font-bold text-xl">
-                  {selectedActivity.completionBonus} điểm
+                <div className="p-4 bg-gray-200 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                  <div className="font-medium text-gray-900 mb-1 text-lg">
+                    Hoàn thành
+                  </div>
+                  <div className="text-gray-700 font-bold text-xl">
+                    {selectedActivity.completionBonus} điểm
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Rules */}
           {selectedActivity.rules && (
@@ -186,7 +191,7 @@ export default function ActivitiesDetailDialog({
               </div>
             ) : resultsError ? (
               <div className="p-4 bg-gray-100 border border-gray-300 rounded-lg">
-                <p className="text-sm text-gray-700">⚠️ Lỗi tải kết quả</p>
+                <p className="text-sm text-gray-700">Chưa có kết quả</p>
               </div>
             ) : activityResults ? (
               <div className="text-sm text-gray-700 bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
@@ -245,7 +250,7 @@ export default function ActivitiesDetailDialog({
             ) : (
               <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg text-center">
                 <p className="text-sm text-gray-600">
-                  📊 Chưa có kết quả cho hoạt động này.
+                  Chưa có kết quả cho hoạt động này.
                 </p>
               </div>
             )}
@@ -280,8 +285,6 @@ export default function ActivitiesDetailDialog({
                 <CustomButton
                   variant="danger"
                   onClick={() => {
-                    console.log(1, "hủy");
-                    console.log(2, selectedActivity?.runningActivityId);
                     handleUnregister(selectedActivity?.runningActivityId);
                   }}
                   className="cursor-pointer w-full"
@@ -293,7 +296,6 @@ export default function ActivitiesDetailDialog({
               <CustomButton
                 variant="danger"
                 onClick={() => {
-                  console.log(1, "hủy");
                   handleUnregister(
                     selectedActivity?.runningActivity?.runningActivityId
                   );
