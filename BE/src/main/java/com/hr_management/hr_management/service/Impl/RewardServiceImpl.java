@@ -2,10 +2,13 @@ package com.hr_management.hr_management.service.Impl;
 
 import com.hr_management.hr_management.dto.request.CashOutRequestDTO;
 import com.hr_management.hr_management.dto.request.PerformancePointGivenRequestDTO;
+import com.hr_management.hr_management.dto.request.PointPolicyUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.CashOutTransactionResponseDTO;
 import com.hr_management.hr_management.dto.response.PointPolicyResponseDTO;
 import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.enums.TransactionType;
+import com.hr_management.hr_management.exception.AppException;
+import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.PointPolicyMapper;
 import com.hr_management.hr_management.repository.*;
 import com.hr_management.hr_management.service.RewardService;
@@ -187,6 +190,32 @@ public class RewardServiceImpl implements RewardService {
                 .build();
 
         return responseDTO;
+    }
+
+    @Override
+    public List<PointPolicyResponseDTO> getAllPointPolicies() {
+        List<PointPolicy> policies = pointPolicyRepository.findAll();
+        List<PointPolicyResponseDTO> responseDTOs = policies.stream()
+                .map(pointPolicyMapper::toPointPolicyResponseDTO)
+                .toList();
+        return responseDTOs;
+    }
+
+    @Override
+    public PointPolicyResponseDTO updatePointPolicy(Integer id, PointPolicyUpdateRequestDTO requestDTO){
+        PointPolicy policy = pointPolicyRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.POINT_POLICY_NOT_FOUND));
+
+        policy.setExpiry(requestDTO.getExpiry());
+        policy.setMinPoints(requestDTO.getMinPoints());
+        policy.setMaxPoints(requestDTO.getMaxPoints());
+        policy.setConversionRate(requestDTO.getConversionRate());
+        policy.setEndDate(requestDTO.getEndDate());
+        policy.setIsActive(requestDTO.getIsActive()? true : false);
+        policy.setUpdatedAt(LocalDateTime.now());
+
+        PointPolicy updatedPolicy = pointPolicyRepository.save(policy);
+        return pointPolicyMapper.toPointPolicyResponseDTO(updatedPolicy);
     }
 
 }
