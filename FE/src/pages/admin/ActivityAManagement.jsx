@@ -161,7 +161,11 @@ export default function RunningActivityManagement() {
                   className="group bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden cursor-pointer"
                 >
                   <img
-                    src={act.image}
+                    src={
+                      act.image
+                        ? act.image
+                        : "https://res.cloudinary.com/dznocieoi/image/upload/v1766487761/istockphoto-1396814518-612x612_upvria.jpg"
+                    }
                     alt={act.title}
                     className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
