@@ -30,12 +30,14 @@ namespace EmpowerHR.Repositories
                 var totalCount = await _context.Employees.CountAsync();
 
                 var employees = await _context.Employees
+                    .Where(e => e.IsActive == true)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .Include(e => e.Department)
                     .Include(e => e.Bank)
                     .Include(e => e.Account)
                     .Include(e => e.Position)
+                    .Include(e => e.PointAccount) 
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -59,6 +61,8 @@ namespace EmpowerHR.Repositories
                     .Include(e => e.Bank)
                     .Include(e => e.Account)
                     .Include(e => e.Position)
+                    .Include(e => e.PointAccount)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(e => e.EmployeeId == id);
             }
             catch (Exception ex)

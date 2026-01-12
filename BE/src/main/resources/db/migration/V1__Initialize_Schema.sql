@@ -296,7 +296,7 @@ CREATE TABLE RunningActivity (
     end_date DATE,
     min_participant INT,
     max_participant INT,
-    status ENUM('Draft', 'Active', 'Completed', 'Cancelled') DEFAULT 'Draft',
+    status ENUM('Draft','Open', 'Active', 'Completed', 'Cancelled') DEFAULT 'Draft',
     target_distance INT,
     rules TEXT,
     completion_bonus INT,
@@ -349,7 +349,7 @@ CREATE TABLE Transaction (
     transaction_id INT PRIMARY KEY AUTO_INCREMENT,
     create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     points DECIMAL(10,2) NOT NULL,
-    transaction_type ENUM('CashOut', 'ActionReward', 'PerformanceReward', 'Other') NOT NULL,
+    transaction_type ENUM('CashOut', 'ActivityReward', 'PerformanceReward', 'Other') NOT NULL,
     point_account_id INT NOT NULL,
     CONSTRAINT fk_transaction_point_account FOREIGN KEY (point_account_id)
         REFERENCES PointAccount(point_account_id) ON DELETE CASCADE

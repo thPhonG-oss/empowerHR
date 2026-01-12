@@ -44,6 +44,7 @@ public class EmployeeController {
     private final RunningActivityService runningActivityService;
     private final JwtUtils jwtUtils;
     private final EmployeeRepository employeeRepository;
+    private final RewardService rewardService;
 
     // [ Employee ]
     // 1. Xem hồ sơ cá nhân
@@ -161,6 +162,20 @@ public class EmployeeController {
                 ApiResponse.<StravaConnectionsResponseDTO>builder()
                         .message("Strava connection retrieved successfully")
                         .result(employeeService.getStravaConnection(employeeId))
+                        .build()
+        );
+    }
+
+    // Redeem point for cash
+    @PostMapping("/redeem-points")
+    public ResponseEntity<ApiResponse<CashOutTransactionResponseDTO>> redeemPointsForCash(
+            @RequestBody CashOutRequestDTO requestDTO) {
+        CashOutTransactionResponseDTO responseDTO = rewardService.cashOutPoints(requestDTO);
+        return ResponseEntity.ok(
+                ApiResponse.<CashOutTransactionResponseDTO>builder()
+                        .code("1000")
+                        .message("Points redeemed for cash successfully.")
+                        .result(responseDTO)
                         .build()
         );
     }

@@ -26,31 +26,7 @@ namespace EmpowerHR.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Lấy danh sách tất cả nhân viên (không phân trang)
-        /// GET: /api/employee/list
-        /// </summary>
-        // [HttpGet("list")]
-        // public async Task<IActionResult> GetAllEmployees()
-        // {
-        //     try
-        //     {
-        //         var employees = await _employeeService.GetAllEmployeesAsync();
 
-        //         if (employees == null || !employees.Any())
-        //         {
-        //             return NotFound();
-        //         }
-
-        //         var employeeResponses = _mapper.Map<IEnumerable<EmployeeResponse>>(employees);
-        //         return Ok(employeeResponses);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError($"Lỗi GetAllEmployees: {ex.Message}");
-        //         return StatusCode(500);
-        //     }
-        // }
 
         /// <summary>
         /// Lấy danh sách nhân viên có phân trang
