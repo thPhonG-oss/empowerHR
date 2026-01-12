@@ -37,6 +37,7 @@ const EmployeeRewardPage = () => {
       setLoading(true);
       const response = await pointApi.getPointAllEmployees();
       const employeesData = response.data;
+      console.log("Employee: ",employeesData);
       setEmployees(employeesData);
       setLoading(false);
     } catch (error) {
@@ -286,6 +287,7 @@ const EmployeeRewardPage = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleViewHistory(employee)}
+                    
                     className="ml-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium flex items-center gap-2 flex-shrink-0"
                   >
                     <History className="w-4 h-4" />

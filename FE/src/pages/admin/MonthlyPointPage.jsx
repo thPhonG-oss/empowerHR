@@ -10,8 +10,8 @@ export default function MonthlyPointPage() {
   const [positionData,setPositionData] = useState([]);
 
   const [departmentData,setDepartmentData] = useState([]);
-  // call api get department budget data
   useEffect(() => {
+    // call api get department budget data
     const fetchDepartmentBudgets = async () => {
       try { 
         const response = await pointApi.getPointDerpartment();
@@ -26,10 +26,21 @@ export default function MonthlyPointPage() {
         console.error("Failed to fetch department budgets:", error);
       } 
     };
-
     fetchDepartmentBudgets();
-  }, []);
 
+    // call api get position point data
+    const fetchPositionPoints = async () => {
+      try {
+        const response = await pointApi.getPointPosition();
+        const positions = response.result;
+        setPositionData(positions);
+      } catch (error) {
+        console.error("Failed to fetch position points:", error);
+      }
+    };
+    fetchPositionPoints();
+
+  }, []);
 
 
   return (

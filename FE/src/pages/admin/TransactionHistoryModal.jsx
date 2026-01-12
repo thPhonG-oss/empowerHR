@@ -55,10 +55,10 @@ const TransactionHistoryModal = ({onClose, employee }) => {
   const getTransactionTypeInfo = (type, points) => {
     const isPositive = points > 0;
     const typeMap = {
-      'Earned': { label: 'Kiếm được', color: 'text-green-600 bg-green-50' },
-      'Redeemed': { label: 'Đổi thưởng', color: 'text-red-600 bg-red-50' },
-      'Bonus': { label: 'Thưởng', color: 'text-blue-600 bg-blue-50' },
-      'Transfer': { label: 'Chuyển điểm', color: 'text-orange-600 bg-orange-50' },
+      'CashOut': { label: 'Đổi tiền', color: 'text-red-600 bg-green-50' },
+      'ActivityReward': { label: 'Thưởng hoạt động', color: 'text-green-600 bg-red-50' },
+      'PerformanceReward': { label: 'Quản lý thưởng hiệu suất', color: 'text-blue-600 bg-blue-50' },
+      'MonthlyReward': { label: 'Thưởng hàng tháng', color: 'text-orange-600 bg-orange-50' },
       'Other': { label: 'Khác', color: 'text-gray-600 bg-gray-50' }
     };
     
@@ -108,6 +108,12 @@ const TransactionHistoryModal = ({onClose, employee }) => {
               <p className="text-sm text-gray-600 mb-1">Tổng điểm giao dịch</p>
               <p className="text-2xl font-bold text-green-600">
                 {formatNumber(employee?.totalEarns)}
+              </p>
+            </div>
+            <div className="bg-orange-50 rounded-lg p-4">
+              <p className="text-sm text-gray-600 mb-1">Điểm đã dùng</p>
+              <p className="text-2xl font-bold text-orange-600">
+                {formatNumber(employee?.totalTransferred)}
               </p>
             </div>
           </div>

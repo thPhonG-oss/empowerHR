@@ -29,9 +29,10 @@ export default function TransactionPage() {
 
   const getTransactionTypeName = (type) => {
     const typeMap = {
-      CashOut: "Đổi tiền thưởng",
-      ActivityReward: "Quản lý thưởng",
-      AdminGift: "Thưởng hoạt động",
+      CashOut: "Đổi tiền",
+      ActivityReward: "Thưởng hoạt động",
+      PerformanceReward: "Thưởng hiệu suất",
+      MonthlyReward: "Thưởng hàng tháng",
       Other: "Khác",
     }
     return typeMap[type] || type
@@ -42,7 +43,7 @@ export default function TransactionPage() {
     const colorMap = {
       CashOut: " text-red-800",
       ActivityReward: "text-blue-800",
-      AdminGift: "text-green-800",
+      PerformanceReward: "text-green-800",
     }
     return colorMap[type] || "text-gray-800"
   }
@@ -69,6 +70,8 @@ const validateDates = (start, end) => {
       try {
         const response = await pointApi.getAllTransactions()
         const data = response.result 
+        //console.log("trans ",data);
+        
         setTransactions(data)
       } catch (error) {
         console.error("Failed to fetch transactions:", error)
@@ -151,11 +154,12 @@ const validateDates = (start, end) => {
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500"
             >
-              <option>Tất cả</option>
-              <option>CashOut</option>
-              <option>ActivityReward</option>
-              <option>AdminGift</option>
-              <option>Other</option>
+             <option value="Tất cả">Tất cả</option>
+             <option value="CashOut">Đổi tiền</option>
+             <option value="ActivityReward">Thưởng hoạt động</option>
+             <option value="PerformanceReward">Thưởng hiệu suất</option>
+             <option value="MonthlyReward">Thưởng hàng tháng</option>
+             <option value="Other">Khác</option>
             </select>
           </div>
 
@@ -223,13 +227,7 @@ const validateDates = (start, end) => {
           </div>
 
           {/* Buttons */}
-          <div className="flex items-end justify-end gap-2">
-            <button
-              onClick={() => {}}
-              className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-            >
-              Lọc
-            </button>
+          <div className="ml-15 flex items-end justify-start">
 
             <button
               onClick={handleReset}
@@ -267,14 +265,14 @@ const validateDates = (start, end) => {
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${getTransactionTypeColor(transaction.transactionType)}`}
                     >
-                      {getTransactionTypeName(transaction.transactionType
-)}
+                      {getTransactionTypeName(transaction.transactionType)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {transaction.transactionType === "CashOut" && "Đổi tiền thưởng từ điểm tích lũy"}
                     {transaction.transactionType === "ActivityReward" && "Điểm thưởng từ hoạt động"}
-                    {transaction.transactionType === "AdminGift" && "Quản lý thưởng điểm cho nhân viên"}
+                    {transaction.transactionType === "PerformanceReward" && "Quản lý thưởng điểm cho nhân viên"}
+                    {transaction.transactionType === "MonthlyReward" && "Phân bổ điểm thưởng hàng tháng"}
                     {transaction.transactionType === "Other" && "Khác"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{transaction.employeeName}</td>
