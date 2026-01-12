@@ -1,5 +1,7 @@
 package com.hr_management.hr_management.service;
 
+import com.hr_management.hr_management.dto.request.DepartmentPointRequest;
+import com.hr_management.hr_management.dto.response.DeparmentPointResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponseDTO;
 import com.hr_management.hr_management.dto.response.EmployeesOfDepartmentResponseDTO;
@@ -13,4 +15,5 @@ public interface DepartmentService {
     EmployeesOfDepartmentResponseDTO getAllEmployeesOfDepartment(Integer departmentId, Integer pageNumber, Integer pageSize);
 
     Department getDepartmentOfManager();
+    DeparmentPointResponse updatePointDeparment(Integer deparmentId,DepartmentPointRequest departmentPointRequest);
 }

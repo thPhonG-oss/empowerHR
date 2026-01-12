@@ -54,7 +54,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<ActivityResponseDto> getAllActivity() {
         List<ActivityResponseDto> activityResponseDtos=activityRepository.findAllByStatusIn(
-                List.of(ActivityStatus.Active, ActivityStatus.Completed)
+                List.of(ActivityStatus.Active, ActivityStatus.Open)
         ).stream().map(runningActivityMapper::toActivityResponseDto).toList();
         activityResponseDtos.forEach(activityResponseDto -> {
             activityResponseDto.setNumberRegistered(participateInRepository.countByRunningActivity_RunningActivityIdAndIsCancelledFalse(activityResponseDto.getRunningActivityId()));

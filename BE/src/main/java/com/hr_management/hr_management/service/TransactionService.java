@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import java.util.List;
 
 public interface TransactionService {
-    Page<TransactionResponse> getAllTransaction(Integer pageNumber, Integer pageSize);
+    List<TransactionResponse> getAllTransaction();
     List<TransactionResponse> getMyTransaction(JwtAuthenticationToken jwtAuthenticationToken);
     List<TransactionResponse> getTransactionById(Integer employeeId);
 
