@@ -5,10 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MonthlyRewardRepository extends JpaRepository<MonthlyReward, Integer> {
     @Query(
             value = "SELECT mr FROM MonthlyReward mr WHERE mr.position.positionId = ?1 AND mr.pointPolicy.pointPolicyId = ?2"
     )
     MonthlyReward findByPositionIdAndPointPolicy_PointPolicyId(Integer positionId, Integer pointPolicyId);
+
+    List<MonthlyReward> findAllByIsActive_True();
 }
