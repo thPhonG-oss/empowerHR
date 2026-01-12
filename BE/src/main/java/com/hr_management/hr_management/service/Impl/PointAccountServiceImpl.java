@@ -54,6 +54,7 @@ public class PointAccountServiceImpl implements PointAccountService {
                     dto.setPositionId(pointAccount.getEmployee().getPosition().getPositionId());
 
 
+
                     return dto;
                 })
                 .collect(Collectors.toList());

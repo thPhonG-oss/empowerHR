@@ -1,6 +1,8 @@
 package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.request.ApiResponse;
+import com.hr_management.hr_management.dto.request.DepartmentPointRequest;
+import com.hr_management.hr_management.dto.response.DeparmentPointResponse;
 import com.hr_management.hr_management.service.DepartmentService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,5 +44,11 @@ public class DepartmentController {
                         .result(departmentService.getAllEmployeesOfDepartment(departmentId, pageNumber, pageSize))
                         .build()
         );
+    }
+    @PutMapping("/{departmentId}/points")
+    public  ApiResponse<DeparmentPointResponse> updatePointDeparment(@PathVariable Integer departmentId, @RequestBody DepartmentPointRequest departmentPointRequest){
+        return ApiResponse.<DeparmentPointResponse>builder()
+                .result(departmentService.updatePointDeparment(departmentId,departmentPointRequest))
+                .build();
     }
 }
