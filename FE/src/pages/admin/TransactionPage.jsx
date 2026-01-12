@@ -70,7 +70,6 @@ const validateDates = (start, end) => {
         const response = await pointApi.getAllTransactions()
         const data = response.result 
         setTransactions(data)
-        console.log("trans:",transactions);
       } catch (error) {
         console.error("Failed to fetch transactions:", error)
       }

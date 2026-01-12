@@ -28,8 +28,6 @@ export default function RatePage() {
     async function fetchData() {
       const res = await pointApi.getCurrentPolicy();
       const policy = res.result;
-      console.log("policy:", policy);
-
       const mappedData = {
       exchangeRate: policy.conversionRate,
       minPoint: policy.minPoints,
@@ -83,8 +81,6 @@ export default function RatePage() {
   const confirmSave = async () => {
     try {
       // await axios.put("/api/reward-policy/rate", formData);
-
-      console.log("Saved:", formData);
       setOriginData(formData);
       setIsEdit(false);
       setShowConfirm(false);
@@ -112,7 +108,7 @@ export default function RatePage() {
           {!isEdit ? (
             <button
               onClick={() => setIsEdit(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+              className="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
             >
               <PencilIcon className="w-4 h-4 mr-1 inline" /> Cập nhật
             </button>

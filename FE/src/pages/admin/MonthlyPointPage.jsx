@@ -15,7 +15,6 @@ export default function MonthlyPointPage() {
     const fetchDepartmentBudgets = async () => {
       try { 
         const response = await pointApi.getPointDerpartment();
-        console.log("Department Budgets:", response.data);
         const budgets = response.data.map((dept) => ({
           id: dept.departmentId,
           name: dept.departmentName,

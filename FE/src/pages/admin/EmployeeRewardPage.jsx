@@ -4,6 +4,7 @@ import Fuse from 'fuse.js';
 import positionApi from '../../api/positionApi';
 import departmentApi from '../../api/departmentApi';
 import pointApi from '../../api/pointApi';
+import TransactionHistoryModal from './TransactionHistoryModal';
 
 const EmployeeRewardPage = () => {
 
@@ -17,6 +18,11 @@ const EmployeeRewardPage = () => {
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+
+
   const itemsPerPage = 6;
 
   // Fetch data
@@ -115,8 +121,8 @@ const EmployeeRewardPage = () => {
   };
 
   const handleViewHistory = (employee) => {
-    console.log('View history for:', employee);
-    // TODO: Navigate to history page or open modal
+    setShowHistoryModal(true);
+    setSelectedEmployee(employee);
   };
 
   if (loading) {
@@ -143,7 +149,7 @@ const EmployeeRewardPage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Nhập tên, ID hoặc email.."
+                placeholder="Nhập tên nhân viên"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -280,7 +286,7 @@ const EmployeeRewardPage = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleViewHistory(employee)}
-                    className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2 flex-shrink-0"
+                    className="ml-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium flex items-center gap-2 flex-shrink-0"
                   >
                     <History className="w-4 h-4" />
                     Lịch sử
@@ -352,6 +358,13 @@ const EmployeeRewardPage = () => {
           )}
         </div>
       </div>
+
+      {showHistoryModal && (
+        <TransactionHistoryModal
+          onClose={() => setShowHistoryModal(false)}
+          employee={selectedEmployee}
+        />
+      )}
     </div>
   );
 };
