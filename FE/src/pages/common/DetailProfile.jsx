@@ -94,43 +94,62 @@ function DetailProfile({}) {
       : "Hồ sơ của tôi";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto space-y-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
+      <div className="mx-auto space-y-8">
         {/* Header */}
         <Header title="Hồ sơ" icon={Contact} />
-        {/* Header với nút chỉnh sửa nổi bật */}
-        <div className="px-8">
+
+        {/* Main Content */}
+        <div className="px-8 pb-8">
           <GoBackLink />
 
-          <div className="mb-4 flex items-center justify-between rounded-lg bg-white p-6 shadow-sm">
-            <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
-            {canEdit && editPath && (
-              <Link
-                to={editPath}
-                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 shadow-md"
-                title="Chỉnh sửa"
-              >
-                <PenLine className="h-4 w-4" />
-                Chỉnh sửa
-              </Link>
-            )}
+          {/* Header Card với Gradient Border */}
+          <div className="mb-8 overflow-hidden rounded-2xl shadow-2xl">
+            <div className="flex items-center justify-between rounded-2xl bg-white p-8">
+              <div>
+                <h1 className="text-3xl font-bold bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                  {pageTitle}
+                </h1>
+                <p className="mt-2 text-sm text-gray-500">
+                  Xem thông tin chi tiết hồ sơ nhân viên
+                </p>
+              </div>
+              {canEdit && editPath && (
+                <Link
+                  to={editPath}
+                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gray-900 px-6 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-xl hover:scale-105"
+                  title="Chỉnh sửa"
+                >
+                  <div className="absolute inset-0 bg-linear-to-r from-gray-700 to-gray-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <PenLine className="relative h-4 w-4 transition-transform group-hover:rotate-12" />
+                  <span className="relative">Chỉnh sửa</span>
+                </Link>
+              )}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Card 1: Thông tin cơ bản - Không thể sửa */}
-            <div className="rounded-lg bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Card 1: Thông tin cơ bản */}
+            <div className="group rounded-2xl bg-white p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-gray-900 to-gray-700 shadow-lg">
+                  <Contact className="h-6 w-6 text-white" />
+                </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-xl font-bold text-gray-900">
                     Thông tin cơ bản
                   </h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Dữ liệu nhân sự chính thức
+                  </p>
                 </div>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+
+              <div className="grid gap-5 sm:grid-cols-2">
                 <InfoField label="Họ và tên" value={profile?.employeeName} />
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField label="Tên phòng ban" value={departmentName} />
                 <InfoField label="Vị trí" value={positionName} />
-
                 <InfoField
                   label="Tài khoản ngân hàng"
                   value={`${profile?.bankAccountNumber} - ${profile?.bank}`}
@@ -150,16 +169,24 @@ function DetailProfile({}) {
                 />
               </div>
             </div>
-            {/* Card 2: Thông tin liên hệ - Có thể sửa */}
-            <div className="rounded-lg bg-white p-6 shadow-sm">
-              <div className="mb-4">
+
+            {/* Card 2: Thông tin liên hệ */}
+            <div className="group rounded-2xl bg-white p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-gray-700 to-gray-500 shadow-lg">
+                  <Phone className="h-6 w-6 text-white" />
+                </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-xl font-bold text-gray-900">
                     Thông tin liên hệ
                   </h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Thông tin có thể cập nhật
+                  </p>
                 </div>
               </div>
-              <div className="space-y-4">
+
+              <div className="space-y-5">
                 <ContactField
                   icon={MapPin}
                   label="Địa chỉ"

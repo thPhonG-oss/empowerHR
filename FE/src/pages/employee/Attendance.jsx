@@ -1,6 +1,5 @@
 import { CalendarClock } from "lucide-react";
 import Header from "../../components/common/Header";
-
 import UpdateTimeSheetCard from "../../components/employee/UpdateTimeSheetCard";
 import AttendanceCard from "../../components/employee/AttendanceCard";
 import { getRecentYears } from "../../utils/years";
@@ -8,7 +7,6 @@ import { getMonths } from "../../utils/months";
 import employeeApi from "../../api/employeeApi";
 import formatDate from "../../utils/formatDate";
 import getDayOfWeek from "../../utils/dayOfWeek";
-
 import { useEffect, useState } from "react";
 
 const statusColor = {
@@ -30,12 +28,12 @@ const statusText = {
 function Attendance() {
   const years = getRecentYears();
   const months = getMonths();
+
   const [attendances, setAttendances] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState(null);
 
-  // state bộ lọc
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
 
@@ -71,6 +69,7 @@ function Attendance() {
             item.checkoutTime
           ),
         }));
+
         setAttendances(formatted);
       } catch (error) {
         console.error("Failed to get attendances", error);
@@ -84,37 +83,38 @@ function Attendance() {
     const m = Number(month);
     const y = Number(year);
 
-    const result = attendances.filter((a) => {
-      const d = new Date(a.dateRaw);
-      return d.getMonth() + 1 === m && d.getFullYear() === y;
-    });
-
-    setFiltered(result);
+    setFiltered(
+      attendances.filter((a) => {
+        const d = new Date(a.dateRaw);
+        return d.getMonth() + 1 === m && d.getFullYear() === y;
+      })
+    );
   }, [month, year, attendances]);
 
   return (
-    <main className="p-0">
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+    <main>
+      <div className="min-h-screen bg-gray-50">
         <Header title="Bảng chấm công" icon={CalendarClock} />
 
-        <div className="flex flex-col justify-start gap-6 p-4">
+        <div className="flex flex-col gap-6 p-4">
           <AttendanceCard />
 
-          <div className="rounded-lg bg-white shadow-sm">
-            <div className="px-6 pt-6 flex justify-between shadow-lg">
-              <div className="mb-4">
-                <h1 className="font-bold text-lg">
+          <div className="rounded-2xl bg-white shadow-sm border border-gray-100">
+            {/* Header + Filter */}
+            <div className="flex justify-between items-center px-6 pt-6">
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
                   Chi tiết lịch sử chấm công
                 </h1>
-                <p className="text-[#595959] text-sm">
+                <p className="mt-1 text-sm text-gray-500">
                   Lịch sử check-in, check-out hằng ngày
                 </p>
               </div>
 
-              {/* FILTER */}
-              <div className="h-fit flex gap-4">
+              <div className="flex gap-3">
                 <select
-                  className="border border-gray-300 rounded-md p-2 cursor-pointer"
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                             focus:border-black focus:ring-1 focus:ring-black"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
@@ -126,7 +126,8 @@ function Attendance() {
                 </select>
 
                 <select
-                  className="border border-gray-300 rounded-md p-2 cursor-pointer"
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm
+                             focus:border-black focus:ring-1 focus:ring-black"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
@@ -139,10 +140,12 @@ function Attendance() {
               </div>
             </div>
 
-            {/* TABLE */}
-            <div className="w-full mt-4 px-6">
-              {/* Header */}
-              <div className="grid grid-cols-8 font-semibold border-b border-gray-300 py-3 text-sm">
+            {/* Table */}
+            <div className="mt-4 px-6">
+              <div
+                className="grid grid-cols-8 border-b border-gray-200 py-3
+                              text-sm font-semibold text-gray-700"
+              >
                 <div>STT</div>
                 <div>Ngày</div>
                 <div>Thứ</div>
@@ -150,14 +153,14 @@ function Attendance() {
                 <div>Check-out</div>
                 <div>Giờ làm</div>
                 <div>Trạng thái</div>
-                <div className="text-start">Hành động</div>
+                <div className="text-center">Thao tác</div>
               </div>
 
-              {/* BODY */}
               {filtered.map((att, index) => (
                 <div
                   key={att.id}
-                  className="grid grid-cols-8 py-3 border-t border-gray-300 text-sm items-center hover:bg-gray-100"
+                  className="grid grid-cols-8 items-center py-3 text-sm
+                             border-t border-gray-100 hover:bg-gray-50"
                 >
                   <div>{index + 1}</div>
                   <div>{att.date}</div>
@@ -181,7 +184,7 @@ function Attendance() {
                       setSelectedAttendance(att);
                       setShowPopup(true);
                     }}
-                    className="w-fit text-blue-600 cursor-pointer hover:underline text-center"
+                    className="text-sm font-medium text-blue-700 hover:underline cursor-pointer"
                   >
                     Cập nhật
                   </button>
@@ -189,7 +192,7 @@ function Attendance() {
               ))}
 
               {filtered.length === 0 && (
-                <p className="text-center py-6 text-gray-500 text-sm">
+                <p className="py-6 text-center text-sm text-gray-500">
                   Không có dữ liệu chấm công
                 </p>
               )}
@@ -197,6 +200,7 @@ function Attendance() {
           </div>
         </div>
       </div>
+
       {showPopup && (
         <UpdateTimeSheetCard
           data={selectedAttendance}

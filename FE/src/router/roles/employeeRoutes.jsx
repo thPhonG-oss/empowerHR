@@ -23,7 +23,7 @@ const employeeRoutes = [
       { path: "profile", element: <DetailProfile /> },
       { path: "profile/edit", element: <EditProfile /> },
       { path: "attendance", element: <Attendance /> },
-      { path: "leavee", element: <LeaveRequest /> },
+      { path: "leave", element: <LeaveRequest /> },
       { path: "request-history", element: <HistoryRequests /> },
       { path: "activities", element: <ActivitiesOpening /> },
       { path: "rewards", element: <Rewards /> },
