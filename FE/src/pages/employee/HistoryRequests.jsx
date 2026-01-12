@@ -158,7 +158,7 @@ export default function HistoryRequests() {
       <div className="mx-auto">
         <Header title="Lịch sử yêu cầu" icon={History} />
 
-        <div className="px-4">
+        <div className="px-4 mt-4">
           <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
             <div className="flex gap-8 border-b border-gray-200 mb-6">
               {tabs.map((tab) => (

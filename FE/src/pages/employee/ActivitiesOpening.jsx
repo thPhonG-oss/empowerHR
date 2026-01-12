@@ -250,7 +250,7 @@ export default function ActivitiesOpening() {
     <div className="min-h-screen bg-gray-50">
       <Header title="Hoạt động" icon={Activity} />
 
-      <div className="px-4 rounded-lg flex flex-col gap-4">
+      <div className="px-4 rounded-lg flex flex-col gap-4 mt-4">
         {/* SEARCH + SORT */}
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex items-center gap-3 mb-4">

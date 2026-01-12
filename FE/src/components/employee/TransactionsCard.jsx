@@ -155,7 +155,7 @@ function TransactionsCard() {
       {allTransactions.length > PREVIEW_LIMIT && (
         <div className="flex justify-center mt-4 pt-3 border-t border-gray-100">
           <button
-            className="text-blue-600 font-medium flex items-center gap-2 hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors duration-150"
+            className="cursor-pointer text-black font-medium flex items-center gap-2 hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors duration-150"
             onClick={() => setShowAll((prev) => !prev)}
           >
             {showAll ? "Thu gọn" : "Xem tất cả"}
