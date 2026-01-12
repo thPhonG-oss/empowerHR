@@ -15,7 +15,7 @@ export default function CustomDialog({ isOpen, onClose, children }) {
           relative bg-white rounded-xl shadow-2xl 
           max-w-2xl w-full 
           max-h-[90vh] 
-          overflow-hidden   /* 🔥 Quan trọng: NGĂN scroll ngoài! */
+          overflow-hidden   
           m-4 
           animate-[scale-in_0.2s_ease-out]
         "
@@ -23,7 +23,7 @@ export default function CustomDialog({ isOpen, onClose, children }) {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+          className="absolute top-4 right-4 text-gray-400 hover:bg-red-100 transition-colors z-10"
         >
           <svg
             className="w-6 h-6"

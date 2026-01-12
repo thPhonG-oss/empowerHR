@@ -1,13 +1,14 @@
 // Services/EmployeeService.cs
 using EmpowerHR.Models;
 using EmpowerHR.Repositories;
+using EmpowerHR.DTOs.Response;
 using EmpowerHR.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
+using EmpowerHR.Dtos.Employee;
 namespace EmpowerHR.Services
 {
     public class EmployeeService : IEmployeeService
@@ -83,6 +84,29 @@ namespace EmpowerHR.Services
                 _logger.LogError($"Lỗi khi xóa nhân viên ID {id}: {ex.Message}");
                 throw;
             }
+
         }
+
+        public async Task<PagedResult<EmployeeResponseDto>>
+        GetEmployeesByDepartmentAsync(int departmentId, int page, int pageSize)
+            {
+                if (departmentId <= 0)
+                    throw new ArgumentException("DepartmentId không hợp lệ");
+
+                if (page <= 0) page = 1;
+                if (pageSize <= 0 || pageSize > 100) pageSize = 10;
+
+                return await _employeeRepository
+                    .GetEmployeesByDepartmentAsync(departmentId, page, pageSize);
+            }
+
+        public async Task SoftDeleteEmployeeAsync(int id)
+        {
+            // Bạn có thể thêm logic kiểm tra quyền, logging, validation...
+            await _employeeRepository.SoftDeleteAsync(id);
+        }
+
+
     }
+        
 }
