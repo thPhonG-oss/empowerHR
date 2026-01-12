@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmpowerHR.Dtos.Employee;     // PositionResponse, DepartmentResponse, BankResponse
+using EmpowerHR.Models.Enums;
 
 namespace EmpowerHR.Repositories
 {
@@ -57,7 +59,6 @@ namespace EmpowerHR.Repositories
                     .Include(e => e.Bank)
                     .Include(e => e.Account)
                     .Include(e => e.Position)
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(e => e.EmployeeId == id);
             }
             catch (Exception ex)
@@ -86,6 +87,87 @@ namespace EmpowerHR.Repositories
             {
                 throw new Exception($"Lỗi khi xóa nhân viên: {ex.Message}");
             }
+        }
+
+
+        public async Task<PagedResult<EmployeeResponseDto>> GetEmployeesByDepartmentAsync(int departmentId, int page, int pageSize)
+        {
+            var query = _context.Employees
+                .AsNoTracking()
+                .Where(e => e.DepartmentId == departmentId && e.IsActive);
+
+            var totalItems = await query.CountAsync();
+
+            // Lấy dữ liệu ra memory trước
+            var employeesData = await query
+                .OrderBy(e => e.EmployeeName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Include(e => e.Position)
+                .Include(e => e.Department)
+                .Include(e => e.Bank)
+                .ToListAsync();
+
+            // Map sang DTO trong memory
+            var employees = employeesData.Select(e => new EmployeeResponseDto
+            {
+                EmployeeId = e.EmployeeId,
+                EmployeeCode = e.EmployeeCode,
+                EmployeeName = e.EmployeeName,
+                IdentityCard = e.IdentityCard,
+                Address = e.Address,
+                DateOfBirth = e.DateOfBirth,
+                Gender = string.IsNullOrEmpty(e.Gender) ? null : Enum.Parse<Gender>(e.Gender),
+                Email = e.Email,
+                PhoneNumber = e.PhoneNumber,
+                StartingDate = e.StartingDate,
+                IsActive = e.IsActive,
+                CreatedAt = e.CreatedAt,
+                UpdatedAt = e.UpdatedAt,
+                TaxCode = e.TaxCode,
+                PointBalance = e.PointAccount != null ? e.PointAccount.CurrentPoints : 0,
+
+                Position = e.Position == null ? null : new PositionResponse
+                {
+                    PositionId = e.Position.PositionId,
+                    PositionName = e.Position.PositionName
+                },
+
+                Department = e.Department == null ? null : new DepartmentResponse
+                {
+                    DepartmentId = e.Department.DepartmentId,
+                    DepartmentName = e.Department.DepartmentName,
+                    PointBalance = e.Department?.PointBalance ?? 0
+                },
+
+                Bank = e.Bank == null ? null : new BankResponse
+                {
+                    BankId = e.Bank.BankId,
+                    BankName = e.Bank.BankName,
+                    Branch = e.Bank.Branch,
+                    BankAccountNumber = e.Bank.BankAccountNumber
+                }
+            }).ToList();
+
+            return new PagedResult<EmployeeResponseDto>
+            {
+                Items = employees,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+        public async Task SoftDeleteAsync(int id)
+        {
+            var employee = await GetByIdAsync(id);
+            if (employee == null)
+                throw new KeyNotFoundException($"Không tìm thấy nhân viên với ID {id}");
+
+            if (!employee.IsActive)
+                throw new InvalidOperationException($"Nhân viên {employee.EmployeeName} đã bị xóa trước đó");
+
+            employee.IsActive = false; // đánh dấu xóa mềm
+            await _context.SaveChangesAsync();
         }
 
 
