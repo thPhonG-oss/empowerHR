@@ -47,15 +47,15 @@ export default function ActivitiesOpening() {
   //=====================================================
   // PROFILE
   //=====================================================
+  const fetchProfile = async () => {
+    try {
+      const profileRes = await employeeApi.getMyProfile();
+      setEmployeeID(profileRes.result.employeeId);
+    } catch (error) {
+      setError(error);
+    }
+  };
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profileRes = await employeeApi.getMyProfile();
-        setEmployeeID(profileRes.result.employeeId);
-      } catch (error) {
-        setError(error);
-      }
-    };
     fetchProfile();
   }, []);
 
@@ -108,7 +108,7 @@ export default function ActivitiesOpening() {
     try {
       const response = await runningActivityApi.employeeGetAllOpeningActivity();
       const filterActivities = response.result.filter(
-        (a) => a.status === "Active"
+        (a) => a.status === "Active" || a.status === "Open"
       );
 
       setActivities(filterActivities || []);
@@ -129,7 +129,6 @@ export default function ActivitiesOpening() {
   //=====================================================
   const handleRegister = async (activity) => {
     try {
-      console.log("ID hoạt động", activity.runningActivityId);
       await runningActivityApi.employeeRegisterActivity(
         activity.runningActivityId
       );
@@ -164,16 +163,17 @@ export default function ActivitiesOpening() {
     }
   };
 
-  const handleUnregister = async (participateInId) => {
+  const handleUnregister = async (id) => {
     try {
-      const res = await runningActivityApi.employeeUnregisterActivity(
-        participateInId
-      );
-      console.log(res);
+      const res = await runningActivityApi.employeeUnregisterActivity(id);
       toast.success("Hủy đăng ký hoạt động thành công");
     } catch (error) {
-      console.error("Hủy đăng ký thất bại", error);
-      toast.error("Hủy đăng ký hoạt động không thành công");
+      console.error("Hủy đăng ký thất bại", error.status);
+      if (error.status) {
+        toast.error("Đã quá hạn chỉnh sửa đăng ký");
+      } else {
+        toast.error("Hủy đăng ký thất bại");
+      }
     }
   };
 
@@ -401,19 +401,22 @@ export default function ActivitiesOpening() {
       </div>
 
       {/* POPUP DETAIL */}
-      <ActivitiesDetailDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        selectedActivity={selectedActivity}
-        formatDate={formatDate}
-        activityResults={activityResults}
-        resultsLoading={resultsLoading}
-        resultsError={resultsError}
-        handleRegister={handleRegister}
-        handleUnregister={handleUnregister}
-        isFull={isFull}
-        isHistory={currentView === "registered" ? true : false}
-      />
+      {selectedActivity && (
+        <ActivitiesDetailDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          selectedActivity={selectedActivity}
+          formatDate={formatDate}
+          activityResults={activityResults}
+          resultsLoading={resultsLoading}
+          resultsError={resultsError}
+          handleRegister={handleRegister}
+          handleUnregister={handleUnregister}
+          isFull={isFull}
+          isHistory={currentView === "registered" ? true : false}
+          isCancelled={activityResults?.isCancelled}
+        />
+      )}
     </div>
   );
 }
