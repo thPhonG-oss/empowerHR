@@ -89,7 +89,6 @@ function Attendance() {
       return d.getMonth() + 1 === m && d.getFullYear() === y;
     });
 
-    console.log(result);
     setFiltered(result);
   }, [month, year, attendances]);
 
