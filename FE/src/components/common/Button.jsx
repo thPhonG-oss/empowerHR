@@ -18,6 +18,8 @@ export default function CustomButton({
     orange:
       "bg-orange-500 text-white hover:bg-orange-600 focus:ring-orange-400",
     green: "bg-green-500 text-white hover:bg-green-600 focus:ring-green-400",
+    blue: "bg-white text-blue-600 border border-blue-400",
+
     link: "text-blue-600 hover:text-blue-700 hover:underline p-0",
   };
 

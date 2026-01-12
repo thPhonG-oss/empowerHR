@@ -18,24 +18,24 @@ export default function ActivitiesRegistered({
   const [loading, setLoading] = useState(true);
   const [change, setChange] = useState(0);
 
+  const fetchRegistered = async () => {
+    try {
+      const res = await runningActivityApi.employeeGetAllRegisteredActivity(
+        employeeID
+      );
+
+      console.log(res.result);
+
+      setRegisteredActivities(res.result || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!employeeID) return;
-
-    const fetchRegistered = async () => {
-      try {
-        const res = await runningActivityApi.employeeGetAllRegisteredActivity(
-          employeeID
-        );
-
-        console.log(res.result);
-
-        setRegisteredActivities(res.result || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchRegistered();
   }, [employeeID]);
@@ -69,7 +69,7 @@ export default function ActivitiesRegistered({
         );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {filteredActivities.map((activity) => (
         <CustomCard key={activity.participateInId}>
           {/* UI GIỮ NGUYÊN */}
@@ -123,7 +123,13 @@ export default function ActivitiesRegistered({
                 <CustomButton
                   variant="danger"
                   onClick={() => {
-                    handleUnregister(activity.participateInId);
+                    console.log(2, "hủy");
+                    handleUnregister(
+                      activity?.runningActivity?.runningActivityId
+                    );
+                    setTimeout(() => {
+                      fetchRegistered();
+                    }, 2000);
                     setChange(change - 1);
                   }}
                   className="cursor-pointer w-full"
@@ -132,7 +138,7 @@ export default function ActivitiesRegistered({
                 </CustomButton>
               ) : activity.runningActivity.status === "Completed" ? (
                 <CustomButton
-                  variant="secondary"
+                  variant="blue"
                   className="w-full cursor-not-allowed"
                 >
                   Đã kết thúc
