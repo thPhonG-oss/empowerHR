@@ -86,27 +86,75 @@ namespace EmpowerHR.Controllers
         /// Xóa nhân viên
         /// DELETE: /api/employee/{id}
         /// </summary>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        [HttpGet("department/{departmentId}")]
+        public async Task<IActionResult> GetByDepartment(
+    int departmentId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10)
+        {
+            var pagedResult = await _employeeService.GetEmployeesByDepartmentAsync(departmentId, page, pageSize);
+
+            if (pagedResult.TotalItems == 0)
+            {
+                return NotFound(new
+                {
+                    code = "1001",
+                    message = "Không có nhân viên trong phòng ban này",
+                    result = (object)null
+                });
+            }
+
+            var response = new
+            {
+                code = "1000",
+                message = "Success",
+                result = new
+                {
+                    employeeResponseDTOS = pagedResult.Items,
+                    pageNumber = pagedResult.Page,
+                    pageSize = pagedResult.PageSize,
+                    totalPages = pagedResult.TotalPages,
+                    totalElements = pagedResult.TotalItems,
+                    lastPage = pagedResult.Page >= pagedResult.TotalPages
+                }
+            };
+
+            return Ok(response);
+        }
+
+        [HttpDelete("soft/{id}")]
+        public async Task<IActionResult> SoftDeleteEmployee(int id)
         {
             try
             {
-                var employee = await _employeeService.GetEmployeeByIdAsync(id);
-
-                if (employee == null)
+                await _employeeService.SoftDeleteEmployeeAsync(id);
+                return Ok(new
                 {
-                    return NotFound();
-                }
-
-                await _employeeService.DeleteEmployeeAsync(id);
-
-                return NoContent();
+                    code = "1000",
+                    message = "success",
+                    result = "Xóa mềm nhân viên thành công"
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    code = "1001",
+                    message = ex.Message,
+                    result = (object)null
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Lỗi DeleteEmployee: {ex.Message}");
-                return StatusCode(500);
+                return BadRequest(new
+                {
+                    code = "1002",
+                    message = ex.Message,
+                    result = (object)null
+                });
             }
         }
+
     }
+
 }
