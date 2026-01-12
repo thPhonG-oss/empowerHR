@@ -151,200 +151,162 @@ function StaffManagement() {
 
   return (
     <main className="p-0 relative">
-      <div className=" mx-auto">
-        {/* Header */}
+      <div className="mx-auto">
         <Header title="Quản lý nhân viên" icon={Contact} />
 
-        {/* Content */}
-        <div className="p-6 space-y-6 ">
-          {/* Search Section */}
-          <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="p-6 space-y-5">
+          {/* SEARCH */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-gray-900 mb-4">
               Tìm kiếm nhân viên
             </h2>
 
-            <div className="flex flex-col md:flex-row gap-4 z-10">
-              {/* Search Input */}
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Nhập tên, ID hoặc email.."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                />
-              </div>
+            <div className="flex flex-col md:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="Nhập tên, ID hoặc email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-2.5 text-sm border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 bg-white transition-colors"
+              />
 
-              {/* Department Dropdown */}
-              <div className="relative w-full md:w-48">
+              <div className="relative md:w-48">
                 <select
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md bg-white cursor-pointer
-                focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg
+                bg-white focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 appearance-none"
                 >
-                  <option value="">Chọn phòng ban</option>
-                  {departments.map((dept) => (
-                    <option key={dept.departmentId} value={dept.departmentName}>
-                      {dept.departmentName}
+                  <option value="">Phòng ban</option>
+                  {departments.map((d) => (
+                    <option key={d.departmentId} value={d.departmentName}>
+                      {d.departmentName}
                     </option>
                   ))}
                 </select>
-
-                {/* Mũi tên */}
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
               </div>
 
-              {/* Position Dropdown */}
-              <div className="relative w-full md:w-48">
+              <div className="relative md:w-48">
                 <select
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
-                  className="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white cursor-pointer"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg
+                bg-white focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 appearance-none"
                 >
-                  <option value="">Chọn chức vụ</option>
-
-                  {positions.map((pos) => (
-                    <option key={pos.positionId} value={pos.positionName}>
-                      {pos.positionName}
+                  <option value="">Chức vụ</option>
+                  {positions.map((p) => (
+                    <option key={p.positionId} value={p.positionName}>
+                      {p.positionName}
                     </option>
                   ))}
                 </select>
-                {/* Mũi tên */}
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
               </div>
             </div>
           </div>
 
-          {/* Staff List Section */}
-          <div className="border border-gray-300 rounded-lg p-6 bg-[#F2F2F2]">
-            <div className="flex items-center justify-between mb-6">
+          {/* LIST */}
+          <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-base font-semibold text-gray-900">
                   Danh sách nhân viên ({totalItems})
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Cập nhật danh sách sinh viên
+                <p className="text-xs text-gray-500 mt-1">
+                  Cập nhật danh sách nhân viên
                 </p>
               </div>
+
               <button
                 onClick={() => setIsAddCardOpen(true)}
-                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                className="px-5 py-2.5 text-sm font-medium rounded-lg
+              bg-gray-900 text-white hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 Thêm nhân viên
               </button>
             </div>
 
-            {/* Staff Cards */}
-            <div className="space-y-4">
+            {/* STAFF CARD */}
+            <div className="space-y-3">
               {currentStaff.map((staff) => (
                 <div
                   key={staff.employeeId}
-                  className="border border-gray-300 rounded-lg p-4 hover:shadow-sm transition-shadow bg-white"
+                  className="group border border-gray-200 rounded-lg p-4 hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white"
                 >
                   <div className="flex items-center justify-between gap-4">
-                    {/* Avatar and Info */}
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="size-12 rounded-full bg-gray-300 flex items-center justify-center font-semibold text-gray-700">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div
+                        className="size-12 rounded-full bg-linear-to-br from-gray-100 to-gray-200
+                      flex items-center justify-center font-semibold text-gray-700 border border-gray-200"
+                      >
                         {staff.employeeName.charAt(0)}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm">
                           {staff.employeeName}
                         </h3>
-                        <p className="text-sm text-gray-600">
-                          {staff.employeeCode} -{" "}
-                          {staff.gender === "Male"
-                            ? "Nam"
-                            : staff.gender === "Female"
-                            ? "Nữ"
-                            : "Khác"}
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {staff.employeeCode}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <Mail className="size-4" />
-                            <span>{staff.email}</span>
+
+                        <div className="flex items-center gap-4 mt-2.5 text-xs text-gray-600">
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="size-3.5 text-gray-400" />
+                            <span className="truncate">{staff.email}</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Phone className="size-4" />
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="size-3.5 text-gray-400" />
                             <span>{staff.phoneNumber}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    {/* Status and Actions */}
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          staff.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {staff.isActive ? "Hoạt động" : "Ngừng hoạt động"}
-                      </span>
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/admin/employee-management/${staff.employeeId}`
-                          )
-                        }
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
-                      >
-                        <Edit2 className="size-4 text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/admin/employee-management/${staff.employeeId}`
-                          )
-                        }
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
-                      >
-                        <View className="size-4 text-gray-600" />
-                      </button>
-                      {/*<button
-                        onClick={() => {
-                          setEmployeeToDelete(staff.employeeId);
-                          setIsConfirmPopupOpen(true);
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                      >
-                        <Trash2 className="size-4 text-red-500" />
-                      </button>
-                      */}
-                    </div>
+
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/admin/employee-management/${staff.employeeId}`
+                        )
+                      }
+                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                      <Edit2 className="size-4 text-gray-500" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Pagination */}
-            <div className="mt-8">
+            {/* PAGINATION */}
+            <div className="mt-6">
               <div className="flex items-center justify-center gap-2">
-                {/* Previous Button */}
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))
                   }
                   disabled={currentPage === 1}
-                  className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400
+                disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronLeft className="size-4" />
+                  <ChevronLeft className="size-4 text-gray-600" />
                 </button>
 
-                {/* Page Numbers */}
-                {generatePaginationPages().map((page, index) => (
-                  <div key={index}>
+                {generatePaginationPages().map((page, idx) => (
+                  <div key={idx}>
                     {page === "..." ? (
-                      <span className="px-3 py-2 text-gray-600">...</span>
+                      <span className="px-3 py-2 text-sm text-gray-400">
+                        ...
+                      </span>
                     ) : (
                       <button
                         onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           page === currentPage
-                            ? "bg-blue-600 text-white"
-                            : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+                            ? "bg-gray-900 text-white border border-gray-900"
+                            : "border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
                         }`}
                       >
                         {page}
@@ -353,7 +315,6 @@ function StaffManagement() {
                   </div>
                 ))}
 
-                {/* Next Button */}
                 <button
                   onClick={() =>
                     setCurrentPage((prev) =>
@@ -361,16 +322,17 @@ function StaffManagement() {
                     )
                   }
                   disabled={currentPage === totalPages}
-                  className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400
+                disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronRight className="size-4" />
+                  <ChevronRight className="size-4 text-gray-600" />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Add Employee Card */}
+      {/* Add Employee Card */}{" "}
       {isAddCardOpen && (
         <AddEmployeeCard
           positions={positions}
@@ -379,14 +341,6 @@ function StaffManagement() {
           onClose={() => setIsAddCardOpen(false)}
         />
       )}
-      {/* {isConfirmPopupOpen && (
-        <ConfirmPopup
-          isOpen={isConfirmPopupOpen}
-          onClose={() => setIsConfirmPopupOpen(false)}
-          message="Bạn có chắc chắn muốn xóa nhân viên này?"
-          onConfirm={handleDeleteEmployee}
-        />
-      )} */}
     </main>
   );
 }

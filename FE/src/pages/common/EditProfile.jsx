@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Contact, RefreshCcw } from "lucide-react";
+import { Contact, RefreshCcw, Save, X } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import Header from "../../components/common/Header";
 import FormField from "../../components/common/FormField";
@@ -183,29 +183,55 @@ function EditProfile() {
 
   const formatDateForInput = (date) => (date ? date.split("T")[0] : "");
 
-  if (!formData) return <div className="p-8">Đang tải...</div>;
+  if (!formData)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
+        <div className="text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900"></div>
+          <p className="mt-4 text-gray-600 font-medium">Đang tải...</p>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto space-y-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
+      <div className="mx-auto space-y-8">
         <Header title={"Hồ sơ"} icon={Contact} />
 
-        <div className="px-8">
+        <div className="px-8 pb-8">
           <GoBackLink destination={backPath} />
 
-          <div className="flex justify-center mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Chỉnh sửa hồ sơ
-            </h1>
+          {/* Header Section */}
+          <div className="mb-8 overflow-hidden rounded-2xl p-px shadow-2xl">
+            <div className="rounded-2xl bg-white p-8 text-center">
+              <h1 className="text-3xl font-bold bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Chỉnh sửa hồ sơ
+              </h1>
+              <p className="mt-2 text-sm text-gray-500">
+                Cập nhật thông tin nhân sự và liên hệ
+              </p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* BASIC INFO */}
-              <div className="rounded-lg bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">Thông tin cơ bản</h2>
+              <div className="group rounded-2xl bg-white p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-gray-900 to-gray-700 shadow-lg">
+                    <Contact className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Thông tin cơ bản
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Dữ liệu nhân sự chính thức
+                    </p>
+                  </div>
+                </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-5 sm:grid-cols-2">
                   <FormField
                     label="Họ và tên"
                     value={formData.employeeName}
@@ -299,12 +325,22 @@ function EditProfile() {
               </div>
 
               {/* CONTACT INFO */}
-              <div className="rounded-lg bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">
-                  Thông tin liên hệ
-                </h2>
+              <div className="group rounded-2xl bg-white p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-gray-700 to-gray-500 shadow-lg">
+                    <Contact className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Thông tin liên hệ
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Thông tin có thể cập nhật
+                    </p>
+                  </div>
+                </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <ContactFormField
                     label="Địa chỉ"
                     value={formData.address}
@@ -330,30 +366,51 @@ function EditProfile() {
                 </div>
               </div>
             </div>
-            <div className="flex justify-between">
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
               <button
                 type="button"
                 onClick={() => handleResetForm()}
-                className="rounded-md border  px-6 py-2 text-sm flex gap-2 hover:bg-gray-200 duration-200 cursor-pointer"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl 
+                border-2 border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 
+                transition-all duration-300 hover:border-gray-900 hover:bg-gray-50 hover:scale-105 cursor-pointer"
               >
-                <RefreshCcw size={20} />
+                <RefreshCcw className="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
                 <span>Thiết lập lại</span>
               </button>
-              <div className="flex justify-end gap-3">
+
+              <div className="flex w-full sm:w-auto gap-3">
                 <button
                   type="button"
                   onClick={() => navigate(backPath)}
-                  className="rounded-md border  px-6 py-2 text-sm hover:bg-gray-200 duration-200 cursor-pointer"
+                  className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl 
+                  border-2 border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-all 
+                  duration-300 hover:border-gray-400 hover:bg-gray-50 cursor-pointer"
                 >
-                  Hủy
+                  <X className="h-4 w-4" />
+                  <span>Hủy</span>
                 </button>
 
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-md bg-black px-6 py-2 text-sm text-white disabled:opacity-50 hover:bg-black/80 duration-200 cursor-pointer"
+                  className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 
+                  rounded-xl bg-linear-to-r from-gray-900 to-gray-700 px-6 py-3 text-sm font-semibold 
+                  text-white transition-all duration-300 hover:from-gray-800 hover:to-gray-600 hover:shadow-xl 
+                  hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                 >
-                  {saving ? "Đang lưu..." : "Lưu"}
+                  {saving ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      <span>Đang lưu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 transition-transform group-hover:scale-110" />
+                      <span>Lưu thay đổi</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

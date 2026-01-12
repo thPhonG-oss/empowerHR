@@ -69,7 +69,7 @@ const navConfig = [
   },
   {
     title: "Nghỉ phép",
-    path: "leavee",
+    path: "leave",
     icon: CalendarX,
     roles: ["employee", "manager"],
   },
