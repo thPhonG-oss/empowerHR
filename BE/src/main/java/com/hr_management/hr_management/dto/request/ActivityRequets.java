@@ -30,4 +30,7 @@ public class ActivityRequets {
     String targetDistance;
     String rules;
     Integer completionBonus;
+    Integer top1Bonus;
+    Integer top2Bonus;
+    Integer top3Bonus;
 }

@@ -14,8 +14,8 @@ const runningActivityApi = {
   employeeRegisterActivity: (activityId) =>
     axiosClient.post(`/api/v1/participateIn/register/${activityId}`),
 
-  employeeUnregisterActivity: (participateInId) =>
-    axiosClient.delete(`/api/v1/participateIn/${participateInId}`),
+  employeeUnregisterActivity: (id) =>
+    axiosClient.delete(`/api/v1/participateIn/${id}`),
 
   employeeGetResultActivities: (employeeId, activityId) =>
     axiosClient.get(`/api/v1/employees/${employeeId}/activities/${activityId}`),
