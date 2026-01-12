@@ -173,7 +173,7 @@ public class RunningActivityServiceImpl implements RunningActivityService {
     }
 
     @Override
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedDelay = 30 * 60 * 1000)
     public void updateRunningActivityStatuses() {
         System.out.println("Start checking and updating running status");
 
