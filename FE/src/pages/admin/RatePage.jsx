@@ -112,7 +112,7 @@ export default function RatePage() {
           {!isEdit ? (
             <button
               onClick={() => setIsEdit(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
             >
               <PencilIcon className="w-4 h-4 mr-1 inline" /> Cập nhật
             </button>

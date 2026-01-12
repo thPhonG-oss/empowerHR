@@ -12,7 +12,8 @@ export default function TransactionPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [transactions, setTransactions] = useState([])
-  const itemsPerPage = 5
+  const [isDateError, setIsDateError] = useState(false);
+  const itemsPerPage = 8
 
   // Format date ngày
   const formatDate = (dateString) => {
@@ -31,6 +32,7 @@ export default function TransactionPage() {
       CashOut: "Đổi tiền thưởng",
       ActivityReward: "Quản lý thưởng",
       AdminGift: "Thưởng hoạt động",
+      Other: "Khác",
     }
     return typeMap[type] || type
   }
@@ -51,14 +53,22 @@ export default function TransactionPage() {
   }
 
 
+  // Hàm kiểm tra tính hợp lệ của ngày
+const validateDates = (start, end) => {
+  if (start && end && new Date(start) > new Date(end)) {
+    setIsDateError(true);
+    return false;
+  }
+  setIsDateError(false);
+  return true;
+};
 
   // Fetch transactions
     useEffect(() => {
     async function fetchTransactions() {
       try {
-        const response = await pointApi.getAllTransactions(currentPage - 1, 10)
-        const data = response.result.content 
-        console.log("All Transactions:", data)
+        const response = await pointApi.getAllTransactions()
+        const data = response.result 
         setTransactions(data)
         console.log("trans:",transactions);
       } catch (error) {
@@ -66,7 +76,7 @@ export default function TransactionPage() {
       }
     }
     fetchTransactions()
-  }, [transactions.length])
+  }, [])
 
   const filteredTransactions = useMemo(() => {
   return transactions.filter((transaction) => {
@@ -101,7 +111,6 @@ export default function TransactionPage() {
   })
 }, [transactions, filterType, startDate, endDate, searchTerm])
 
-
   // Pagination
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -118,9 +127,9 @@ export default function TransactionPage() {
     setStartDate("")
     setEndDate("")
     setSearchTerm("")
+    setIsDateError(false);
     setCurrentPage(1)
   }
-
 
   return (
     <div className="p-6 bg-white">
@@ -147,6 +156,7 @@ export default function TransactionPage() {
               <option>CashOut</option>
               <option>ActivityReward</option>
               <option>AdminGift</option>
+              <option>Other</option>
             </select>
           </div>
 
@@ -159,11 +169,13 @@ export default function TransactionPage() {
               <input
                 type="date"
                 value={startDate}
+                max={endDate}
                 onChange={(e) => {
                   setStartDate(e.target.value)
+                  validateDates(e.target.value, endDate);
                   setCurrentPage(1)
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${isDateError ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"}`}
               />
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" />
             </div>
@@ -174,11 +186,11 @@ export default function TransactionPage() {
           {/* Mô tả */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mô tả
+              Chủ giao dịch
             </label>
             <input
               type="text"
-              placeholder="Nhập mô tả, chủ giao dịch"
+              placeholder="Nhập tên người giao dịch"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value)
@@ -193,15 +205,19 @@ export default function TransactionPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Đến ngày
             </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+            </label>
             <div className="relative">
               <input
                 type="date"
                 value={endDate}
+                min={startDate}
                 onChange={(e) => {
                   setEndDate(e.target.value)
+                  validateDates(startDate, e.target.value);
                   setCurrentPage(1)
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${isDateError ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"}`}
               />
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" />
             </div>
@@ -260,6 +276,7 @@ export default function TransactionPage() {
                     {transaction.transactionType === "CashOut" && "Đổi tiền thưởng từ điểm tích lũy"}
                     {transaction.transactionType === "ActivityReward" && "Điểm thưởng từ hoạt động"}
                     {transaction.transactionType === "AdminGift" && "Quản lý thưởng điểm cho nhân viên"}
+                    {transaction.transactionType === "Other" && "Khác"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{transaction.employeeName}</td>
                   <td
