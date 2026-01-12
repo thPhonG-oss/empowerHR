@@ -2,6 +2,7 @@ package com.hr_management.hr_management.controller;
 
 import com.cloudinary.Api;
 import com.hr_management.hr_management.dto.request.ApiResponse;
+import com.hr_management.hr_management.dto.request.RunningActivityUpdateStatusRequest;
 import com.hr_management.hr_management.dto.response.*;
 import com.hr_management.hr_management.entity.ParticipateIn;
 import com.hr_management.hr_management.service.ActivityService;
@@ -61,11 +62,20 @@ public class RunningActivityController {
       }
 
     // [ Admin ] Update activitiy
-    @PutMapping("/admin/update-activities/{runningActivityId}")
+    @PutMapping("/{runningActivityId}")
     ApiResponse<RunningActivityResponseDTO> updateActivity(@PathVariable Integer runningActivityId, @Valid @RequestBody RunningActivityUpdateRequestDTO runningActivityUpdateRequestDTO){
         RunningActivityResponseDTO runningActivityResponseDTO= runningActivityService.updateActivity(runningActivityId,runningActivityUpdateRequestDTO);
         return ApiResponse.<RunningActivityResponseDTO>builder()
                 .message("Update thành công")
+                .result(runningActivityResponseDTO)
+                .build();
+    }
+
+    @PatchMapping("/status/{runningActivityId}")
+    ApiResponse<RunningActivityResponseDTO> updateStatusActivity(@PathVariable Integer runningActivityId, @Valid @RequestBody RunningActivityUpdateStatusRequest runningActivityUpdateStatusRequest){
+        RunningActivityResponseDTO runningActivityResponseDTO= runningActivityService.updateStatusActivity(runningActivityId,runningActivityUpdateStatusRequest);
+        return ApiResponse.<RunningActivityResponseDTO>builder()
+                .message("Update Status thành công")
                 .result(runningActivityResponseDTO)
                 .build();
     }
@@ -77,7 +87,7 @@ public class RunningActivityController {
                 .build();
     }
 
-    @DeleteMapping("/admin/{activityId}")
+    @DeleteMapping("/{activityId}")
     public ApiResponse<RunningActivityResponseDTO> deleteActivity(@PathVariable Integer activityId){
         return ApiResponse.<RunningActivityResponseDTO>builder()
                 .message("Xóa thành công activity")

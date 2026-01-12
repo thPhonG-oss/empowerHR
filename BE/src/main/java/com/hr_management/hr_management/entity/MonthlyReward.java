@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.entity;
 
+import com.hr_management.hr_management.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@DiscriminatorValue("MonthlyReward")
 public class MonthlyReward {
 
     @Id

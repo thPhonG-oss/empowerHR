@@ -58,3 +58,7 @@ cloudinary:
   cloud-name: ${CLOUD_NAME}
   api-key: ${CLOUD_API_KEY}
   api-secret: ${CLOUD_API_SECRET}
+
+app:
+  scheduler:
+    annual-monthly-reward: "0 * * * * ?"

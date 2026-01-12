@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.mapper;
 
+import com.hr_management.hr_management.dto.response.PointAccountResponse;
 import com.hr_management.hr_management.dto.response.PointAccountResponseDTO;
 import com.hr_management.hr_management.entity.PointAccount;
 import org.mapstruct.Mapper;
@@ -8,4 +9,6 @@ import org.mapstruct.Mapper;
 public interface PointAccountMapper {
 
     PointAccountResponseDTO toPointAccountResponseDTO(PointAccount pointAccount);
+
+    PointAccountResponse toPointAccountResponse(PointAccount pointAccount);
 }

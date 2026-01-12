@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 public interface ParticipateInMapper {
 
 //    ParticipateIn toParticipateIn(ParticipateInRequest participateInRequest);
+//    @Mapping(target = "numberRegistered", source = "numberRegistered")
     ParticipateInResponse toParticipateInResponse(ParticipateIn participateIn);
 
     @Mapping(target = "employeeId", source = "employee.employeeId")
