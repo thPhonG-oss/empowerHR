@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import transactionsApi from "../../api/transactionsApi";
 import {
   Gift,
@@ -54,14 +54,15 @@ const transactionTypeConfig = {
 
 const PREVIEW_LIMIT = 2;
 
-function TransactionsCard() {
+function TransactionsCard(redeemKey) {
   const [allTransactions, setAllTransactions] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedType, setSelectedType] = useState("ALL");
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [redeemKey]);
 
   const fetchTransactions = async () => {
     try {
@@ -80,16 +81,42 @@ function TransactionsCard() {
     }
   };
 
+  /* =======================
+     Filter logic
+  ======================= */
+  const filteredTransactions = useMemo(() => {
+    if (selectedType === "ALL") return allTransactions;
+    return allTransactions.filter((t) => t.transactionType === selectedType);
+  }, [allTransactions, selectedType]);
+
   const displayedTransactions = showAll
-    ? allTransactions
-    : allTransactions.slice(0, PREVIEW_LIMIT);
+    ? filteredTransactions
+    : filteredTransactions.slice(0, PREVIEW_LIMIT);
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-      <div className="flex justify-between items-center mb-5">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-lg text-gray-800">
           Giao dịch gần đây
         </h3>
+
+        {/* Filter */}
+        <select
+          value={selectedType}
+          onChange={(e) => {
+            setSelectedType(e.target.value);
+            setShowAll(false);
+          }}
+          className="border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="ALL">Tất cả</option>
+          {Object.entries(transactionTypeConfig).map(([key, value]) => (
+            <option key={key} value={key}>
+              {value.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Loading */}
@@ -101,17 +128,17 @@ function TransactionsCard() {
       )}
 
       {/* Empty */}
-      {!loading && allTransactions.length === 0 && (
+      {!loading && filteredTransactions.length === 0 && (
         <div className="text-center py-12">
           <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
             <Gem className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="text-gray-500 text-sm">Chưa có giao dịch nào</p>
+          <p className="text-gray-500 text-sm">Không có giao dịch phù hợp</p>
         </div>
       )}
 
       {/* List */}
-      {!loading && allTransactions.length > 0 && (
+      {!loading && filteredTransactions.length > 0 && (
         <div className="space-y-1">
           {displayedTransactions.map((item) => {
             const config =
@@ -132,11 +159,7 @@ function TransactionsCard() {
                   <div>
                     <p className="font-medium text-gray-800">{config.label}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {new Date(item.createAt).toLocaleDateString("vi-VN", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
+                      {new Date(item.createAt).toLocaleDateString("vi-VN")}
                     </p>
                   </div>
                 </div>
@@ -152,7 +175,7 @@ function TransactionsCard() {
       )}
 
       {/* Expand / Collapse */}
-      {allTransactions.length > PREVIEW_LIMIT && (
+      {filteredTransactions.length > PREVIEW_LIMIT && (
         <div className="flex justify-center mt-4 pt-3 border-t border-gray-100">
           <button
             className="cursor-pointer text-black font-medium flex items-center gap-2 hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors duration-150"

@@ -1,22 +1,32 @@
 import { useEffect, useState } from "react";
 import pointAccountApi from "../../api/pointAccountApi";
-import { Gem, TrendingUp, ArrowLeftRight } from "lucide-react";
+import pointPolicyApi from "../../api/pointPolicyApi";
+import RedeemRewardModal from "./RedeemRewardModal";
+import { Gem, TrendingUp, ArrowLeftRight, Info } from "lucide-react";
 
-function PointCard() {
+function PointCard({ onRedeemSuccess }) {
   const [pointData, setPointData] = useState(null);
+  const [pointPolicy, setPointPolicy] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [openRedeem, setOpenRedeem] = useState(false);
 
   useEffect(() => {
-    fetchPointAccount();
+    fetchData();
   }, []);
 
-  const fetchPointAccount = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await pointAccountApi.getMyPoint();
-      setPointData(res.data);
+
+      const [pointRes, policyRes] = await Promise.all([
+        pointAccountApi.getMyPoint(),
+        pointPolicyApi.getPointPolicy(),
+      ]);
+
+      setPointData(pointRes.data);
+      setPointPolicy(policyRes.result);
     } catch (error) {
-      console.error("Failed to fetch point account", error);
+      console.error("Failed to fetch point data", error);
     } finally {
       setLoading(false);
     }
@@ -40,18 +50,43 @@ function PointCard() {
         <h3 className="font-semibold text-lg text-gray-800">
           Điểm thưởng của bạn
         </h3>
-        <div className="bg-blue-50 p-2.5 rounded-xl">
-          <Gem className="w-5 h-5 text-blue-600" />
+        <div className="flex flex-row items-center gap-2 p-2 rounded-xl">
+          {/* Redeem Button */}
+          <button
+            onClick={() => setOpenRedeem(true)}
+            className="flex-1 h-full bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition p-2 cursor-pointer"
+          >
+            Đổi thưởng
+          </button>
+
+          {/* Icon */}
+          <div className="bg-blue-50 p-2.5 rounded-xl flex items-center justify-center">
+            <Gem className="w-5 h-5 text-black" />
+          </div>
         </div>
       </div>
 
       {/* Current Points */}
-      <div className="mb-5">
+      <div className="mb-4">
         <p className="text-sm text-gray-500">Điểm hiện tại</p>
         <p className="text-3xl font-bold text-black mt-1">
           {pointData.currentPoints.toLocaleString()} pts
         </p>
       </div>
+
+      {/* Conversion Rate */}
+      {pointPolicy && (
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 mb-5">
+          <Info className="w-4 h-4 text-gray-500" />
+          <p className="text-sm text-gray-600">
+            Tỉ lệ quy đổi:&nbsp;
+            <span className="font-semibold text-gray-800">
+              {pointPolicy.conversionRate.toLocaleString()} pts
+            </span>
+            &nbsp;= 1 đơn vị
+          </p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
@@ -75,12 +110,13 @@ function PointCard() {
           </p>
         </div>
       </div>
-
-      {/* Footer info */}
-      <p className="text-xs text-gray-400 mt-4">
-        Cập nhật lần cuối:{" "}
-        {new Date(pointData.updateAt).toLocaleString("vi-VN")}
-      </p>
+      <RedeemRewardModal
+        isOpen={openRedeem}
+        onClose={() => setOpenRedeem(false)}
+        pointPolicy={pointPolicy}
+        currentPoints={pointData.currentPoints}
+        onSuccess={onRedeemSuccess}
+      />
     </div>
   );
 }
