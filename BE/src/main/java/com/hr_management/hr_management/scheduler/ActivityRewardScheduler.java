@@ -15,17 +15,17 @@ public class ActivityRewardScheduler {
     /**
      * Chạy mỗi ngày lúc 00:00 để kiểm tra hoạt động đã kết thúc và cộng điểm
      */
-    @Scheduled(cron = "0 0 0 * * *") // Cron: 00:00 mỗi ngày
-    public void scheduleActivityRewardProcessing() {
-        log.info("=== Bắt đầu chạy tác vụ tự động cộng điểm cho hoạt động đã kết thúc  ===");
-        pointTransactionService.processActivityRewardsForCompletedActivities();
-        log.info("=== Hoàn tất tác vụ tự động cộng điểm cho hoạt động đã kết thúc ===");
-    }
+//    @Scheduled(cron = "0 0 0 * * *") // Cron: 00:00 mỗi ngày
+//    public void scheduleActivityRewardProcessing() {
+//        log.info("=== Bắt đầu chạy tác vụ tự động cộng điểm cho hoạt động đã kết thúc  ===");
+//        pointTransactionService.processActivityRewardsForCompletedActivities();
+//        log.info("=== Hoàn tất tác vụ tự động cộng điểm cho hoạt động đã kết thúc ===");
+//    }
 
     /**
      * Alternative: Chạy mỗi 1 giờ để check thường xuyên hơn
      */
-    @Scheduled(fixedDelay = 3600000) // 1 giờ = 3600000ms
+    @Scheduled(fixedDelay = 60 * 60 * 1000) // 1 giờ = 3600000ms
     public void scheduleActivityRewardProcessingHourly() {
         log.info("=== Bắt đầu chạy tác vụ tự động cộng điểm cho hoạt động đã kết thúc  ===");
         pointTransactionService.processActivityRewardsForCompletedActivities();

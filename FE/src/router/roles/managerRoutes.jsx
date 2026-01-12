@@ -6,6 +6,7 @@ import EditProfile from "../../pages/common/EditProfile";
 import Attendance from "../../pages/employee/Attendance";
 import LeaveRequest from "../../pages/employee/LeaveRequest";
 import HistoryRequests from "../../pages/employee/HistoryRequests";
+import Rewards from "../../pages/employee/Rewards";
 
 import RoleRoute from "../RoleRoute";
 import RequestManagement from "../../pages/manager/RequestManagement";
@@ -34,6 +35,7 @@ const managerRoutes = [
         element: <RequestManagementHistory />,
       },
       { path: "activities", element: <ActivitiesOpening /> },
+      { path: "rewards", element: <Rewards /> },
     ],
   },
 ];
