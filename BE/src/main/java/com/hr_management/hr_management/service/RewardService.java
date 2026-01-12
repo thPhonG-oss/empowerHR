@@ -2,8 +2,11 @@ package com.hr_management.hr_management.service;
 
 import com.hr_management.hr_management.dto.request.CashOutRequestDTO;
 import com.hr_management.hr_management.dto.request.PerformancePointGivenRequestDTO;
+import com.hr_management.hr_management.dto.request.PointPolicyUpdateRequestDTO;
 import com.hr_management.hr_management.dto.response.CashOutTransactionResponseDTO;
 import com.hr_management.hr_management.dto.response.PointPolicyResponseDTO;
+
+import java.util.List;
 
 public interface RewardService {
     // Automate refresh budget points for departments can be added here if needed
@@ -21,4 +24,8 @@ public interface RewardService {
     boolean givePointsToEmployee(PerformancePointGivenRequestDTO request);
 
     CashOutTransactionResponseDTO cashOutPoints(CashOutRequestDTO request);
+
+    List<PointPolicyResponseDTO> getAllPointPolicies();
+
+    PointPolicyResponseDTO updatePointPolicy(Integer id, PointPolicyUpdateRequestDTO requestDTO);
 }
