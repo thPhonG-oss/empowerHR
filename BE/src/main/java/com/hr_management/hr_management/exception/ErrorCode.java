@@ -69,7 +69,9 @@ public enum ErrorCode {
     CONNECTION_NOT_FOUND("1038", "Strava connection not found for the employee", HttpStatus.BAD_REQUEST),
     INVALID_ACTIVITY_STATUS("1039", "Status Request Sai, Chỉ bao gồm: Draft,Open, Active, Completed, Cancelled", HttpStatus.BAD_REQUEST),
     DEPARTMENT_BUDGET_NOT_FOUND("1040", "DEPARTMENT_BUDGET_NOT_FOUND", HttpStatus.BAD_REQUEST),
-    VALUE_INVALID("1050","value invalid",HttpStatus.BAD_REQUEST);
+    VALUE_INVALID("1050","value invalid",HttpStatus.BAD_REQUEST),
+    MONTHLY_NOT_FOUND("1051","monthly not found",HttpStatus.BAD_REQUEST),
+    NOT_EDIT_PAST_TIME("1052","Do not edit past time.",HttpStatus.BAD_REQUEST);
     ErrorCode(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;
