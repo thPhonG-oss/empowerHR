@@ -16,11 +16,12 @@ function Rewards() {
       <Header icon={Gem} title="Điểm thưởng của tôi" />
 
       <div className=" px-6 py-6 flex flex-col gap-4 bg-gray-50 min-h-screen">
-        <PointCard onRedeemSuccess={handleRedeemSuccess} />
+        <PointCard
+          redeemKey={redeemKey}
+          onRedeemSuccess={handleRedeemSuccess}
+        />
 
         <TransactionsCard redeemKey={redeemKey} />
-
-        {/* 🔥 Sau này bạn thêm card khác ở đây */}
       </div>
     </main>
   );

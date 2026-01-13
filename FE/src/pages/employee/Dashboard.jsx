@@ -127,7 +127,7 @@ function Dashboard() {
           <div className="grid grid-cols-4 pt-8 px-8 gap-6">
             {/* ===== POINT CARD ===== */}
             <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
-              <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
+              <div className="p-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
                 <Gem className="size-7 text-white" />
               </div>
 
@@ -141,7 +141,7 @@ function Dashboard() {
                     Đang tải...
                   </p>
                 ) : (
-                  <p className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
+                  <p className="text-3xl font-bold bg-linear-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
                     {pointData?.currentPoints?.toLocaleString() ?? 0} pts
                   </p>
                 )}
