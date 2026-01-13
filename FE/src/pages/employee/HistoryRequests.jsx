@@ -7,6 +7,8 @@ import {
   RefreshCw,
   Calendar,
   ClockIcon,
+  Inbox,
+  Loader2,
 } from "lucide-react";
 
 import Header from "../../components/common/Header";
@@ -16,6 +18,7 @@ export default function HistoryRequests() {
   const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -25,6 +28,7 @@ export default function HistoryRequests() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const res = await employeeApi.getMyRequest({ page: 1, size: 100 });
 
         if (res?.result?.requestResponseDTOS) {
@@ -48,7 +52,6 @@ export default function HistoryRequests() {
 
             requestDate: item.submitAt?.split("T")[0] || "",
             requestTime: item.submitAt?.split("T")[1]?.substring(0, 5) || "",
-
             submitAt: item.submitAt,
 
             status: item.status.toLowerCase(),
@@ -74,6 +77,8 @@ export default function HistoryRequests() {
         }
       } catch (e) {
         console.error("Lỗi gọi API:", e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -103,10 +108,8 @@ export default function HistoryRequests() {
     .filter((req) => (activeTab === "all" ? true : req.status === activeTab))
     .filter((req) => {
       const date = new Date(req.requestDate);
-
       if (startDate && date < new Date(startDate)) return false;
       if (endDate && date > new Date(endDate)) return false;
-
       return true;
     });
 
@@ -247,7 +250,7 @@ export default function HistoryRequests() {
             </div>
 
             {/* DATE FILTERS */}
-            <div className="flex flex-wrap items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-lg border border-gray-200 mb-5">
+            <div className="flex flex-wrap items-center gap-3 p-4 bg-linear-to-r from-gray-50 to-gray-100/50 rounded-lg border border-gray-200 mb-5">
               <div className="flex items-center gap-2">
                 <label className="text-xs font-medium text-gray-600">
                   Từ ngày:
@@ -284,135 +287,154 @@ export default function HistoryRequests() {
             </div>
 
             {/* REQUEST CARDS */}
-            <div className="space-y-3">
-              {pageData.map((request) => (
-                <div
-                  key={request.id}
-                  className={`border rounded-lg p-5 transition-all duration-200 ${getStatusColor(
-                    request.status
-                  )}`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="mt-0.5">
-                        {getStatusIcon(request.status)}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-gray-900 text-sm">
-                            {request.title}
-                          </h3>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border ${getTypeColor(
-                              request.type
-                            )}`}
-                          >
-                            {getTypeIcon(request.type)}
-                            {request.type === "LEAVE"
-                              ? "Nghỉ phép"
-                              : "Chấm công"}
-                          </span>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+                <Loader2 className="w-8 h-8 mb-3 animate-spin text-gray-400" />
+                <p className="text-sm font-medium">Đang tải dữ liệu...</p>
+              </div>
+            ) : pageData.length > 0 ? (
+              <div className="space-y-3">
+                {pageData.map((request) => (
+                  <div
+                    key={request.id}
+                    className={`border rounded-lg p-5 transition-all duration-200 ${getStatusColor(
+                      request.status
+                    )}`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="mt-0.5">
+                          {getStatusIcon(request.status)}
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-3">
-                          {request.description}
-                        </p>
-
-                        <div className="flex flex-wrap gap-4 text-xs">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-gray-900 text-sm">
+                              {request.title}
+                            </h3>
                             <span
-                              className={`inline-block px-2.5 py-1 text-xs font-medium rounded-md border ${
-                                request.status === "approved"
-                                  ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                                  : request.status === "pending"
-                                  ? "bg-amber-100 text-amber-800 border-amber-300"
-                                  : "bg-rose-100 text-rose-800 border-rose-300"
-                              }`}
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border ${getTypeColor(
+                                request.type
+                              )}`}
                             >
-                              {request.statusBadge}
+                              {getTypeIcon(request.type)}
+                              {request.type === "LEAVE"
+                                ? "Nghỉ phép"
+                                : "Chấm công"}
                             </span>
-                            <p className="text-gray-600">
-                              {request.requestDate}{" "}
-                              <span className="text-gray-500">
-                                {request.requestTime}
-                              </span>
-                            </p>
                           </div>
 
-                          <div className="flex items-center">
-                            <p className="text-gray-500">
-                              Xử lý lúc:{" "}
-                              <span className="font-medium text-gray-700">
-                                {request.deadline}
+                          <p className="text-sm text-gray-600 mb-3">
+                            {request.description}
+                          </p>
+
+                          <div className="flex flex-wrap gap-4 text-xs">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`inline-block px-2.5 py-1 text-xs font-medium rounded-md border ${
+                                  request.status === "approved"
+                                    ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                                    : request.status === "pending"
+                                    ? "bg-amber-100 text-amber-800 border-amber-300"
+                                    : "bg-rose-100 text-rose-800 border-rose-300"
+                                }`}
+                              >
+                                {request.statusBadge}
                               </span>
-                            </p>
+                              <p className="text-gray-600">
+                                {request.requestDate}{" "}
+                                <span className="text-gray-500">
+                                  {request.requestTime}
+                                </span>
+                              </p>
+                            </div>
+
+                            <div className="flex items-center">
+                              <p className="text-gray-500">
+                                Xử lý lúc:{" "}
+                                <span className="font-medium text-gray-700">
+                                  {request.deadline}
+                                </span>
+                              </p>
+                            </div>
                           </div>
+
+                          {request.notes && (
+                            <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-rose-700 text-xs leading-relaxed">
+                              <span className="font-semibold">⚠️ </span>
+                              {request.notes}
+                            </div>
+                          )}
                         </div>
-
-                        {request.notes && (
-                          <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-rose-700 text-xs leading-relaxed">
-                            <span className="font-semibold">⚠️ </span>
-                            {request.notes}
-                          </div>
-                        )}
                       </div>
-                    </div>
 
-                    <button
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${getButtonStyle(
-                        request.status
-                      )}`}
-                    >
-                      {request.statusBadge}
-                    </button>
+                      <button
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${getButtonStyle(
+                          request.status
+                        )}`}
+                      >
+                        {request.statusBadge}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+                <Inbox className="w-10 h-10 mb-3 text-gray-400" />
+                <p className="text-sm font-medium">Không có yêu cầu nào</p>
+                <p className="text-xs text-gray-400">
+                  {activeTab === "all"
+                    ? "Bạn chưa gửi yêu cầu nào hoặc không có dữ liệu phù hợp."
+                    : "Không có yêu cầu thuộc trạng thái này."}
+                </p>
+              </div>
+            )}
 
             {/* PAGINATION */}
-            <div className="flex items-center justify-center gap-2 mt-6 select-none">
-              <button
-                onClick={() => setCurrentPage((p) => p - 1)}
-                disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === 1
-                    ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-gray-50 hover:border-gray-900"
-                }`}
-              >
-                ← Trước
-              </button>
+            {!loading && pageData.length > 0 && (
+              <div className="flex items-center justify-center gap-2 mt-6 select-none">
+                <button
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  disabled={currentPage === 1}
+                  className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === 1
+                      ? "opacity-40 cursor-not-allowed"
+                      : "hover:bg-gray-50 hover:border-gray-900"
+                  }`}
+                >
+                  ← Trước
+                </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-9 h-9 rounded-lg border text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-900"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-9 h-9 rounded-lg border text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? "bg-gray-900 text-white border-gray-900"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-900"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
 
-              <button
-                onClick={() => setCurrentPage((p) => p + 1)}
-                disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === totalPages
-                    ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-gray-50 hover:border-gray-900"
-                }`}
-              >
-                Sau →
-              </button>
-            </div>
+                <button
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === totalPages
+                      ? "opacity-40 cursor-not-allowed"
+                      : "hover:bg-gray-50 hover:border-gray-900"
+                  }`}
+                >
+                  Sau →
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

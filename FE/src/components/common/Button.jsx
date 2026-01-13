@@ -4,6 +4,7 @@ export default function CustomButton({
   disabled = false,
   variant = "primary",
   className = "",
+  title = "",
 }) {
   const baseStyles =
     "px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ";
@@ -32,6 +33,7 @@ export default function CustomButton({
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`${baseStyles} ${variants[variant]} ${className}`}
     >
       {children}

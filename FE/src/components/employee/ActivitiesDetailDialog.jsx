@@ -24,18 +24,18 @@ export default function ActivitiesDetailDialog({
     <CustomDialog isOpen={isOpen} onClose={onClose}>
       <div className="relative flex flex-col h-full max-h-[90vh] w-full max-w-4xl bg-white rounded-xl shadow-2xl">
         {/* HEADER STICKY */}
-        <div className="p-6 shadow-lg bg-black sticky top-0 z-20 flex justify-between items-start rounded-t-xl">
+        <div className="p-6 shadow-lg bg-white sticky top-0 z-20 flex justify-between items-start rounded-t-xl">
           <div className="flex-1 pr-4">
-            <h2 className="text-2xl font-bold text-white mb-2 leading-tight">
+            <h2 className="text-2xl font-bold mb-2 leading-tight">
               {selectedActivity.title}
             </h2>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p className="text-gray-600 text-sm leading-relaxed">
               {selectedActivity.description}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="hover:bg-white/10 p-2 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-white hover:rotate-90 transform"
+            className=" p-2 rounded-lg cursor-pointer transition-all duration-200 shrink-0  hover:bg-red-100 transform"
           >
             <X className="w-5 h-5" />
           </button>
@@ -232,7 +232,7 @@ export default function ActivitiesDetailDialog({
                     return (
                       <div
                         key={f.label}
-                        className={`flex justify-between py-3 px-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors duration-150 ${
+                        className={`flex justify-between py-3 px-4 border-b border-gray-300 last:border-b-0 hover:bg-gray-50 transition-colors duration-150 ${
                           index % 2 === 0 ? "bg-white" : "bg-gray-50"
                         }`}
                       >
