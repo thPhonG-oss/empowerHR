@@ -1,242 +1,3 @@
-// import { useEffect, useState } from "react";
-// import pointApi from "../../api/pointApi";
-// import pointPolicyApi from "../../api/pointPolicyApi";
-
-// import Input from "../../components/common/Input";
-// import Field from "../../components/common/Field";
-// import{
-//   PencilIcon,
-// } from 'lucide-react';  
-
-
-// const initialData = {
-//   policyID: "",
-//   exchangeRate: 0,
-//   minPoint: 0,
-//   maxPoint: 0,
-//   expiredTime: 0,
-//   isActive: true,
-// };
-
-// export default function RatePage() {
-//   const [isEdit, setIsEdit] = useState(false);
-//   const [formData, setFormData] = useState(initialData);
-//   const [originData, setOriginData] = useState(initialData);
-//   const [errors, setErrors] = useState({});
-//   const [showConfirm, setShowConfirm] = useState(false);
-
-
-//   // Call api
-//   useEffect(() => {
-//     async function fetchData() {
-//       const res = await pointApi.getCurrentPolicy();
-//       const policy = res.result;
-//       const mappedData = {
-//       policyID: policy.pointPolicyId,
-//       exchangeRate: policy.conversionRate,
-//       minPoint: policy.minPoints,
-//       maxPoint: policy.maxPoints,
-//       expiredTime: policy.expiry,
-//       isActive: policy.isActive,
-//     };
-
-//       setFormData(mappedData);
-//       setOriginData(mappedData);
-//     }
-//     fetchData();
-//   }, []);
-
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   };
-
-//   const validate = () => {
-//     const newErrors = {};
-
-//     if (formData.exchangeRate <= 0) {
-//       newErrors.exchangeRate = "Tỉ lệ quy đổi phải > 0";
-//     }
-
-//     if (formData.minPoint <= 0) {
-//       newErrors.minPoint = "Số điểm tối thiểu phải > 0";
-//     }
-
-//     if (formData.maxPoint <= 0) {
-//       newErrors.maxPoint = "Số điểm tối đa phải > 0";
-//     }
-
-//     if (Number(formData.minPoint) > Number(formData.maxPoint)) {
-//       newErrors.maxPoint = "Số điểm tối đa phải ≥ số điểm tối thiểu";
-//     }
-
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-//   const handleSave = () => {
-//     if (!validate()) return;
-//     setShowConfirm(true);
-//   };
-
-//   const confirmSave = async () => {
-//     try {
-//       const dataToUpdate = {
-//         conversionRate: Number(formData.exchangeRate),
-//         minPoints: Number(formData.minPoint),
-//         maxPoints: Number(formData.maxPoint),
-//         expiry: Number(formData.expiredTime),
-//         isActive: formData.isActive,
-//       };
-//       await pointPolicyApi.updatePointPolicy(formData.policyID, dataToUpdate);
-//       setOriginData(dataToUpdate);
-//       setIsEdit(false);
-//       setShowConfirm(false);
-//     } catch (err) {
-//       console.error(err);
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     setFormData(originData);
-//     setErrors({});
-//     setIsEdit(false);
-//   };
-
-
-//   return (
-//     <>
-//       <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-5xl">
-//         {/* Header */}
-//         <div className="flex justify-between items-center mb-6">
-//           <h2 className="font-semibold">
-//             Tỉ lệ quy đổi điểm thưởng
-//           </h2>
-
-//           {!isEdit ? (
-//             <button
-//               onClick={() => setIsEdit(true)}
-//               className="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
-//             >
-//               <PencilIcon className="w-4 h-4 mr-1 inline" /> Cập nhật
-//             </button>
-//           ) : (
-//             <div className="flex gap-2">
-//               <button
-//                 onClick={handleSave}
-//                 className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-//               >
-//                 Lưu
-//               </button>
-//               <button
-//                 onClick={handleCancel}
-//                 className="border px-4 py-2 rounded text-sm hover:bg-gray-100"
-//               >
-//                 Hủy
-//               </button>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* Form */}
-//         <div className="grid grid-cols-2 gap-6">
-//           {/* Exchange rate */}
-//           <Field
-//             label="Tỉ lệ quy đổi (1 điểm = ? VNĐ)"
-//             error={errors.exchangeRate}
-//           >
-//             <Input
-//               name="exchangeRate"
-//               value={formData.exchangeRate}
-//               onChange={handleChange}
-//               disabled={!isEdit}
-//               suffix="VNĐ"
-//             />
-//           </Field>
-
-//           {/* Expired */}
-//           <Field label="Hạn sử dụng">
-//             <select
-//               name="expiredTime"
-//               value={formData.expiredTime}
-//               onChange={handleChange}
-//               disabled={!isEdit}
-//               className="w-full border border-gray-200 rounded px-3 py-2 disabled:bg-transparent hover:border-gray-400 focus:border-black-500 transition"
-//             >
-//               <option value="180">6 tháng</option>
-//               <option value="365">Một năm</option>
-//               <option value="730">Hai năm</option>
-//             </select>
-//           </Field>
-
-//           {/* Min */}
-//           <Field
-//             label="Số điểm tối thiểu để quy đổi"
-//             note="* Áp dụng cho yêu cầu đổi tiền"
-//             error={errors.minPoint}
-//           >
-//             <Input
-//               name="minPoint"
-//               value={formData.minPoint}
-//               onChange={handleChange}
-//               disabled={!isEdit}
-//               suffix="điểm"
-//             />
-//           </Field>
-
-//           {/* Max */}
-//           <Field
-//             label="Số điểm tối đa để quy đổi"
-//             note="* Áp dụng cho yêu cầu đổi tiền"
-//             error={errors.maxPoint}
-//           >
-//             <Input
-//               name="maxPoint"
-//               value={formData.maxPoint}
-//               onChange={handleChange}
-//               disabled={!isEdit}
-//               suffix="điểm"
-//             />
-//           </Field>
-//         </div>
-//       </div>
-
-//       {/* Confirm Modal */}
-//       {showConfirm && (
-//         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-//           <div className="bg-white rounded-lg p-6 w-[400px]">
-//             <h3 className="font-semibold mb-2">
-//               Xác nhận cập nhật
-//             </h3>
-//             <p className="text-sm text-gray-600 mb-6">
-//               Bạn có chắc chắn muốn cập nhật chính sách điểm thưởng?
-//             </p>
-
-//             <div className="flex justify-end gap-2">
-//               <button
-//                 onClick={() => setShowConfirm(false)}
-//                 className="border px-4 py-2 rounded text-sm"
-//               >
-//                 Hủy
-//               </button>
-//               <button
-//                 onClick={confirmSave}
-//                 className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
-//               >
-//                 Xác nhận
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// }
-
 import { useEffect, useState } from "react";
 import pointApi from "../../api/pointApi";
 import pointPolicyApi from "../../api/pointPolicyApi";
@@ -251,6 +12,7 @@ const initialData = {
   maxPoint: 0,
   expiredTime: 0,
   isActive: true,
+  endDate:"",
 };
 
 export default function RatePage() {
@@ -272,6 +34,7 @@ export default function RatePage() {
         maxPoint: policy.maxPoints,
         expiredTime: policy.expiry,
         isActive: policy.isActive,
+        endDate: policy.endDate,
       };
 
       setFormData(mappedData);
@@ -307,6 +70,10 @@ export default function RatePage() {
       newErrors.maxPoint = "Số điểm tối đa phải ≥ số điểm tối thiểu";
     }
 
+    if (!formData.endDate) {
+      newErrors.endDate = "Vui lòng chọn ngày kết thúc";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -324,9 +91,10 @@ export default function RatePage() {
         maxPoints: Number(formData.maxPoint),
         expiry: Number(formData.expiredTime),
         isActive: formData.isActive,
+        endDate: formData.endDate,
       };
       await pointPolicyApi.updatePointPolicy(formData.policyID, dataToUpdate);
-      setOriginData(dataToUpdate);
+      setOriginData(formData);
       setIsEdit(false);
       setShowConfirm(false);
     } catch (err) {
@@ -338,6 +106,12 @@ export default function RatePage() {
     setFormData(originData);
     setErrors({});
     setIsEdit(false);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
   };
 
   return (
@@ -452,6 +226,21 @@ export default function RatePage() {
                     suffix="điểm"
                   />
                 </Field>
+
+                {/* End Date */}
+                <Field
+                  label="Ngày kết thúc chính sách"
+                  error={errors.endDate}
+                >
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    disabled={!isEdit}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-50 disabled:text-gray-600 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </Field>
               </div>
             </div>
           </div>
@@ -505,6 +294,16 @@ export default function RatePage() {
                 <span className="text-gray-600">Điểm tối đa:</span>
                 <span className="font-semibold text-gray-900">{formData.maxPoint} điểm</span>
               </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Hạn sử dụng:</span>
+                <span className="font-semibold text-gray-900">{formData.expiredTime} ngày</span>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Ngày kết thúc:</span>
+                <span className="font-semibold text-gray-900">{formatDate(formData.endDate)}</span>
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -527,5 +326,3 @@ export default function RatePage() {
     </>
   );
 }
-
-
