@@ -28,6 +28,9 @@ function CreateActivityOverlay({
     targetDistance: "",
     rules: "",
     completionBonus: "",
+    top1Bonus: "",
+    top2Bonus: "",
+    top3Bonus: "",
   };
 
   const [form, setForm] = useState(defaultForm);
@@ -49,6 +52,9 @@ function CreateActivityOverlay({
         targetDistance: activity.targetDistance ?? "",
         rules: activity.rules || "",
         completionBonus: activity.completionBonus ?? "",
+        top1Bonus: activity.top1Bonus ?? "",
+        top2Bonus: activity.top2Bonus ?? "",
+        top3Bonus: activity.top3Bonus ?? "",
       });
     } else if (mode === "create") {
       setForm(defaultForm);
@@ -371,6 +377,50 @@ function CreateActivityOverlay({
               className={baseInput}
               placeholder="200"
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Thưởng Top 1
+              </label>
+              <input
+                type="number"
+                name="top1Bonus"
+                value={form.top1Bonus}
+                onChange={handleChange}
+                className={baseInput}
+                placeholder="150"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Thưởng Top 2
+              </label>
+              <input
+                type="number"
+                name="top2Bonus"
+                value={form.top2Bonus}
+                onChange={handleChange}
+                className={baseInput}
+                placeholder="100"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Thưởng Top 3
+              </label>
+              <input
+                type="number"
+                name="top3Bonus"
+                value={form.top3Bonus}
+                onChange={handleChange}
+                className={baseInput}
+                placeholder="50"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

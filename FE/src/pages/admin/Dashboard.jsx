@@ -1,86 +1,109 @@
-import {
-  Users,
-  SquareActivity,
-  ShoppingCart,
-  ShieldCheck,
-  Home,
-} from "lucide-react";
-
+import { Home, Users, Activity } from "lucide-react";
+import { useEffect, useState } from "react";
+import adminApi from "../../api/adminApi";
+import runningActivityApi from "../../api/runningActivityApi";
+import transactionsApi from "../../api/transactionsApi";
 import Header from "../../components/common/Header";
 
 function Dashboard() {
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [totalActivities, setTotalActivities] = useState(0);
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        // Lấy nhân viên
+        const res = await adminApi.getAllUsers();
+        setTotalUsers(res?.result?.length ?? 0);
+
+        // Lấy hoạt động
+        const activityRes = await runningActivityApi.adminGetAllActivity();
+        setTotalActivities(activityRes?.result?.totalElements ?? 0);
+
+        // Transactions - TOP 5 GẦN NHẤT
+        const transactionRes = await transactionsApi.getAllTransactions();
+
+        const top5Recent = (transactionRes?.result ?? [])
+          .sort((a, b) => new Date(b.createAt) - new Date(a.createAt))
+          .slice(0, 5);
+
+        setRecentTransactions(top5Recent);
+      } catch (error) {
+        console.error("Lỗi lấy danh sách nhân viên:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
     <main className="p-0">
-      <div className=" mx-auto">
+      <div className="mx-auto">
         {/* Header */}
         <Header title="Tổng quan" icon={Home} />
 
         {/* Content */}
-        <div className="p-6">
-          {/* Stats Cards - 4 columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {/* Stat Card 1 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Tổng số nhân viên</h3>
-                <Users className="w-5 h-5 " />
+        <div className="flex flex-col">
+          <div className="grid grid-cols-2 pt-6 px-6 gap-6">
+            {/* THẺ ĐẦU TIÊN: SỐ LƯỢNG NHÂN VIÊN */}
+            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-blue-100 text-blue-600">
+                <Users size={28} />
               </div>
-              <p className="text-2xl font-bold ">100</p>
+              <div>
+                <p className="text-sm text-gray-500">Tổng nhân viên</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {loading ? "..." : totalUsers}
+                </p>
+              </div>
             </div>
 
-            {/* Stat Card 2 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Hoạt động đang diễn ra</h3>
-                <SquareActivity className="w-5 h-5 " />
+            {/* THẺ THỨ 2: TỔNG HOẠT ĐỘNG */}
+            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-green-100 text-green-600">
+                <Activity size={28} />
               </div>
-              <p className="text-2xl font-bold ">5</p>
-            </div>
-
-            {/* Stat Card 3 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">
-                  Sản phẩm trong cửa hàng
-                </h3>
-                <ShoppingCart className="w-5 h-5 " />
+              <div>
+                <p className="text-sm text-gray-500">Tổng hoạt động</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {loading ? "..." : totalActivities}
+                </p>
               </div>
-              <p className="text-2xl font-bold ">15</p>
-            </div>
-
-            {/* Stat Card 4 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Đang truy cập</h3>
-                <ShieldCheck className="w-5 h-5 " />
-              </div>
-              <p className="text-2xl font-bold ">80</p>
             </div>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-            <h2 className="text-lg font-semibold  mb-4">Thống kê chung</h2>
-            <p className="text-sm  mb-4">Dữ liệu quan trọng</p>
+          <div className="grid grid-cols-1 pt-6 px-6 gap-6">
+            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
+              <h3 className="text-lg font-semibold mb-4">Giao dịch gần đây</h3>
 
-            <div className="space-y-3">
-              {/* Request Card 1 */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                <p className="font-semibold">Tài khoảng đang hoạt động</p>
-                <p className="text-2xl font-bold">90/100</p>
-              </div>
+              <ul className="space-y-3">
+                {recentTransactions.map((tx) => (
+                  <li
+                    key={tx.transactionId}
+                    className="flex justify-between items-center text-sm"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {tx.employeeName}
+                      </p>
+                      <p className="text-gray-500">{tx.transactionType}</p>
+                    </div>
 
-              {/* Request Card 2 */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                <p className="font-semibold">Tỉ lệ phê duyệt yêu cầu</p>
-                <p className="text-2xl font-bold">92%</p>
-              </div>
-
-              {/* Request Card 3 */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                <p className="font-semibold">Tổng điểm thưởng phát hành</p>
-                <p className="text-2xl font-bold">9,427</p>
-              </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">
+                        {tx.points} điểm
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(tx.createAt).toLocaleString("vi-VN")}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

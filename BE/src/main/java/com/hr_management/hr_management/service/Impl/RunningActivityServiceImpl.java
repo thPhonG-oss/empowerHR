@@ -1,6 +1,7 @@
 package com.hr_management.hr_management.service.Impl;
 
 
+import com.hr_management.hr_management.dto.request.RunningActivityUpdateStatusRequest;
 import com.hr_management.hr_management.dto.response.RunningActivityResponseDTO;
 import com.hr_management.hr_management.entity.*;
 import com.hr_management.hr_management.dto.request.RunningActivityUpdateRequestDTO;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +44,22 @@ public class RunningActivityServiceImpl implements RunningActivityService {
     @Override
     public Page<RunningActivityResponseDTO> getAllActivities(Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("runningActivityId").descending());
-        Page<RunningActivity> activitiespage = runningActivityRepository.findAll(pageable);
-        return activitiespage.map(runningActivityMapper::toRunningActivityResponseDTO);
+        Page<RunningActivity> activitiesPage = runningActivityRepository.findAll(pageable);
+        Page<RunningActivityResponseDTO> dtoPage =
+                activitiesPage.map(activity -> {
+                    RunningActivityResponseDTO dto =
+                            runningActivityMapper.toRunningActivityResponseDTO(activity);
+
+                    Integer numberRegistered =
+                            participateInRepository
+                                    .countByRunningActivity_RunningActivityIdAndIsCancelledFalse(
+                                            activity.getRunningActivityId()
+                                    );
+
+                    dto.setNumberRegistered(numberRegistered);
+                    return dto;
+                });
+        return dtoPage;
     }
 
     // Implement service methods here
@@ -55,27 +72,25 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         ActivityStatus currentStatus = activity.getStatus();
 
         // Check permissions based on status
-        if (currentStatus == ActivityStatus.Completed || currentStatus == ActivityStatus.Cancelled) {
+        if (currentStatus == ActivityStatus.Completed || currentStatus == ActivityStatus.Cancelled ||  currentStatus == ActivityStatus.Active) {
             throw new IllegalStateException("Cannot edit activity that has completed");
         }
 
-        if (currentStatus == ActivityStatus.Active) {
-
-            activity.setDescription(requestDTO.getDescription());
-            activity.setImage(requestDTO.getImage());
-            activity.setRules(requestDTO.getRules());
-            activity.setRegistrationEndDate(requestDTO.getRegistrationEndDate());
-
-            RunningActivity updatedActivity = runningActivityRepository.save(activity);
-            return runningActivityMapper.toRunningActivityResponseDTO(updatedActivity);
-        }
+//        if (currentStatus == ActivityStatus.Active) {
+//
+//            activity.setDescription(requestDTO.getDescription());
+//            activity.setImage(requestDTO.getImage());
+//            activity.setRules(requestDTO.getRules());
+//            activity.setRegistrationEndDate(requestDTO.getRegistrationEndDate());
+//
+//            RunningActivity updatedActivity = runningActivityRepository.save(activity);
+//            return runningActivityMapper.toRunningActivityResponseDTO(updatedActivity);
+//        }
 
 
         LocalDate today = LocalDate.now();
         LocalDateTime today_1 = LocalDateTime.now();
-        if (requestDTO.getRegistrationStartDate().isBefore(today_1)) {
-            throw new IllegalArgumentException("Ngày bắt đăng kí không được ở trong quá khứ");
-        }
+
         if (requestDTO.getRegistrationEndDate().isBefore(today_1)) {
             throw new IllegalArgumentException("Ngày kết thúc đăng kí không được ở trong quá khứ");
         }
@@ -85,9 +100,7 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         if (requestDTO.getEndDate().isBefore(today)) {
             throw new IllegalArgumentException("Ngày kết thúc hoạt động không được ở quá khứ");
         }
-        if (requestDTO.getRegistrationStartDate().isAfter(requestDTO.getRegistrationEndDate())) {
-            throw new IllegalArgumentException("Ngày bắt đầu đăng ký phải trước hoặc bằng ngày kết thúc đăng ký");
-        }
+
         LocalDateTime startDateTime = requestDTO.getStartDate().atStartOfDay();
 
         if (requestDTO.getRegistrationEndDate().isAfter(startDateTime)) {
@@ -157,5 +170,86 @@ public class RunningActivityServiceImpl implements RunningActivityService {
 
 
         return runningActivityMapper.toRunningActivityResponseDTO(activity);
+    }
+
+    @Override
+    @Scheduled(fixedDelay = 30 * 60 * 1000)
+    public void updateRunningActivityStatuses() {
+        System.out.println("Start checking and updating running status");
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = LocalDate.now();
+
+        // Lấy tất cả activity chưa hoàn thành/hủy
+        List<ActivityStatus> excludeStatuses = Arrays.asList(
+                ActivityStatus.Completed,
+                ActivityStatus.Cancelled
+        );
+        List<RunningActivity> activities = runningActivityRepository.findByStatusNotIn(excludeStatuses);
+
+        for (RunningActivity activity : activities) {
+            ActivityStatus oldStatus = activity.getStatus();
+            ActivityStatus newStatus = determineStatus(activity, now, today);
+
+            if (!oldStatus.equals(newStatus)) {
+                activity.setStatus(newStatus);
+                runningActivityRepository.save(activity);
+                System.out.println(
+                        "Activity [" + activity.getRunningActivityId() + "]: "
+                                + oldStatus + " -> " + newStatus
+                );
+            }
+        }
+
+    }
+
+    @Override
+    public RunningActivityResponseDTO updateStatusActivity(Integer runningActivityId, RunningActivityUpdateStatusRequest runningActivityUpdateStatusRequest) {
+        // 1. Tìm activity theo ID
+        RunningActivity runningActivity = runningActivityRepository.findById(runningActivityId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACTIVITY_NOT_FOUND));
+
+        // 2. Validate status hợp lệ
+        ActivityStatus newStatus;
+        try {
+            newStatus = ActivityStatus.valueOf(runningActivityUpdateStatusRequest.getStatus());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new AppException(ErrorCode.INVALID_ACTIVITY_STATUS);
+        }
+        // 3. Cập nhật status
+        runningActivity.setStatus(newStatus);
+
+        // 4. Lưu vào database
+        RunningActivity updatedActivity = runningActivityRepository.save(runningActivity);
+        return runningActivityMapper.toRunningActivityResponseDTO(updatedActivity);
+
+    }
+
+    private ActivityStatus determineStatus(RunningActivity activity, LocalDateTime now, LocalDate today) {
+        // Draft → Open (khi đến registration_start_date)
+        if (activity.getStatus() == ActivityStatus.Draft
+                && activity.getRegistrationStartDate() != null
+                && now.isAfter(activity.getRegistrationStartDate())) {
+            return ActivityStatus.Open;
+        }
+
+        // Open → Active (khi đến registration_end_date AND start_date)
+        if (activity.getStatus() == ActivityStatus.Open
+                && activity.getRegistrationEndDate() != null
+                && activity.getStartDate() != null
+                && now.isAfter(activity.getRegistrationEndDate())
+                && today.isAfter(activity.getStartDate().atStartOfDay().toLocalDate())) {
+            return ActivityStatus.Active;
+        }
+
+        // Active → Completed (khi đến end_date)
+        if (activity.getStatus() == ActivityStatus.Active
+                && activity.getEndDate() != null
+                && today.isAfter(activity.getEndDate())) {
+            return ActivityStatus.Completed;
+        }
+
+        // Nếu không khớp điều kiện nào, giữ nguyên status
+        return activity.getStatus();
     }
 }

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 // Update: Thêm @SuperBuilder
 @SuperBuilder
+@DiscriminatorColumn(name = "transaction_type", discriminatorType = DiscriminatorType.STRING)
 public class Transaction {
 
     @Id
@@ -30,9 +31,9 @@ public class Transaction {
     @Column(name = "points", nullable = false)
     private Long points;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_type", nullable = false)
-    private TransactionType transactionType;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "transaction_type", nullable = false)
+//    private TransactionType transactionType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "point_account_id", nullable = false)

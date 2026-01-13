@@ -21,23 +21,19 @@ export default function RunningActivityManagement() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
-
-  // 🔥 overlay detail
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  // Search + sort + status
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // 🔍 Fuse config (KHÔNG ảnh hưởng logic khác)
   const fuseOptions = {
     keys: [
       { name: "title", weight: 0.7 },
       { name: "description", weight: 0.3 },
     ],
-    threshold: 0.4,
+    threshold: 0.2,
     ignoreLocation: true,
     minMatchCharLength: 2,
   };
@@ -62,22 +58,18 @@ export default function RunningActivityManagement() {
     fetchActivities(0);
   }, []);
 
-  // 🔍 Search (Fuse) + Filter + Sort
   useEffect(() => {
     let result = [...activities];
 
-    // 👉 FUZZY SEARCH
     if (searchTerm.trim()) {
       const fuse = new Fuse(result, fuseOptions);
       result = fuse.search(searchTerm).map((r) => r.item);
     }
 
-    // 👉 FILTER STATUS
     if (statusFilter !== "ALL") {
       result = result.filter((a) => a.status === statusFilter);
     }
 
-    // 👉 SORT DATE
     result.sort((a, b) => {
       const dateA = new Date(a.startDate);
       const dateB = new Date(b.startDate);
@@ -88,68 +80,83 @@ export default function RunningActivityManagement() {
   }, [searchTerm, sortOrder, statusFilter, activities]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+    <main className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
       <Header title="Quản lý hoạt động" icon={Activity} />
 
-      <div className="p-6 space-y-6">
-        {/* Bộ lọc */}
-        <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-4 py-2 bg-gwhite focus-within:ring-2 focus-within:ring-blue-500 transition w-full lg:w-1/2">
-            <Search className="w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tiêu đề hoặc mô tả..."
-              className="w-full bg-transparent outline-none text-sm placeholder-gray-400"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* FILTER */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50 ">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+            <div className="relative flex-1 max-w-md">
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="text"
+                placeholder="Tìm kiếm tiêu đề hoặc mô tả..."
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm transition-all focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-end gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm h-9 focus:ring-2 focus:ring-blue-500 outline-none"
-            >
-              <option value="ALL">Tất cả</option>
-              <option value="Draft">Chuẩn bị</option>
-              <option value="Active">Đang mở</option>
-              <option value="Completed">Đã kết thúc</option>
-              <option value="Cancelled">Đã hủy</option>
-            </select>
+            <div className="flex flex-wrap gap-3">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 outline-none transition-all hover:bg-gray-100 focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 cursor-pointer"
+              >
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="Draft">Chuẩn bị</option>
+                <option value="Open">Đang mở</option>
+                <option value="Active">Đang diễn ra</option>
+                <option value="Completed">Đã kết thúc</option>
+                <option value="Cancelled">Đã hủy</option>
+              </select>
 
-            <button
-              onClick={() =>
-                setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
-              }
-              className="w-32 flex items-center gap-2 px-4 rounded-md bg-black text-sm text-white hover:bg-gray-800 transition h-9 cursor-pointer"
-            >
-              <ArrowUpDown size={16} />
-              {sortOrder === "desc" ? "Gần nhất" : "Xa nhất"}
-            </button>
+              <button
+                onClick={() =>
+                  setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
+                }
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-sm font-medium text-white shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <ArrowUpDown size={16} />
+                {sortOrder === "desc" ? "Gần nhất" : "Xa nhất"}
+              </button>
 
-            <button
-              onClick={() => setOpenCreate(true)}
-              className="flex items-center gap-2 px-4 rounded-md bg-black text-sm text-white hover:bg-gray-800 transition h-9 cursor-pointer"
-            >
-              <PlusCircle size={16} />
-              <span>Tạo hoạt động</span>
-            </button>
+              <button
+                onClick={() => setOpenCreate(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-black to-gray-900 text-sm font-medium text-white shadow-lg shadow-black/20 transition-all hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <PlusCircle size={16} />
+                Tạo hoạt động
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Nội dung */}
+        {/* CONTENT */}
         {loading ? (
-          <div className="text-center py-20 text-gray-400 animate-pulse">
-            Đang tải dữ liệu...
+          <div className="text-center py-32">
+            <div className="inline-flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-lg">
+              <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+              <span className="text-gray-600 font-medium">
+                Đang tải dữ liệu...
+              </span>
+            </div>
           </div>
         ) : filteredActivities.length === 0 ? (
-          <p className="text-center text-gray-400 py-20">
-            Không có hoạt động nào.
-          </p>
+          <div className="text-center py-32">
+            <div className="inline-flex flex-col items-center gap-4 px-8 py-10 bg-white rounded-2xl shadow-lg">
+              <Activity size={48} className="text-gray-300" />
+              <p className="text-gray-500 font-medium">
+                Không có hoạt động nào
+              </p>
+            </div>
+          </div>
         ) : (
           <>
-            {/* Danh sách */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredActivities.map((act) => (
                 <div
@@ -158,29 +165,35 @@ export default function RunningActivityManagement() {
                     setSelectedActivity(act);
                     setOpenDetail(true);
                   }}
-                  className="group bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden cursor-pointer"
+                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-md shadow-gray-200/50 transition-all duration-300 hover:shadow-2xl hover:shadow-gray-300/50 hover:-translate-y-1 cursor-pointer"
                 >
-                  <img
-                    src={act.image}
-                    alt={act.title}
-                    className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={
+                        act.image ||
+                        "https://res.cloudinary.com/dznocieoi/image/upload/v1766487761/istockphoto-1396814518-612x612_upvria.jpg"
+                      }
+                      alt={act.title}
+                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
 
-                  <div className="p-4 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h2 className="text-base font-semibold text-gray-800 line-clamp-2">
+                  <div className="p-5 space-y-3">
+                    <div className="flex justify-between items-start gap-3">
+                      <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug flex-1">
                         {act.title}
-                      </h2>
+                      </h3>
 
                       <span
-                        className={`text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap ${
+                        className={`shrink-0 text-xs px-3 py-1.5 rounded-full font-semibold tracking-wide ${
                           act.status === "Active"
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
                             : act.status === "Completed"
-                            ? "bg-blue-100 text-blue-700"
+                            ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
                             : act.status === "Cancelled"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-600"
+                            ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                            : "bg-gray-100 text-gray-700 ring-1 ring-gray-200"
                         }`}
                       >
                         {act.status === "Active"
@@ -193,43 +206,47 @@ export default function RunningActivityManagement() {
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-600 line-clamp-3">
+                    <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                       {act.description}
                     </p>
 
-                    <div className="text-xs text-gray-500 space-y-1 pt-2 border-t border-gray-300">
-                      <p className="flex gap-2">
-                        <Clock size={14} /> <strong>Bắt đầu:</strong>{" "}
-                        {act.startDate}
-                      </p>
-                      <p className="flex gap-2">
-                        <GripHorizontal size={14} /> <strong>Kết thúc:</strong>{" "}
-                        {act.endDate}
-                      </p>
+                    <div className="text-xs text-gray-500 space-y-2 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <Clock size={14} className="text-gray-400" />
+                        <span className="font-medium">Bắt đầu:</span>
+                        <span>{act.startDate}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <GripHorizontal size={14} className="text-gray-400" />
+                        <span className="font-medium">Kết thúc:</span>
+                        <span>{act.endDate}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Phân trang */}
-            <div className="flex justify-center items-center gap-3 mt-8">
+            {/* PAGINATION */}
+            <div className="flex justify-center items-center gap-4 pt-4">
               <button
-                className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-600/80 transition cursor-pointer disabled:bg-blue-600/50 disabled:cursor-not-allowed"
                 onClick={() => fetchActivities(pageNumber - 1)}
                 disabled={pageNumber === 0}
+                className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 ← Trước
               </button>
 
-              <span className="text-sm font-medium text-gray-700">
-                Trang {pageNumber + 1} / {totalPages}
-              </span>
+              <div className="px-6 py-3 bg-white rounded-xl shadow-md border border-gray-100">
+                <span className="text-sm text-gray-700 font-semibold">
+                  Trang {pageNumber + 1} / {totalPages}
+                </span>
+              </div>
 
               <button
-                className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-600/80 transition cursor-pointer disabled:bg-blue-600/50 disabled:cursor-not-allowed"
                 onClick={() => fetchActivities(pageNumber + 1)}
                 disabled={pageNumber + 1 >= totalPages}
+                className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 Sau →
               </button>
@@ -238,20 +255,18 @@ export default function RunningActivityManagement() {
         )}
       </div>
 
-      {/* Overlay Create */}
       <CreateActivityOverlay
         open={openCreate}
         onClose={() => setOpenCreate(false)}
         onSuccess={() => fetchActivities(0)}
       />
 
-      {/* Overlay Detail */}
       <DetailActivityOverlay
         open={openDetail}
         onClose={() => setOpenDetail(false)}
         activity={selectedActivity}
         onSuccess={() => fetchActivities(0)}
       />
-    </div>
+    </main>
   );
 }

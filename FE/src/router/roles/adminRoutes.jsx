@@ -6,6 +6,7 @@ import EditProfile from "../../pages/common/EditProfile";
 import AccountManagement from "../../pages/admin/AccountManagement";
 import RunningActivityManagement from "../../pages/admin/ActivityAManagement";
 import RoleRoute from "../RoleRoute";
+import RewardPolicy from "../../pages/admin/RewardPolicy";
 
 const adminRoutes = [
   {
@@ -28,6 +29,7 @@ const adminRoutes = [
         path: "activity-management",
         element: <RunningActivityManagement />,
       },
+      { path: "rewards", element: <RewardPolicy /> },
     ],
   },
 ];

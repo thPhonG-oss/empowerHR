@@ -1,7 +1,7 @@
 import { useState } from "react";
 import requestApi from "../../api/requestApi";
-// import { Toast } from "../common/Toast";
 import toast from "react-hot-toast";
+import { X, Calendar, Clock, User, FileText, ImageIcon } from "lucide-react";
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -33,29 +33,23 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
   const isLeave = request.requestType === "LEAVE";
   const isTimesheet = request.requestType === "TIMESHEET_UPDATE";
 
-  // ===== CALL API APPROVE =====
   const approveRequest = async () => {
     try {
       await requestApi.approve(request.requestId, note);
-
       if (reloadData) reloadData();
       toast.success("Phê duyệt yêu cầu thành công");
     } catch (err) {
       toast.error("Phê duyệt yêu cầu thất bại");
-      console.error(err);
     }
   };
 
-  // ===== CALL API REJECT =====
   const rejectRequest = async () => {
     try {
       await requestApi.reject(request.requestId, note);
-
       if (reloadData) reloadData();
       toast.success("Từ chối yêu cầu thành công");
     } catch (err) {
       toast.error("Từ chối yêu cầu thất bại");
-      console.error(err);
     }
   };
 
@@ -87,234 +81,190 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
 
   return (
     <>
-      {/* Main Popup */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/50 " onClick={onClose} />
 
-        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {isLeave
-                ? "Xin nghỉ phép"
-                : isTimesheet
-                ? "Cập nhật chấm công"
-                : "Yêu cầu"}
-            </h2>
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-linear-to-r from-gray-50 to-white">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                {isLeave
+                  ? "Xin nghỉ phép"
+                  : isTimesheet
+                  ? "Cập nhật chấm công"
+                  : "Yêu cầu"}
+              </h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Chi tiết yêu cầu từ nhân viên
+              </p>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 cursor-pointer p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className="text-gray-400 hover:bg-red-100 p-2 rounded-lg transition-all duration-200 cursor-pointer"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X size={20} />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-4">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">Người yêu cầu:</span>
-                <span className="text-gray-900 font-semibold">
-                  {request.employeeName}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">Bộ phận:</span>
-                <span className="text-gray-900">Developer</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">Ngày yêu cầu:</span>
-                <span className="text-gray-900">
-                  {formatDate(request.submitAt)}
-                </span>
-              </div>
-
-              <div></div>
-
-              {/* Leave */}
-              {isLeave && (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Bắt đầu:</span>
-                    <span className="text-gray-900">
-                      {request.startDate
-                        ? `${formatTimeOnly("08:00:00")} - ${formatDate(
-                            request.startDate
-                          )}`
-                        : "N/A"}
-                    </span>
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            {/* Employee Info Card */}
+            <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-xl p-5 mb-5 border border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-white p-2 rounded-lg shadow-sm">
+                    <User size={18} className="text-gray-600" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Đến ngày:</span>
-                    <span className="text-gray-900">
-                      {request.endDate
-                        ? `${formatTimeOnly("17:00:00")} - ${formatDate(
-                            request.endDate
-                          )}`
-                        : "N/A"}
-                    </span>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-0.5">
+                      Người yêu cầu
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {request.employeeName}
+                    </p>
                   </div>
-                </>
-              )}
+                </div>
 
-              {/* Timesheet */}
-              {isTimesheet && (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Checkin Time:</span>
-                    <span className="text-gray-900">
-                      {request.attendanceDate && request.checkinTime
-                        ? `${formatTimeOnly(
-                            request.checkinTime
-                          )} - ${formatDate(request.attendanceDate)}`
-                        : "N/A"}
-                    </span>
+                <div className="flex items-start gap-3">
+                  <div className="bg-white p-2 rounded-lg shadow-sm">
+                    <FileText size={18} className="text-gray-600" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Checkout Time:</span>
-                    <span className="text-gray-900">
-                      {request.attendanceDate && request.checkoutTime
-                        ? `${formatTimeOnly(
-                            request.checkoutTime
-                          )} - ${formatDate(request.attendanceDate)}`
-                        : "N/A"}
-                    </span>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-0.5">Bộ phận</p>
+                    <p className="font-semibold text-gray-900">Developer</p>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
 
-            {isLeave && days > 0 && (
-              <div className="mt-3 text-sm">
-                <span className="text-gray-500">Tổng ngày nghỉ:</span>
-                <span className="ml-2 text-gray-900 font-medium">
-                  {days} ngày
-                </span>
-              </div>
-            )}
-
-            {/* Reason */}
-            <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
-              <p className="text-sm text-gray-500 mb-1">Lý do:</p>
-              <p className="text-sm text-gray-700">{request.reason}</p>
-            </div>
-
-            {/* Proof Image */}
-            {request.proofDocument && isLeave && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-500 mb-2">File đính kèm</p>
-                <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-2">
-                  <img
-                    src={request.proofDocument}
-                    alt="Minh chứng"
-                    className="w-[400px] h-[300px] object-contain rounded mx-auto"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      const errorDiv = e.target.nextElementSibling;
-                      if (errorDiv) {
-                        errorDiv.style.display = "block";
-                      }
-                    }}
-                  />
-                  <div className="hidden p-4 text-center text-gray-500 text-sm bg-gray-100 rounded">
-                    <svg
-                      className="w-12 h-12 mx-auto mb-2 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    Không thể tải hình ảnh
+                <div className="flex items-start gap-3">
+                  <div className="bg-white p-2 rounded-lg shadow-sm">
+                    <Calendar size={18} className="text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-0.5">Ngày yêu cầu</p>
+                    <p className="font-semibold text-gray-900">
+                      {formatDate(request.submitAt)}
+                    </p>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Status */}
-            {isProcessed && (
-              <div className="mt-4 p-4 rounded-md border border-gray-200 bg-gray-50">
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${
-                      request.status === "Approved"
-                        ? "bg-green-100 text-green-700 border border-green-200"
-                        : "bg-red-100 text-red-700 border border-red-200"
-                    }`}
-                  >
-                    {request.status === "Approved"
-                      ? "Đã phê duyệt"
-                      : "Đã từ chối"}
-                  </span>
-                  {request.handleAt && (
-                    <span className="text-sm text-gray-500">
-                      vào {formatDate(request.handleAt)}
-                    </span>
-                  )}
+            {/* Time Details for Leave */}
+            {isLeave && (
+              <div className="bg-white rounded-xl p-5 mb-5 border border-gray-200 shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Clock size={16} className="text-gray-600" />
+                  Thời gian nghỉ phép
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-1">Bắt đầu</p>
+                    <p className="font-semibold text-gray-900">
+                      08h00 - {formatDate(request.startDate)}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-1">Kết thúc</p>
+                    <p className="font-semibold text-gray-900">
+                      17h00 - {formatDate(request.endDate)}
+                    </p>
+                  </div>
                 </div>
-                {request.responseReason && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-1">
-                      Ghi chú của quản lý:
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      {request.responseReason}
-                    </p>
+
+                {days > 0 && (
+                  <div className="mt-4 bg-linear-to-r from-black to-gray-800 text-white rounded-lg p-4 text-center">
+                    <p className="text-sm opacity-90 mb-1">Tổng ngày nghỉ</p>
+                    <p className="text-2xl font-bold">{days} ngày</p>
                   </div>
                 )}
               </div>
             )}
 
+            {/* Time Details for Timesheet */}
+            {isTimesheet && (
+              <div className="bg-white rounded-xl p-5 mb-5 border border-gray-200 shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Clock size={16} className="text-gray-600" />
+                  Thời gian chấm công
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-1">Check-in</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {formatTimeOnly(request.checkinTime)}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-1">Check-out</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {formatTimeOnly(request.checkoutTime)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Reason */}
+            <div className="bg-white rounded-xl p-5 mb-5 border border-gray-200 shadow-sm">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                Lý do
+              </h3>
+              <p className="text-gray-700 leading-relaxed">{request.reason}</p>
+            </div>
+
+            {/* Proof Document */}
+            {request.proofDocument && (
+              <div className="bg-white rounded-xl p-5 mb-5 border border-gray-200 shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <ImageIcon size={16} className="text-gray-600" />
+                  Tài liệu minh chứng
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <img
+                    src={request.proofDocument}
+                    alt=""
+                    className="mx-auto max-h-64 rounded-lg shadow-md"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Manager Note */}
             {!isProcessed && (
-              <div className="mt-4">
-                <p className="text-sm font-medium text-gray-900 mb-2">
-                  Ghi chú của quản lý
-                </p>
+              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                <label className="text-sm font-semibold text-gray-900 mb-3 block">
+                  Ghi chú quản lý
+                </label>
                 <textarea
                   value={note}
-                  onChange={(e) => {
-                    setNote(e.target.value);
-                    setError("");
-                  }}
-                  placeholder="Ghi chú lý do từ chối hoặc phê duyệt"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={3}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all resize-none"
+                  placeholder="Nhập ghi chú của bạn..."
+                  rows="3"
                 />
-                {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+                {error && (
+                  <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                    <span className="font-medium">⚠</span> {error}
+                  </p>
+                )}
               </div>
             )}
           </div>
 
+          {/* Footer Actions */}
           {!isProcessed && (
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={handleRejectClick}
-                className="px-5 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md cursor-pointer transition-colors"
+                className="px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-lg 
+                hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
               >
                 Từ chối
               </button>
               <button
                 onClick={handleApproveClick}
-                className="px-5 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md cursor-pointer transition-colors"
+                className="px-5 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-lg shadow-black/20 cursor-pointer"
               >
                 Phê duyệt
               </button>
@@ -323,76 +273,48 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
         </div>
       </div>
 
-      {/* Confirmation */}
+      {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setShowConfirm(null)}
           />
-          <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
-            <div className="flex items-center gap-3 mb-4">
+
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+            <div className="text-center mb-6">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
                   showConfirm === "approve" ? "bg-green-100" : "bg-red-100"
                 }`}
               >
-                {showConfirm === "approve" ? (
-                  <svg
-                    className="w-5 h-5 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
+                <span className="text-3xl">
+                  {showConfirm === "approve" ? "✓" : "✕"}
+                </span>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Xác nhận {showConfirm === "approve" ? "phê duyệt" : "từ chối"}
-                </h3>
-              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Xác nhận hành động
+              </h3>
+              <p className="text-gray-600">
+                Bạn có chắc chắn muốn{" "}
+                {showConfirm === "approve" ? "phê duyệt" : "từ chối"} yêu cầu
+                này không?
+              </p>
             </div>
 
-            <p className="text-sm text-gray-600 mb-6">
-              Bạn có chắc chắn muốn{" "}
-              {showConfirm === "approve" ? "phê duyệt" : "từ chối"} yêu cầu của{" "}
-              <span className="font-medium">{request.employeeName}</span>?
-            </p>
-
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md cursor-pointer transition-colors"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-200 cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 onClick={confirmAction}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer transition-colors ${
+                className={`flex-1 px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 shadow-lg cursor-pointer ${
                   showConfirm === "approve"
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-red-600 hover:bg-red-700"
+                    ? "bg-green-600 hover:bg-green-700 shadow-green-600/30"
+                    : "bg-red-600 hover:bg-red-700 shadow-red-600/30"
                 }`}
               >
                 Xác nhận

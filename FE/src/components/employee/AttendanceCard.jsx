@@ -1,10 +1,10 @@
-import { CalendarClock, Clock, LogIn, LogOut } from "lucide-react";
+import { Clock, LogIn, LogOut } from "lucide-react";
 import { getCurrentDateParts } from "../../utils/date";
 import { useState, useEffect } from "react";
 import employeeApi from "../../api/employeeApi";
 import toast from "react-hot-toast";
 
-function AttendanceCard() {
+function AttendanceCard({ isDashboard = false, className = "" }) {
   const [checkInTime, setCheckInTime] = useState("--:--");
   const [checkOutTime, setCheckOutTime] = useState("--:--");
 
@@ -18,6 +18,7 @@ function AttendanceCard() {
     try {
       const res = await fetch("https://api.ipify.org?format=json");
       const data = await res.json();
+
       return data.ip;
     } catch (err) {
       console.error("Error getting public IP:", err);
@@ -100,54 +101,84 @@ function AttendanceCard() {
 
   return (
     <>
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <div className="mb-4">
-          <h1 className="font-bold text-lg">Chấm công hôm nay</h1>
-          <p className="text-[#595959] text-sm">
+      <div
+        className={`rounded-2xl bg-white p-6 shadow-lg border border-gray-100  ${className}`}
+      >
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="font-bold text-xl text-gray-900">
+            {isDashboard ? "Chấm công nhanh" : "Chấm công hôm nay"}
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
             {dayOfWeek}, {day} tháng {month}, {year}
           </p>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center gap-6">
+          {/* Time info */}
           <div className="flex gap-4">
-            <div>
-              <p>Check-in</p>
-              <p className="inline-flex items-center gap-2">
-                <span>
-                  <Clock size={20} className="text-[#595959]" />
+            {/* Check-in */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 min-w-[120px]">
+              <p className="text-xs text-gray-500 mb-1">Check-in</p>
+              <div className="flex items-center gap-2">
+                <Clock size={18} className="text-gray-400" />
+                <span className="text-lg font-semibold text-gray-900">
+                  {checkInTime}
                 </span>
-                <span className="font-extrabold">{checkInTime}</span>
-              </p>
+              </div>
             </div>
-            <div>
-              <p>Check-out</p>
-              <p className="inline-flex items-center gap-2">
-                <span>
-                  <Clock size={20} className="text-[#595959]" />
+
+            {/* Check-out */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 min-w-[120px]">
+              <p className="text-xs text-gray-500 mb-1">Check-out</p>
+              <div className="flex items-center gap-2">
+                <Clock size={18} className="text-gray-400" />
+                <span className="text-lg font-semibold text-gray-900">
+                  {checkOutTime}
                 </span>
-                <span className="font-extrabold">{checkOutTime}</span>
-              </p>
+              </div>
             </div>
           </div>
 
+          {/* Action button */}
           <div>
             {isIn && !isOut && (
               <button
                 onClick={handleCheckIn}
-                className="inline-flex justify-center items-center gap-2 text-white bg-black p-2 rounded-lg cursor-pointer hover:opacity-80"
+                title=""
+                className="
+                inline-flex items-center gap-2
+                bg-black text-white
+                px-4 py-2.5 rounded-xl
+                font-medium
+                hover:bg-gray-800
+                active:scale-95
+                transition-all
+                cursor-pointer
+              "
               >
-                <LogIn />
-                <span>Check-in</span>
+                <LogIn size={18} />
+                <span>Bắt đầu làm việc</span>
               </button>
             )}
 
             {!isIn && isOut && (
               <button
+                title=""
                 onClick={handleCheckOut}
-                className="inline-flex justify-center items-center gap-2 border text-black bg-white p-2 rounded-lg cursor-pointer hover:opacity-80"
+                className="
+                inline-flex items-center gap-2
+                bg-white text-gray-900
+                border border-gray-300
+                px-4 py-2.5 rounded-xl
+                font-medium
+                hover:bg-gray-100
+                active:scale-95
+                transition-all
+              "
               >
-                <LogOut />
-                <span>Check-out</span>
+                <LogOut size={18} />
+                <span>Kết thúc làm việc</span>
               </button>
             )}
           </div>

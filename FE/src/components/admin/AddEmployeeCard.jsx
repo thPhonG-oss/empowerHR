@@ -6,8 +6,9 @@ import positionApi from "../../api/positionApi";
 import departmentApi from "../../api/departmentApi";
 
 import { getProvinces } from "vn-provinces-wards";
+import toast from "react-hot-toast";
 
-const AddEmployeeCard = ({ onClose }) => {
+const AddEmployeeCard = ({ onClose, onAddSuccess }) => {
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
     employeeName: "",
@@ -32,13 +33,13 @@ const AddEmployeeCard = ({ onClose }) => {
   const provinces = getProvinces();
 
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer";
 
   const btnPrimary =
-    "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition";
+    "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition cursor-pointer";
 
   const btnOutline =
-    "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition";
+    "px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-100 transition cursor-pointer";
 
   const banks = [
     "Vietcombank",
@@ -59,15 +60,6 @@ const AddEmployeeCard = ({ onClose }) => {
   ];
 
   const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
-
-  // const handleDeleteEmployee = () => {
-  //   // Xóa giả
-  //   setEmployeeList((prev) =>
-  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
-  //   );
-  //   // Gọi API xóa ở đây
-  //   setIsConfirmPopupOpen(false);
-  // };
 
   // Load danh sách departments
   useEffect(() => {
@@ -116,23 +108,18 @@ const AddEmployeeCard = ({ onClose }) => {
   const handleSubmit = async () => {
     try {
       const response = await adminApi.addUser(formData);
-
-      alert("Tạo nhân viên thành công!");
       onClose(); // Đóng modal sau khi submit thành công
-      // reload
-      window.location.reload();
+      onAddSuccess();
+      toast.success("Tạo nhân viên thành công");
     } catch (error) {
       console.error("Lỗi khi tạo nhân viên:", error);
-      alert("Tạo nhân viên thất bại. Vui lòng thử lại!");
+      toast.error("Tạo nhân viên thất bại");
     }
   };
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/30 z-50" onClick={onClose} />
 
       <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
         <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 max-h-[90vh] overflow-y-auto">
@@ -143,7 +130,7 @@ const AddEmployeeCard = ({ onClose }) => {
           <div className="flex gap-2 mb-6 border-b">
             <button
               onClick={() => setActiveTab("personal")}
-              className={`px-4 py-2 font-medium border-b-2 transition ${
+              className={`px-4 py-2 font-medium border-b-2 transition cursor-pointer ${
                 activeTab === "personal"
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
@@ -153,7 +140,7 @@ const AddEmployeeCard = ({ onClose }) => {
             </button>
             <button
               onClick={() => setActiveTab("work")}
-              className={`px-4 py-2 font-medium border-b-2 transition ${
+              className={`px-4 py-2 font-medium border-b-2 transition cursor-pointer ${
                 activeTab === "work"
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
@@ -242,12 +229,15 @@ const AddEmployeeCard = ({ onClose }) => {
                 </div>
               </div>
               <div className="flex justify-end gap-2 mt-6">
-                <button onClick={onClose} className={btnOutline}>
+                <button
+                  onClick={onClose}
+                  className={btnOutline + "cursor-pointer"}
+                >
                   Hủy
                 </button>
                 <button
                   onClick={() => setActiveTab("work")}
-                  className={btnPrimary}
+                  className={btnPrimary + "cursor-pointer"}
                 >
                   Tiếp tục
                 </button>
@@ -359,11 +349,14 @@ const AddEmployeeCard = ({ onClose }) => {
               <div className="flex justify-end gap-4 mt-6">
                 <button
                   onClick={() => setActiveTab("personal")}
-                  className={btnOutline}
+                  className={btnOutline + "cursor-pointer"}
                 >
                   Quay lại
                 </button>
-                <button onClick={handleSubmit} className={btnPrimary}>
+                <button
+                  onClick={handleSubmit}
+                  className={btnPrimary + "cursor-pointer"}
+                >
                   Xác nhận
                 </button>
               </div>
