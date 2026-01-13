@@ -9,6 +9,7 @@ export default function MonthlyPointPage() {
   const [departmentData, setDepartmentData] = useState([]);
   const [editing, setEditing] = useState(null);
   const [value, setValue] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchDepartments();
@@ -42,48 +43,113 @@ export default function MonthlyPointPage() {
   const startEdit = (type, item) => {
     setEditing({ type, id: item.id });
     setValue(item.point);
+    setError("");
   };
 
   const cancelEdit = () => {
     setEditing(null);
     setValue("");
+    setError("");
+  };
+
+  const validateValue = () => {
+    // Check empty
+    if (!value || value === '' || value.toString().trim() === '') {
+      setError("Vui lòng nhập giá trị");
+      return false;
+    }
+
+    // Check if is number
+    if (isNaN(value)) {
+      setError("Giá trị phải là số");
+      return false;
+    }
+
+    // Check positive number
+    const numValue = Number(value);
+    if (numValue <= 0) {
+      setError("Giá trị phải lớn hơn 0");
+      return false;
+    }
+
+    // Check integer
+    if (!Number.isInteger(numValue)) {
+      setError("Giá trị phải là số nguyên");
+      return false;
+    }
+
+    // Check max value (optional - prevent too large numbers)
+    if (numValue > 1000000) {
+      setError("Giá trị không được vượt quá 1,000,000");
+      return false;
+    }
+
+    setError("");
+    return true;
   };
 
   const saveEdit = async () => {
-    if (editing.type === "position") {
-      await monthlyRewardApi.updateMonthlyReward(editing.id, { monthlyPoints: value });
-      setPositionData((prev) =>
-        prev.map((p) =>
-          p.id === editing.id ? { ...p, point: value } : p
-        )
-      );
-      toast.success("Cập nhật điểm chức vụ thành công!");
+    if (!validateValue()) {
+      return;
     }
 
-    if (editing.type === "department") {
-      await monthlyRewardApi.updateDepartmentPoint(editing.id, { budget: value });
-      setDepartmentData((prev) =>
-        prev.map((d) =>
-          d.id === editing.id ? { ...d, point: value } : d
-        )
-      );
-      toast.success("Cập nhật ngân sách phòng ban thành công!");
-    }
+    try {
+      const numValue = Number(value);
 
-    cancelEdit();
+      if (editing.type === "position") {
+        await monthlyRewardApi.updateMonthlyReward(editing.id, { monthlyPoints: numValue });
+        setPositionData((prev) =>
+          prev.map((p) =>
+            p.id === editing.id ? { ...p, point: numValue } : p
+          )
+        );
+        toast.success("Cập nhật điểm chức vụ thành công!");
+      }
+
+      if (editing.type === "department") {
+        await monthlyRewardApi.updateDepartmentPoint(editing.id, { budget: numValue });
+        setDepartmentData((prev) =>
+          prev.map((d) =>
+            d.id === editing.id ? { ...d, point: numValue } : d
+          )
+        );
+        toast.success("Cập nhật ngân sách phòng ban thành công!");
+      }
+
+      cancelEdit();
+    } catch (err) {
+      toast.error("Có lỗi xảy ra khi cập nhật!");
+      console.error(err);
+    }
+  };
+
+  const handleValueChange = (e) => {
+    setValue(e.target.value);
+    setError("");
   };
 
   const renderPointCell = (item, type) => {
     const isEdit = editing?.id === item.id && editing?.type === type;
 
     return isEdit ? (
-      <input
-        type="number"
-        className="border-2 border-blue-500 rounded-lg px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        autoFocus
-      />
+      <div className="space-y-1">
+        <input
+          type="number"
+          className={`border-2 rounded-lg px-3 py-2 w-32 focus:outline-none focus:ring-2 transition-colors ${
+            error 
+              ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+              : 'border-blue-500 focus:ring-blue-500'
+          }`}
+          value={value}
+          onChange={handleValueChange}
+          autoFocus
+          min="1"
+          step="1"
+        />
+        {error && (
+          <p className="text-xs text-red-600 font-medium">{error}</p>
+        )}
+      </div>
     ) : (
       <span className="font-semibold text-gray-900">{item.point.toLocaleString()}</span>
     );
@@ -96,23 +162,26 @@ export default function MonthlyPointPage() {
       <div className="flex gap-2">
         <button
           onClick={saveEdit}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-green-50 rounded-lg transition-colors group"
+          title="Lưu"
         >
-          <Check className="w-4 h-4 text-green-600" />
+          <Check className="w-4 h-4 text-green-600 group-hover:text-green-700" />
         </button>
         <button
           onClick={cancelEdit}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
+          title="Hủy"
         >
-          <X className="w-4 h-4 text-red-600" />
+          <X className="w-4 h-4 text-red-600 group-hover:text-red-700" />
         </button>
       </div>
     ) : (
       <button
         onClick={() => startEdit(type, item)}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
+        title="Chỉnh sửa"
       >
-        <Pencil className="w-4 h-4 text-blue-600" />
+        <Pencil className="w-4 h-4 text-blue-600 group-hover:text-blue-700" />
       </button>
     );
   };
@@ -228,6 +297,23 @@ export default function MonthlyPointPage() {
             )}
           />
         </Section>
+
+        {/* Info Card */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0">
+              <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                i
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-blue-900 font-medium mb-1">Lưu ý khi cập nhật</p>
+              <p className="text-sm text-blue-800">
+                Giá trị phải là số nguyên dương và không vượt quá 1,000,000. Thay đổi sẽ được áp dụng ngay lập tức.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
