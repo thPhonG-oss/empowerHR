@@ -4,7 +4,7 @@ import pointPolicyApi from "../../api/pointPolicyApi";
 import RedeemRewardModal from "./RedeemRewardModal";
 import { Gem, TrendingUp, ArrowLeftRight, Info } from "lucide-react";
 
-function PointCard({ onRedeemSuccess }) {
+function PointCard({ redeemKey, onRedeemSuccess }) {
   const [pointData, setPointData] = useState(null);
   const [pointPolicy, setPointPolicy] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ function PointCard({ onRedeemSuccess }) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [redeemKey]);
 
   const fetchData = async () => {
     try {
