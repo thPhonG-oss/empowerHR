@@ -24,22 +24,22 @@ Trước khi chạy ứng dụng, vui lòng tạo database trong MySQL Workbench
 3.  **Lưu ý quan trọng:**
     * Ứng dụng đang được cấu hình mặc định kết nối với user: `root` và password: `root`.
     * Nếu máy của Thầy/Cô có password khác, vui lòng cập nhật lại file cấu hình tại:
-        * **Java BE:** `BE/src/main/resources/application.yml` (hoặc `application.properties`).
-        * **.NET BE:** `BE-dotnet/appsettings.json`.
+        * **Java BE:** 'Source Code/Backend/spring/.env`.
+        * **.NET BE:** `Source Code/Backend/dotnet/.env`.
 
 ---
 
 ## 3. Khởi chạy Backend 1: Java Spring Boot
 Dịch vụ này chạy mặc định tại cổng **8080**.
 
-1.  Mở terminal (Command Prompt hoặc PowerShell) và trỏ vào thư mục `BE`.
+1.  Mở terminal (Command Prompt hoặc PowerShell) và trỏ vào thư mục `Source Code/BackEnd/spring`.
     ```bash
-    cd BE
+    cd "Source Code/BackEnd/spring"
     ```
 2.  Chạy lệnh sau để tải thư viện và khởi động ứng dụng (dùng Maven Wrapper có sẵn):
     * **Windows:**
         ```cmd
-        mvnw.cmd spring-boot:run
+        ./mvnw spring-boot:run
         ```
     * **macOS / Linux:**
         ```bash
@@ -54,16 +54,16 @@ Dịch vụ này chạy mặc định tại cổng **8080**.
 Dịch vụ này sẽ chạy song song để xử lý các nghiệp vụ khác.
 
 1.  Mở một cửa sổ terminal **mới**.
-2.  Trỏ vào thư mục `BE-dotnet`.
+2.  Trỏ vào thư mục `Source Code/BackEnd/dotnet`.
     ```bash
-    cd BE-dotnet
+    cd "Source Code/BackEnd/dotnet"
     ```
 3.  Chạy lệnh để khôi phục thư viện và khởi chạy:
     ```bash
     dotnet run
     ```
     *(Hoặc có thể mở file `BE-dotnet.sln` bằng Visual Studio và nhấn F5)*.
-4.  Lưu ý cổng mạng (Port) mà ứng dụng .NET đang chạy (thường sẽ hiển thị trong log, ví dụ: `Now listening on: http://localhost:5xxx`).
+4.  Lưu ý cổng mạng (Port) mà ứng dụng .NET đang chạy (thường sẽ hiển thị trong log, ví dụ: `Now listening on: http://localhost:5000`).
 
 ---
 
@@ -71,9 +71,9 @@ Dịch vụ này sẽ chạy song song để xử lý các nghiệp vụ khác.
 Giao diện người dùng chạy trên Vite.
 
 1.  Mở một cửa sổ terminal **mới**.
-2.  Trỏ vào thư mục `FE`.
+2.  Trỏ vào thư mục `Source Code/Frontend`.
     ```bash
-    cd FE
+    cd "Source Code/FrontEnd"
     ```
 3.  Cài đặt các thư viện (node_modules):
     ```bash
@@ -94,6 +94,6 @@ Sau khi chạy thành công 3 bước trên:
 
 * **Trang chủ (Web App):** `http://localhost:5173` (hoặc port hiển thị ở bước 5).
 * **Java API Swagger:** `http://localhost:8080/swagger-ui/index.html` (đường dẫn có thể thay đổi tùy cấu hình Swagger).
-* **Dotnet API Swagger:** `http://localhost:<PORT_DOTNET>/swagger`.
+* **Dotnet API Swagger:** `http://localhost:5000/swagger`.
 
 Nếu gặp lỗi xung đột cổng (Port already in use), vui lòng kiểm tra xem có tiến trình nào đang chạy ngầm và tắt nó đi.
