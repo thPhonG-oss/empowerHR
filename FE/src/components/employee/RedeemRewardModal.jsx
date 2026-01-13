@@ -29,10 +29,33 @@ function RedeemRewardModal({
   const handlePointChange = (e) => {
     const value = e.target.value;
     setPoints(value);
+    setError("");
 
     const numericPoints = Number(value);
 
-    if (!numericPoints || numericPoints <= 0 || !pointPolicy?.conversionRate) {
+    if (!numericPoints || numericPoints <= 0) {
+      setPreviewAmount(0);
+      return;
+    }
+
+    if (numericPoints < pointPolicy?.minPoints) {
+      setError(
+        `Số điểm tối thiểu là ${pointPolicy.minPoints.toLocaleString()} pts`
+      );
+      setPreviewAmount(0);
+      return;
+    }
+
+    if (numericPoints > pointPolicy?.maxPoints) {
+      setError(
+        `Số điểm tối đa là ${pointPolicy.maxPoints.toLocaleString()} pts`
+      );
+      setPreviewAmount(0);
+      return;
+    }
+
+    if (numericPoints > currentPoints) {
+      setError("Số điểm đổi vượt quá số điểm hiện có");
       setPreviewAmount(0);
       return;
     }
@@ -108,12 +131,28 @@ function RedeemRewardModal({
           </p>
 
           {pointPolicy && (
-            <p className="text-sm text-gray-600 mt-1">
-              Tỉ lệ quy đổi:&nbsp;
-              <span className="font-semibold">
-                1 pts = {pointPolicy.conversionRate.toLocaleString()} VNĐ
-              </span>
-            </p>
+            <>
+              <p className="text-sm text-gray-600 mt-1">
+                Tỉ lệ quy đổi:&nbsp;
+                <span className="font-semibold">
+                  1 pts = {pointPolicy.conversionRate.toLocaleString()} VNĐ
+                </span>
+              </p>
+
+              <p className="text-sm text-gray-600 mt-1">
+                Điểm đổi tối thiểu:&nbsp;
+                <span className="font-semibold">
+                  {pointPolicy.minPoints.toLocaleString()} pts
+                </span>
+              </p>
+
+              <p className="text-sm text-gray-600 mt-1">
+                Điểm đổi tối đa:&nbsp;
+                <span className="font-semibold">
+                  {pointPolicy.maxPoints.toLocaleString()} pts
+                </span>
+              </p>
+            </>
           )}
         </div>
 

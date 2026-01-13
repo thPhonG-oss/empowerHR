@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
 const runningActivityApi = {
-  adminGetAllActivity: (pageNumber = 0, pageSize = 10) =>
+  adminGetAllActivity: (pageNumber = 0, pageSize = 1000) =>
     axiosClient.get(`/api/v1/activities/admin`, {
       params: { pageNumber, pageSize },
     }),

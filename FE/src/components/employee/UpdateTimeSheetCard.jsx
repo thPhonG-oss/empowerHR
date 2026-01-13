@@ -53,7 +53,7 @@ function UpdateTimeSheetCard({ data, onClose }) {
             Yêu cầu chỉnh sửa chấm công
           </h2>
           <button
-            className="p-2 rounded-lg hover:bg-red-50 transition cursor-pointer"
+            className="p-2 rounded-lg hover:bg-red-100 transition cursor-pointer"
             aria-label="Đóng"
             onClick={onClose}
           >

@@ -1,5 +1,5 @@
 // UpdateActivityOverlay.jsx
-import { X, SquareActivity } from "lucide-react";
+import { X, SquareActivity, Upload, ImageIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import runningActivityApi from "../../api/runningActivityApi";
 import toast from "react-hot-toast";
@@ -62,7 +62,9 @@ export default function UpdateActivityOverlay({
   if (!open || !activity) return null;
 
   const baseInput =
-    "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition";
+    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all hover:border-gray-300";
+
+  const baseLabel = "block text-sm font-semibold text-gray-700 mb-2";
 
   /* ================= UPLOAD IMAGE ================= */
   const handleImageUpload = async (e) => {
@@ -153,248 +155,280 @@ export default function UpdateActivityOverlay({
 
   /* ================= UI ================= */
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 shadow-sm">
-          <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
-            <SquareActivity size={22} /> Cập nhật hoạt động
+        <div className="flex items-center justify-between px-6 py-5 shadow-md">
+          <h2 className="inline-flex items-center gap-2.5 text-xl font-bold ">
+            <SquareActivity size={24} /> Cập nhật hoạt động
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-md hover:bg-red-100 transition cursor-pointer hover:opacity-80"
+            className="p-2 rounded-lg  hover:bg-red-100 "
           >
             <X size={20} />
           </button>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
-        >
-          {/* title */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Tiêu đề hoạt động
-            </label>
+        <div className="p-6 space-y-6 max-h-[calc(90vh-100px)] overflow-y-auto bg-linear-to-br from-gray-50 to-white">
+          {/* Title */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <label className={baseLabel}>Tiêu đề hoạt động</label>
             <input
               name="title"
               value={form.title}
               onChange={handleChange}
               className={baseInput}
+              placeholder="Nhập tiêu đề hoạt động..."
               required
             />
           </div>
 
-          {/* upload image */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Hình ảnh hoạt động
-            </label>
+          {/* Upload Image */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <label className={baseLabel}>Hình ảnh hoạt động</label>
 
-            <label className="relative flex items-center justify-center w-full h-48 rounded-xl cursor-pointer overflow-hidden border-2 border-dashed border-gray-300">
+            <label className="relative group flex items-center justify-center w-full h-52 rounded-xl cursor-pointer overflow-hidden border-2 border-dashed border-gray-300 hover:border-gray-900 transition-all bg-gray-50 hover:bg-gray-100">
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="hidden"
+                disabled={uploading}
               />
 
-              {form.image && (
-                <img
-                  src={form.image}
-                  alt="preview"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+              {uploading ? (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+                  <span className="text-sm text-gray-600 font-medium">
+                    Đang tải lên...
+                  </span>
+                </div>
+              ) : form.image ? (
+                <>
+                  <img
+                    src={form.image}
+                    alt="preview"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-2 text-white">
+                      <Upload size={32} />
+                      <span className="text-sm font-medium">Thay đổi ảnh</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-3 text-gray-400">
+                  <ImageIcon size={40} strokeWidth={1.5} />
+                  <span className="text-sm font-medium">
+                    Click để tải ảnh lên
+                  </span>
+                </div>
               )}
             </label>
           </div>
 
-          {/* description */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Mô tả hoạt động
-            </label>
+          {/* Description */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <label className={baseLabel}>Mô tả hoạt động</label>
             <textarea
               name="description"
               value={form.description}
               onChange={handleChange}
+              className={`${baseInput} h-28 resize-none`}
+              placeholder="Nhập mô tả chi tiết về hoạt động..."
+            />
+          </div>
+
+          {/* Registration & Activity Dates */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-5">
+            <h3 className="text-base font-semibold text-gray-900 pb-3 border-b border-gray-200">
+              Thời gian
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={baseLabel}>Bắt đầu đăng ký</label>
+                <input
+                  type="date"
+                  name="registrationStartDate"
+                  value={form.registrationStartDate}
+                  onChange={handleChange}
+                  min={today}
+                  className={baseInput}
+                  required
+                />
+              </div>
+              <div>
+                <label className={baseLabel}>Kết thúc đăng ký</label>
+                <input
+                  type="date"
+                  name="registrationEndDate"
+                  value={form.registrationEndDate}
+                  onChange={handleChange}
+                  min={form.registrationStartDate || today}
+                  className={baseInput}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={baseLabel}>Ngày bắt đầu</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={form.startDate}
+                  onChange={handleChange}
+                  className={baseInput}
+                  required
+                />
+              </div>
+              <div>
+                <label className={baseLabel}>Ngày kết thúc</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={form.endDate}
+                  onChange={handleChange}
+                  className={baseInput}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Participants & Distance */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-5">
+            <h3 className="text-base font-semibold text-gray-900 pb-3 border-b border-gray-200">
+              Thông tin tham gia
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={baseLabel}>Số người tối thiểu</label>
+                <input
+                  type="number"
+                  name="minParticipant"
+                  value={form.minParticipant}
+                  onChange={handleChange}
+                  className={baseInput}
+                  placeholder="Ví dụ: 10"
+                />
+              </div>
+              <div>
+                <label className={baseLabel}>Số người tối đa</label>
+                <input
+                  type="number"
+                  name="maxParticipant"
+                  value={form.maxParticipant}
+                  onChange={handleChange}
+                  className={baseInput}
+                  placeholder="Ví dụ: 100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={baseLabel}>Cự ly mục tiêu (km)</label>
+              <input
+                type="number"
+                name="targetDistance"
+                value={form.targetDistance}
+                onChange={handleChange}
+                className={baseInput}
+                placeholder="Ví dụ: 42"
+              />
+            </div>
+          </div>
+
+          {/* Rules */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <label className={baseLabel}>Luật tham gia</label>
+            <textarea
+              name="rules"
+              value={form.rules}
+              onChange={handleChange}
               className={`${baseInput} h-24 resize-none`}
+              placeholder="Nhập các quy định và luật lệ..."
             />
           </div>
 
-          {/* registration dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-600">Bắt đầu đăng ký</label>
-              <input
-                type="date"
-                name="registrationStartDate"
-                value={form.registrationStartDate}
-                onChange={handleChange}
-                min={today}
-                className={`${baseInput} mt-1`}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-600">Kết thúc đăng ký</label>
-              <input
-                type="date"
-                name="registrationEndDate"
-                value={form.registrationEndDate}
-                onChange={handleChange}
-                min={form.registrationStartDate || today}
-                className={`${baseInput} mt-1`}
-                required
-              />
-            </div>
-          </div>
+          {/* Bonuses */}
+          <div className="bg-linear-to-br from-amber-50 to-yellow-50 rounded-xl p-5 shadow-sm border border-amber-100 space-y-5">
+            <h3 className="text-base font-semibold text-gray-900 pb-3 border-b border-amber-200">
+              Phần thưởng
+            </h3>
 
-          {/* activity dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-600">Ngày bắt đầu</label>
-              <input
-                type="date"
-                name="startDate"
-                value={form.startDate}
-                onChange={handleChange}
-                className={`${baseInput} mt-1`}
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className={baseLabel}>🥇 Top 1</label>
+                <input
+                  type="number"
+                  name="top1Bonus"
+                  value={form.top1Bonus}
+                  onChange={handleChange}
+                  className={baseInput}
+                  placeholder="Điểm"
+                />
+              </div>
+              <div>
+                <label className={baseLabel}>🥈 Top 2</label>
+                <input
+                  type="number"
+                  name="top2Bonus"
+                  value={form.top2Bonus}
+                  onChange={handleChange}
+                  className={baseInput}
+                  placeholder="Điểm"
+                />
+              </div>
+              <div>
+                <label className={baseLabel}>🥉 Top 3</label>
+                <input
+                  type="number"
+                  name="top3Bonus"
+                  value={form.top3Bonus}
+                  onChange={handleChange}
+                  className={baseInput}
+                  placeholder="Điểm"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-sm text-gray-600">Ngày kết thúc</label>
-              <input
-                type="date"
-                name="endDate"
-                value={form.endDate}
-                onChange={handleChange}
-                className={`${baseInput} mt-1`}
-                required
-              />
-            </div>
-          </div>
 
-          {/* participants */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Số người tối thiểu
-              </label>
+              <label className={baseLabel}>✨ Thưởng hoàn thành</label>
               <input
                 type="number"
-                name="minParticipant"
-                value={form.minParticipant}
+                name="completionBonus"
+                value={form.completionBonus}
                 onChange={handleChange}
                 className={baseInput}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Số người tối đa
-              </label>
-              <input
-                type="number"
-                name="maxParticipant"
-                value={form.maxParticipant}
-                onChange={handleChange}
-                className={baseInput}
+                placeholder="Điểm thưởng cho người hoàn thành"
               />
             </div>
           </div>
 
-          {/* distance */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Cự ly mục tiêu (km)
-            </label>
-            <input
-              type="number"
-              name="targetDistance"
-              value={form.targetDistance}
-              onChange={handleChange}
-              className={baseInput}
-            />
-          </div>
-
-          {/* rules */}
-          <textarea
-            name="rules"
-            value={form.rules}
-            onChange={handleChange}
-            className={`${baseInput} h-20 resize-none`}
-            placeholder="Luật tham gia"
-          />
-
-          {/* bonuses */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700">Top 1</label>
-              <input
-                type="number"
-                name="top1Bonus"
-                value={form.top1Bonus}
-                onChange={handleChange}
-                className={baseInput}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Top 2</label>
-              <input
-                type="number"
-                name="top2Bonus"
-                value={form.top2Bonus}
-                onChange={handleChange}
-                className={baseInput}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Top 3</label>
-              <input
-                type="number"
-                name="top3Bonus"
-                value={form.top3Bonus}
-                onChange={handleChange}
-                className={baseInput}
-              />
-            </div>
-          </div>
-
-          {/* completion bonus */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Thưởng hoàn thành
-            </label>
-            <input
-              type="number"
-              name="completionBonus"
-              value={form.completionBonus}
-              onChange={handleChange}
-              className={baseInput}
-            />
-          </div>
-
-          {/* buttons */}
+          {/* Buttons */}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer "
+              className="px-6 py-3 rounded-xl border-2 border-gray-200 font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all"
             >
               Hủy
             </button>
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={loading || uploading}
-              className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition cursor-pointer hover:opacity-90"
+              className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white font-medium shadow-lg shadow-gray-900/30 hover:shadow-xl hover:shadow-gray-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5 active:translate-y-0"
             >
               {loading ? "Đang cập nhật..." : "Cập nhật hoạt động"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

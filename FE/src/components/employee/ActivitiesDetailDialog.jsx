@@ -294,15 +294,10 @@ export default function ActivitiesDetailDialog({
               )
             ) : selectedActivity.status === "Active" && !isCancelled ? (
               <CustomButton
-                variant="danger"
-                onClick={() => {
-                  handleUnregister(
-                    selectedActivity?.runningActivity?.runningActivityId
-                  );
-                }}
-                className="cursor-pointer w-full"
+                variant="blue"
+                className="flex-1 cursor-not-allowed"
               >
-                Hủy đăng ký
+                Hoạt động đang diễn ra
               </CustomButton>
             ) : selectedActivity.status === "Completed" ? (
               <CustomButton

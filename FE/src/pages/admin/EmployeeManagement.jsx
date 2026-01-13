@@ -36,7 +36,7 @@ function StaffManagement() {
   // Thêm Staff vào danh sách cục bộ
   const [employeeList, setEmployeeList] = useState([]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 6;
 
   const filteredEmployees = employeeList.filter((emp) => {
     // Search by name, employeeCode, or email
@@ -93,15 +93,6 @@ function StaffManagement() {
     return pages;
   };
 
-  // const handleDeleteEmployee = () => {
-  //   // Xóa giả
-  //   setEmployeeList((prev) =>
-  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
-  //   );
-  //   // Gọi API xóa ở đây
-  //   setIsConfirmPopupOpen(false);
-  // };
-
   // Load danh sách departments
   useEffect(() => {
     const fetchData = async () => {
@@ -129,20 +120,19 @@ function StaffManagement() {
     fetchData();
   }, []);
 
+  const fetchDataUser = async () => {
+    try {
+      const res = await adminApi.getAllUsers();
+
+      setEmployeeList(res.result);
+      localStorage.setItem("employeeList", JSON.stringify(res.result));
+    } catch (err) {
+      console.error("Lỗi khi load danh sách nhân viên:", err);
+    }
+  };
   // Load danh sách nhân viên từ API
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await adminApi.getAllUsers();
-
-        setEmployeeList(res.result);
-        localStorage.setItem("employeeList", JSON.stringify(res.result));
-      } catch (err) {
-        console.error("Lỗi khi load danh sách nhân viên:", err);
-      }
-    };
-
-    fetchData();
+    fetchDataUser();
   }, []);
 
   useEffect(() => {
@@ -222,7 +212,7 @@ function StaffManagement() {
               <button
                 onClick={() => setIsAddCardOpen(true)}
                 className="px-5 py-2.5 text-sm font-medium rounded-lg
-              bg-gray-900 text-white hover:bg-gray-800 transition-colors cursor-pointer"
+              bg-blue-600 text-white hover:bg-blue-800 transition-colors cursor-pointer"
               >
                 Thêm nhân viên
               </button>
@@ -233,7 +223,10 @@ function StaffManagement() {
               {currentStaff.map((staff) => (
                 <div
                   key={staff.employeeId}
-                  className="group border border-gray-200 rounded-lg p-4 hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white"
+                  onClick={() =>
+                    navigate(`/admin/employee-management/${staff.employeeId}`)
+                  }
+                  className="cursor-pointer group border border-gray-200 rounded-lg p-4 hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -264,17 +257,6 @@ function StaffManagement() {
                         </div>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/admin/employee-management/${staff.employeeId}`
-                        )
-                      }
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                    >
-                      <Edit2 className="size-4 text-gray-500" />
-                    </button>
                   </div>
                 </div>
               ))}
@@ -335,10 +317,9 @@ function StaffManagement() {
       {/* Add Employee Card */}{" "}
       {isAddCardOpen && (
         <AddEmployeeCard
-          positions={positions}
-          departments={departments}
           isOpen={isAddCardOpen}
           onClose={() => setIsAddCardOpen(false)}
+          onAddSuccess={fetchDataUser}
         />
       )}
     </main>

@@ -2,6 +2,7 @@ import { Eye, EyeClosed, Lock, CheckCircle2, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import authApi from "../../api/authApi";
 import { useAlphanumericInput } from "../../hooks/useAlphanumericInput";
+import toast from "react-hot-toast";
 
 function ChangePasswordModal({ isOpen, onClose }) {
   const [currentPassword, handleCurrentChange, setCurrentPassword] =
@@ -62,7 +63,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
       if (error.response?.status === 401 || error.response?.status === 400) {
         setWrongInput(true);
       } else {
-        alert("Đổi mật khẩu thất bại! Vui lòng thử lại.");
+        toast.error("Đổi mật khẩu thất bại! Vui lòng thử lại.");
       }
     } finally {
       setIsLoading(false);
@@ -73,12 +74,15 @@ function ChangePasswordModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-500 flex items-center justify-center bg-black/50">
-      <div className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div
+        className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden animate-in 
+      fade-in zoom-in duration-200"
+      >
         {/* Header */}
         <div className=" p-6 relative shadow-md">
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            className="cursor-pointer absolute top-4 right-4 text-gray-400 hover:bg-red-100 p-1 rounded-md transition-colors"
           >
             <X size={24} />
           </button>
@@ -132,7 +136,8 @@ function ChangePasswordModal({ isOpen, onClose }) {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                    className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 
+                    hover:text-gray-700 transition-colors"
                   >
                     {showPassword ? <Eye size={18} /> : <EyeClosed size={18} />}
                   </button>
@@ -205,7 +210,8 @@ function ChangePasswordModal({ isOpen, onClose }) {
                       showPassword ? "Nhập lại mật khẩu" : "••••••••••"
                     }
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black 
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none 
+                    focus:ring-2 focus:ring-black 
                     transition-all bg-gray-50 hover:bg-white"
                   />
                 </div>
@@ -224,7 +230,8 @@ function ChangePasswordModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl 
+                  hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                 >
                   Hủy
                 </button>
