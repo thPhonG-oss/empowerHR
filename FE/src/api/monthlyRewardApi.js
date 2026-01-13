@@ -5,7 +5,7 @@ const monthlyRewardApi = {
         axiosClient.put(`/api/v1/monthly-reward/${rewardId}`, data),
 
     updateDepartmentPoint: (departmentBudgeId, data) =>
-        axiosClient.put(`/api/v1/departments/{departmentId}/points/api/v1/department-budgets/${departmentBudgeId}`, data),
+        axiosClient.put(`/api/v1/department-budgets/${departmentBudgeId}`, data),
 }
 
 export default monthlyRewardApi;
