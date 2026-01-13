@@ -124,6 +124,7 @@ public class RewardServiceImpl implements RewardService {
         }
 
         pointAccount.setCurrentPoints(pointAccount.getCurrentPoints() + request.getPoints());
+        pointAccount.setTotalEarns(pointAccount.getTotalEarns() + request.getPoints());
 
         pointAccountRepository.save(pointAccount);
         departmentRepository.save(department);
@@ -169,6 +170,9 @@ public class RewardServiceImpl implements RewardService {
         // proceed to cash out
         pointAccount.setCurrentPoints(pointAccount.getCurrentPoints() - request.getPointsToCashOut());
         Long cashAmount = Math.round(request.getPointsToCashOut() * pointPolicy.getConversionRate());
+
+        pointAccount.setTotalTransferred(pointAccount.getTotalTransferred() + request.getPointsToCashOut());
+
         pointAccountRepository.save(pointAccount);
 
         CashOut cashOut = CashOut.builder()
