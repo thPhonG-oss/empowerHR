@@ -268,6 +268,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         PointAccount pointAccount = PointAccount.builder()
                 .currentPoints(Long.valueOf(0))
+                .totalEarns(0)
+                .totalTransferred(0)
                 .createdAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
                 .build();
