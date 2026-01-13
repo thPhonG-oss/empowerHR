@@ -86,7 +86,6 @@ export default function ActivitiesOpening() {
       const redirectUrl = response.redirectUrl;
       if (redirectUrl) {
         setRedirect_uri(redirectUrl);
-
         window.open(redirectUrl, "_blank");
       }
     } catch (error) {
@@ -124,6 +123,10 @@ export default function ActivitiesOpening() {
   //=====================================================
   const handleRegister = async (activity) => {
     try {
+      if(!connectedStrava){
+        toast.error("Vui lòng kết nối Strava trước khi đăng ký");
+        return;
+      }
       await runningActivityApi.employeeRegisterActivity(
         activity.runningActivityId
       );
