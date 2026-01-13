@@ -150,10 +150,18 @@ function DetailProfile({}) {
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField label="Tên phòng ban" value={departmentName} />
                 <InfoField label="Vị trí" value={positionName} />
-                <InfoField
-                  label="Tài khoản ngân hàng"
-                  value={`${profile?.bankAccountNumber} - ${profile?.bank}`}
-                />
+                {safeRole === "MANAGER" && !employeeId ? (
+                  <InfoField
+                    label="Tài khoản ngân hàng"
+                    value={`${profile?.bankAccountNumber} - ${profile?.bank}`}
+                  />
+                ) : (
+                  <InfoField
+                    label="Tài khoản ngân hàng"
+                    value={`${profile?.bank?.bankAccountNumber} - ${profile?.bank?.bankName}`}
+                  />
+                )}
+
                 <InfoField
                   label="Ngày vào làm"
                   value={formatDate(profile?.startingDate)}

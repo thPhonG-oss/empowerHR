@@ -5,13 +5,7 @@ import authApi from "../../api/authApi";
 
 import { Link, useLocation } from "react-router-dom";
 
-import {
-  Users,
-  CircleUser,
-  LogOut,
-  KeyRound,
-  ChevronRight,
-} from "lucide-react";
+import { Users, CircleUser, LogOut, KeyRound, ChevronUp } from "lucide-react";
 import ChangePasswordModal from "./ChangePasswordModal";
 
 function Sidebar() {
@@ -44,21 +38,21 @@ function Sidebar() {
   return (
     <>
       <div className="sticky top-0 w-full h-screen flex flex-col justify-between bg-white shadow-2xl border-r border-gray-200">
-        <div>
-          {/* Header */}
-          <div
-            onClick={handleReload}
-            className="h-20 flex p-6 items-center gap-3 border-b border-gray-200 cursor-pointer"
-          >
-            <div className="bg-black p-2.5 rounded-xl shadow-lg transition-transform hover:scale-105">
-              <Users className="text-white" size={24} />
-            </div>
-            <p className="font-bold text-xl tracking-wide text-gray-900">
-              HRSYSTEM
-            </p>
+        {/* Header */}
+        <div
+          onClick={handleReload}
+          className="h-20 flex p-6 items-center gap-3 border-b border-gray-200 cursor-pointer shrink-0"
+        >
+          <div className="bg-black p-2.5 rounded-xl shadow-lg transition-transform hover:scale-105">
+            <Users className="text-white" size={24} />
           </div>
+          <p className="font-bold text-xl tracking-wide text-gray-900">
+            HRSYSTEM
+          </p>
+        </div>
 
-          {/* Content */}
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
           {role.toLowerCase() === "manager" ? (
             <div className="flex flex-col px-3 py-6 gap-1">
               {navItems.map((item) => {
@@ -124,7 +118,7 @@ function Sidebar() {
         </div>
 
         {/* User - Actions */}
-        <div className="border-t border-gray-200 bg-gray-50 relative">
+        <div className="border-t border-gray-200 bg-gray-50 relative shrink-0">
           {/* Dropdown Menu */}
           {showUserMenu && (
             <div className="absolute bottom-full left-0 right-0 mb-2 mx-3 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
@@ -133,14 +127,14 @@ function Sidebar() {
                   setShowModal(true);
                   setShowUserMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <KeyRound size={18} className="text-gray-500" />
                 <span className="text-sm font-medium">Đổi mật khẩu</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
+                className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100 cursor-pointer"
               >
                 <LogOut size={18} />
                 <span className="text-sm font-medium">Đăng xuất</span>
@@ -170,10 +164,10 @@ function Sidebar() {
                 </p>
               </div>
             </div>
-            <ChevronRight
+            <ChevronUp
               size={18}
               className={`text-gray-400 transition-transform duration-200 ${
-                showUserMenu ? "rotate-90" : ""
+                showUserMenu ? "rotate-180" : ""
               }`}
             />
           </button>

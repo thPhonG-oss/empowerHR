@@ -112,8 +112,8 @@ const navConfig = [
     roles: ["manager"],
   },
   {
-    title: "Tặng điểm nhân viên",
-    path: "give-rewards",
+    title: "Thưởng điểm",
+    path: "performance-points",
     icon: PartyPopper,
     roles: ["manager"],
   },

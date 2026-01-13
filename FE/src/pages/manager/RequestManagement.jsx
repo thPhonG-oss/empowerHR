@@ -378,7 +378,8 @@ export default function RequestManagement() {
 
                       <button
                         onClick={() => setSelectedRequest(request)}
-                        className="cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium border bg-gray-900 text-white border-gray-900 hover:bg-gray-800 transition-colors flex-shrink-0"
+                        className="cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium border bg-gray-900 text-white 
+                        border-gray-900 hover:bg-gray-800 transition-colors shrink-0"
                       >
                         Chi tiết →
                       </button>
