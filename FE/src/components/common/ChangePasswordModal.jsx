@@ -3,7 +3,7 @@ import { useState } from "react";
 import authApi from "../../api/authApi";
 import { useAlphanumericInput } from "../../hooks/useAlphanumericInput";
 
-function ChangePasswordModal({ isOpen, onClose, userName }) {
+function ChangePasswordModal({ isOpen, onClose }) {
   const [currentPassword, handleCurrentChange, setCurrentPassword] =
     useAlphanumericInput("");
   const [newPassword, handleNewChange, setNewPassword] =
@@ -16,7 +16,7 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
+  const [userName, setUserName] = useState(localStorage.getItem("userName"));
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleClose = () => {

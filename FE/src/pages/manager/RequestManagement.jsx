@@ -261,7 +261,7 @@ export default function RequestManagement() {
                     setStartDate("");
                     setEndDate("");
                   }}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 flex items-center gap-2 transition-colors"
+                  className="cursor-pointer px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 flex items-center gap-2 transition-colors"
                 >
                   <RefreshCw size={16} className="text-gray-600" />
                   <span className="text-gray-700 font-medium">

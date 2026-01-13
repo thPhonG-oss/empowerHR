@@ -205,7 +205,6 @@ function Sidebar() {
       <ChangePasswordModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        userName={userName}
       />
     </>
   );

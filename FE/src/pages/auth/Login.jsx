@@ -1,5 +1,5 @@
-import { useContext, useState, useEffect } from "react";
-import { Users, Eye, EyeClosed, Lock, User, Loader2 } from "lucide-react";
+import { useContext, useState, useEffect, useRef } from "react";
+import { Users, Eye, EyeClosed, Lock, User, Loader2, X } from "lucide-react";
 import authApi from "../../api/authApi";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -15,21 +15,47 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [wrongInput, setWrongInput] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [savedAccounts, setSavedAccounts] = useState([]);
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const suggestionsRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // Load saved credentials khi component mount
+  // Load danh sách tài khoản đã lưu khi component mount
   useEffect(() => {
-    const savedUserName = localStorage.getItem("savedUserName");
-    const savedPassword = localStorage.getItem("savedPassword");
-
-    if (savedUserName && savedPassword) {
-      setUserName(savedUserName);
-      setPassword(savedPassword);
-      setRememberMe(true);
+    const accounts = localStorage.getItem("savedAccounts");
+    if (accounts) {
+      try {
+        setSavedAccounts(JSON.parse(accounts));
+      } catch (err) {
+        console.error("Error parsing saved accounts:", err);
+        setSavedAccounts([]);
+      }
     }
   }, []);
+
+  // Đóng dropdown khi click bên ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target) &&
+        !inputRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Lọc danh sách tài khoản theo input của người dùng
+  const filteredAccounts = savedAccounts.filter((account) =>
+    account.userName.toLowerCase().includes(userName.toLowerCase())
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,13 +75,18 @@ function Login() {
       const token = res.result.acessToken;
       login(token);
 
-      // Lưu hoặc xóa thông tin đăng nhập
+      // Lưu tài khoản nếu tick "Lưu tài khoản"
       if (rememberMe) {
-        localStorage.setItem("savedUserName", userName);
-        localStorage.setItem("savedPassword", password);
-      } else {
-        localStorage.removeItem("savedUserName");
-        localStorage.removeItem("savedPassword");
+        const newAccount = { userName, password };
+        const updatedAccounts = savedAccounts.filter(
+          (acc) => acc.userName !== userName
+        );
+        updatedAccounts.unshift(newAccount); // Thêm vào đầu danh sách
+
+        // Giới hạn tối đa 5 tài khoản
+        const limitedAccounts = updatedAccounts.slice(0, 5);
+        localStorage.setItem("savedAccounts", JSON.stringify(limitedAccounts));
+        setSavedAccounts(limitedAccounts);
       }
 
       const role = localStorage.getItem("role");
@@ -72,6 +103,24 @@ function Login() {
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  // Chọn tài khoản từ danh sách
+  const handleSelectAccount = (account) => {
+    setUserName(account.userName);
+    setPassword(account.password);
+    setShowSuggestions(false);
+    setRememberMe(true);
+  };
+
+  // Xóa tài khoản khỏi danh sách
+  const handleDeleteAccount = (e, userNameToDelete) => {
+    e.stopPropagation();
+    const updatedAccounts = savedAccounts.filter(
+      (acc) => acc.userName !== userNameToDelete
+    );
+    localStorage.setItem("savedAccounts", JSON.stringify(updatedAccounts));
+    setSavedAccounts(updatedAccounts);
+  };
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-100">
@@ -95,7 +144,7 @@ function Login() {
         <div className="p-8 -mt-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username Input */}
-            <div>
+            <div className="relative">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Tên tài khoản
               </label>
@@ -104,18 +153,74 @@ function Login() {
                   <User size={20} />
                 </div>
                 <input
+                  ref={inputRef}
                   type="text"
                   value={userName}
                   onChange={(e) => {
                     handleUserNameChange(e);
                     setWrongInput(false);
+                    // Hiển thị suggestions khi có saved accounts
+                    if (savedAccounts.length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  onFocus={() => {
+                    // Chỉ hiển thị khi có saved accounts
+                    if (savedAccounts.length > 0) {
+                      setShowSuggestions(true);
+                    }
                   }}
                   placeholder="Tên tài khoản (chỉ chữ và số)"
                   required
-                  autoComplete="username"
-                  className="w-full pl-11 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+                  autoComplete="off"
+                  className="w-full pl-11 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black 
+                  focus:border-transparent transition-all bg-gray-50 hover:bg-white"
                 />
               </div>
+
+              {/* Dropdown danh sách tài khoản */}
+              {showSuggestions && filteredAccounts.length > 0 && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto"
+                >
+                  <div className="p-2">
+                    <div className="text-xs font-semibold text-gray-500 px-3 py-2">
+                      TÀI KHOẢN ĐÃ LƯU
+                    </div>
+                    {filteredAccounts.map((account, index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleSelectAccount(account)}
+                        className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-900 to-gray-700 flex items-center justify-center shrink-0">
+                            <User size={16} className="text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 truncate">
+                              {account.userName}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {"•".repeat(account.password.length)}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) =>
+                            handleDeleteAccount(e, account.userName)
+                          }
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded-md transition-all cursor-pointer"
+                        >
+                          <X size={16} className="text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Password Input */}
@@ -160,7 +265,7 @@ function Login() {
                 id="rememberMe"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-black focus:ring-2 focus:ring-black cursor-pointer"
+                className="w-4 h-4 rounded border-gray-300 accent-black  cursor-pointer"
               />
               <label
                 htmlFor="rememberMe"
