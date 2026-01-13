@@ -3,7 +3,6 @@ import { Calendar, MapPin, Users, Clock } from "lucide-react";
 import Fuse from "fuse.js";
 
 import CustomButton from "../common/Button";
-import CustomCard from "../common/CustomCard";
 import runningActivityApi from "../../api/runningActivityApi";
 
 export default function ActivitiesRegistered({

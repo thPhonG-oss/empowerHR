@@ -28,6 +28,9 @@ function CreateActivityOverlay({
     targetDistance: "",
     rules: "",
     completionBonus: "",
+    top1Bonus: "",
+    top2Bonus: "",
+    top3Bonus: "",
   };
 
   const [form, setForm] = useState(defaultForm);

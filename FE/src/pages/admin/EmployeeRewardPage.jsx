@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, ChevronDown, Edit2, Eye, History } from 'lucide-react';
-import Fuse from 'fuse.js';
-import positionApi from '../../api/positionApi';
-import departmentApi from '../../api/departmentApi';
-import pointApi from '../../api/pointApi';
-import TransactionHistoryModal from './TransactionHistoryModal';
+import React, { useState, useEffect, useMemo } from "react";
+import { Search, ChevronDown, Edit2, Eye, History } from "lucide-react";
+import Fuse from "fuse.js";
+import positionApi from "../../api/positionApi";
+import departmentApi from "../../api/departmentApi";
+import pointApi from "../../api/pointApi";
+import TransactionHistoryModal from "./TransactionHistoryModal";
 
 const EmployeeRewardPage = () => {
-
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedPosition, setSelectedPosition] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
@@ -20,8 +19,6 @@ const EmployeeRewardPage = () => {
   const [positions, setPositions] = useState([]);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-
-
 
   const itemsPerPage = 6;
 
@@ -37,11 +34,11 @@ const EmployeeRewardPage = () => {
       setLoading(true);
       const response = await pointApi.getPointAllEmployees();
       const employeesData = response.data;
-      console.log("Employee: ",employeesData);
+      console.log("Employee: ", employeesData);
       setEmployees(employeesData);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees:", error);
       setLoading(false);
     }
   };
@@ -52,7 +49,7 @@ const EmployeeRewardPage = () => {
       const Departments = departmentsResponse.result;
       setDepartments(Departments);
     } catch (error) {
-      console.error('Error fetching departments:', error);
+      console.error("Error fetching departments:", error);
     }
   };
 
@@ -61,16 +58,16 @@ const EmployeeRewardPage = () => {
       const positionsResponse = await positionApi.getAllPosition();
       setPositions(positionsResponse.result);
     } catch (error) {
-      console.error('Error fetching positions:', error);
+      console.error("Error fetching positions:", error);
     }
   };
 
   // Configure Fuse.js for fuzzy search
   const fuse = useMemo(() => {
     return new Fuse(employees, {
-      keys: ['employeeName'],
+      keys: ["employeeName"],
       threshold: 0.1,
-      ignoreLocation: true
+      ignoreLocation: true,
     });
   }, [employees]);
 
@@ -81,17 +78,19 @@ const EmployeeRewardPage = () => {
     // Apply search
     if (searchTerm.trim()) {
       const fuseResults = fuse.search(searchTerm);
-      result = fuseResults.map(item => item.item);
+      result = fuseResults.map((item) => item.item);
     }
 
     // Apply department filter
     if (selectedDepartment) {
-      result = result.filter(emp => emp.departmentName === selectedDepartment);
+      result = result.filter(
+        (emp) => emp.departmentName === selectedDepartment
+      );
     }
 
     // Apply position filter
     if (selectedPosition) {
-      result = result.filter(emp => emp.positionName === selectedPosition);
+      result = result.filter((emp) => emp.positionName === selectedPosition);
     }
 
     return result;
@@ -111,13 +110,13 @@ const EmployeeRewardPage = () => {
 
   // Format number with commas
   const formatNumber = (num) => {
-    return num?.toLocaleString('vi-VN') || '0';
+    return num?.toLocaleString("vi-VN") || "0";
   };
 
   // Get initials for avatar
   const getInitials = (name) => {
-    if (!name) return 'N';
-    const parts = name.split(' ');
+    if (!name) return "N";
+    const parts = name.split(" ");
     return parts[parts.length - 1][0].toUpperCase();
   };
 
@@ -160,11 +159,13 @@ const EmployeeRewardPage = () => {
             {/* Department Filter */}
             <div className="relative w-full md:w-64">
               <button
-                onClick={() => setShowDepartmentDropdown(!showDepartmentDropdown)}
+                onClick={() =>
+                  setShowDepartmentDropdown(!showDepartmentDropdown)
+                }
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
               >
                 <span className="text-gray-700">
-                  {selectedDepartment || 'Chọn phòng ban'}
+                  {selectedDepartment || "Chọn phòng ban"}
                 </span>
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               </button>
@@ -172,7 +173,7 @@ const EmployeeRewardPage = () => {
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   <div
                     onClick={() => {
-                      setSelectedDepartment('');
+                      setSelectedDepartment("");
                       setShowDepartmentDropdown(false);
                     }}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
@@ -202,7 +203,7 @@ const EmployeeRewardPage = () => {
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
               >
                 <span className="text-gray-700">
-                  {selectedPosition || 'Chọn chức vụ'}
+                  {selectedPosition || "Chọn chức vụ"}
                 </span>
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               </button>
@@ -210,7 +211,7 @@ const EmployeeRewardPage = () => {
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   <div
                     onClick={() => {
-                      setSelectedPosition('');
+                      setSelectedPosition("");
                       setShowPositionDropdown(false);
                     }}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
@@ -253,7 +254,10 @@ const EmployeeRewardPage = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1">
                     {/* Avatar */}
-                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                    <div
+                      className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center 
+                    text-white font-semibold text-lg shrink-0"
+                    >
                       {getInitials(employee.employeeName)}
                     </div>
 
@@ -287,8 +291,8 @@ const EmployeeRewardPage = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleViewHistory(employee)}
-                    
-                    className="ml-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium flex items-center gap-2 flex-shrink-0"
+                    className="ml-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 
+                    transition-colors text-sm font-medium flex items-center gap-2 shrink-0"
                   >
                     <History className="w-4 h-4" />
                     Lịch sử
@@ -297,7 +301,6 @@ const EmployeeRewardPage = () => {
               </div>
             ))}
           </div>
-
 
           {/* No Results */}
           {filteredEmployees.length === 0 && (
@@ -310,13 +313,13 @@ const EmployeeRewardPage = () => {
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
               <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Trước
               </button>
-              
+
               <div className="flex gap-1">
                 {[...Array(totalPages)].map((_, index) => {
                   const page = index + 1;
@@ -332,8 +335,8 @@ const EmployeeRewardPage = () => {
                         onClick={() => setCurrentPage(page)}
                         className={`px-4 py-2 rounded-lg ${
                           currentPage === page
-                            ? 'bg-blue-600 text-white'
-                            : 'border border-gray-300 hover:bg-gray-50'
+                            ? "bg-blue-600 text-white"
+                            : "border border-gray-300 hover:bg-gray-50"
                         }`}
                       >
                         {page}
@@ -343,14 +346,20 @@ const EmployeeRewardPage = () => {
                     page === currentPage - 2 ||
                     page === currentPage + 2
                   ) {
-                    return <span key={page} className="px-2 py-2">...</span>;
+                    return (
+                      <span key={page} className="px-2 py-2">
+                        ...
+                      </span>
+                    );
                   }
                   return null;
                 })}
               </div>
 
               <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >

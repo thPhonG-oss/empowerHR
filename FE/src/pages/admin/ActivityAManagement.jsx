@@ -105,7 +105,8 @@ export default function RunningActivityManagement() {
             >
               <option value="ALL">Tất cả</option>
               <option value="Draft">Chuẩn bị</option>
-              <option value="Active">Đang mở</option>
+              <option value="Open">Đang mở</option>
+              <option value="Active">Đang diễn ra</option>
               <option value="Completed">Đã kết thúc</option>
               <option value="Cancelled">Đã hủy</option>
             </select>
