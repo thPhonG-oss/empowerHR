@@ -29,7 +29,7 @@ function getInitials(name) {
 }
 
 export default function RequestManagementHistory() {
-  const [allRequests, setAllRequests] = useState([]); // 🔥 dữ liệu gốc API
+  const [allRequests, setAllRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 

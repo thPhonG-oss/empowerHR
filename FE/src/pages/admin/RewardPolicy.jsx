@@ -1,59 +1,3 @@
-// import RatePage from "./RatePage";
-// import MonthlyPointPage from "./MonthlyPointPage";
-// import TransactionPage from "./TransactionPage";
-// import EmployeeRewardPage from "./EmployeeRewardPage";
-// import Header from "../../components/common/Header";
-
-
-// import {
-//     Contact,
-// } from "lucide-react";
-
-// import { useState } from "react";
-
-// const tabs = [
-//   { key: "rate", label: "Tỉ lệ quy đổi" },
-//   { key: "point_monthly", label: "Phân bổ hàng tháng" },
-//   { key: "transaction", label: "Giao dịch điểm" },
-//   { key: "employee_point", label: "Điểm thưởng nhân viên" },
-// ];
-
-// export default function RewardPolicy() {
-//   const [activeTab, setActiveTab] = useState("rate");
-//   return (
-//     <main className="p-0 relative">
-//         <div className="mx-auto">
-//           <Header title={"Quản lý điểm thưởng"} icon={Contact} />
-//           {/* Content */}
-//           <div className="px-6 space-y-6">
-//             {/* {activeTab} */}
-//             <div className="py-6 border-gray-200 flex gap-6">
-//             {tabs.map((tab) => (
-//               <button
-//                 key={tab.key}
-//                 onClick={() => setActiveTab(tab.key)}
-//                 className={`pb-2 text-sm font-medium transition
-//                   ${
-//                     activeTab === tab.key
-//                       ? "text-black-600 border-b-2 border-black-600"
-//                       : "text-gray-500 hover:text-gray-700"
-//                   }`}
-//               >
-//                 {tab.label}
-//               </button>
-//             ))}
-//             </div>
-
-//             {/* {content} */}
-//             {activeTab === "rate" && <RatePage />}
-//             {activeTab === "point_monthly" && <MonthlyPointPage />}
-//             {activeTab === "transaction" && <TransactionPage />}
-//             {activeTab === "employee_point" && <EmployeeRewardPage />}
-//           </div>
-//         </div>
-//     </main>
-//   );
-// }
 import RatePage from "./RatePage";
 import MonthlyPointPage from "./MonthlyPointPage";
 import TransactionPage from "./TransactionPage";
@@ -61,13 +5,12 @@ import EmployeeRewardPage from "./EmployeeRewardPage";
 import Header from "../../components/common/Header";
 
 import {
-    Contact,
-    Percent,
-    Calendar,
-    ArrowLeftRight,
-    Award
+  Contact,
+  Percent,
+  Calendar,
+  ArrowLeftRight,
+  Award,
 } from "lucide-react";
-
 import { useState } from "react";
 
 const tabs = [
@@ -79,44 +22,35 @@ const tabs = [
 
 export default function RewardPolicy() {
   const [activeTab, setActiveTab] = useState("rate");
-  
+
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
       <div className="mx-auto">
         <Header title={"Quản lý điểm thưởng"} icon={Contact} />
-        
-        {/* Tab Navigation */}
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-          <div className="px-6">
-            <div className="flex gap-1 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-2 px-4 py-4 text-sm font-medium transition-all whitespace-nowrap relative
-                      ${
-                        activeTab === tab.key
-                          ? "text-blue-600"
-                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                      }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {tab.label}
-                    {activeTab === tab.key && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
 
         {/* Content */}
-        <div className="px-6 py-6">
-          <div className="max-w-7xl mx-auto">
+        <div className="px-6 space-y-6 mt-6">
+          {/* Tabs Navigation */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-2">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`cursor-pointer shrink-0 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    activeTab === tab.key
+                      ? "bg-linear-to-br from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/30"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 min-h-[400px]">
             {activeTab === "rate" && <RatePage />}
             {activeTab === "point_monthly" && <MonthlyPointPage />}
             {activeTab === "transaction" && <TransactionPage />}

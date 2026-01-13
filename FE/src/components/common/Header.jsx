@@ -1,6 +1,6 @@
 function Header({ title, icon: Icon }) {
   return (
-    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm h-20 px-6 flex items-center gap-3 border-b border-gray-200">
+    <div className="sticky top-0 z-50 bg-white/80  shadow-sm h-20 px-6 flex items-center gap-3 border-b border-gray-200">
       {Icon && (
         <div className="w-10 h-10 rounded-xl bg-linear-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-lg">
           <Icon className="w-5 h-5 text-white" />

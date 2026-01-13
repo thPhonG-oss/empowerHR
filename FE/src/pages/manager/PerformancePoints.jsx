@@ -11,6 +11,7 @@ import Fuse from "fuse.js";
 import Header from "../../components/common/Header";
 import transactionsApi from "../../api/transactionsApi";
 import { getMyDepartmentEmployeeIds } from "../../utils/getMyDepartmentEmployeeIds";
+import { getMyDepartmentPointBalance } from "../../utils/getMyDepartmentPointBalance";
 import GiveRewardsModal from "../../components/manager/GiveRewardsModal";
 
 function PerformancePoints() {
@@ -19,15 +20,17 @@ function PerformancePoints() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [myEmployeeIds, setMyEmployeeIds] = useState([]);
+  const [departmentPointBalance, setDepartmentPointBalance] = useState(null);
 
   useEffect(() => {
     const init = async () => {
       try {
-        // 1️⃣ Lấy danh sách nhân viên trong phòng ban (trừ tôi)
         const ids = await getMyDepartmentEmployeeIds();
         setMyEmployeeIds(ids);
 
-        // 2️⃣ Sau đó mới fetch transactions
+        const balance = await getMyDepartmentPointBalance();
+        setDepartmentPointBalance(balance);
+
         await fetchTransactions(ids);
       } catch (error) {
         console.error("Error initializing data:", error);
@@ -68,7 +71,7 @@ function PerformancePoints() {
   // Tìm kiếm bằng Fuse.js
   const fuse = new Fuse(transactions, {
     keys: ["employeeName"],
-    threshold: 0.2,
+    threshold: 0.1,
   });
 
   const filteredTransactions = searchTerm
@@ -87,10 +90,7 @@ function PerformancePoints() {
     }).format(date);
   };
 
-  const totalPoints = filteredTransactions.reduce(
-    (sum, t) => sum + t.points,
-    0
-  );
+  const totalPoints = transactions.reduce((sum, t) => sum + t.points, 0);
 
   return (
     <main className="p-0 relative">
@@ -99,7 +99,7 @@ function PerformancePoints() {
 
         <div className="p-6 space-y-5">
           {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-gray-900 rounded-lg">
@@ -122,7 +122,23 @@ function PerformancePoints() {
                 <div>
                   <p className="text-xs text-gray-500">Số lần trao thưởng</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {filteredTransactions.length}
+                    {transactions.length}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gray-900 rounded-lg">
+                  <Gift className="size-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Số dư điểm phòng ban</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {departmentPointBalance !== null
+                      ? departmentPointBalance.toLocaleString()
+                      : "--"}
                   </p>
                 </div>
               </div>

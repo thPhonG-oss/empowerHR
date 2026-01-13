@@ -101,7 +101,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-all duration-200"
+              className="text-gray-400 hover:bg-red-100 p-2 rounded-lg transition-all duration-200 cursor-pointer"
             >
               <X size={20} />
             </button>

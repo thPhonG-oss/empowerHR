@@ -114,7 +114,7 @@ function Attendance() {
               <div className="flex gap-3">
                 <select
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm
-                             focus:border-black focus:ring-1 focus:ring-black"
+                            focus:border-black focus:ring-1 focus:ring-black"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
@@ -127,7 +127,7 @@ function Attendance() {
 
                 <select
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm
-                             focus:border-black focus:ring-1 focus:ring-black"
+                            focus:border-black focus:ring-1 focus:ring-black"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
@@ -160,7 +160,7 @@ function Attendance() {
                 <div
                   key={att.id}
                   className="grid grid-cols-8 items-center py-3 text-sm
-                             border-t border-gray-100 hover:bg-gray-50"
+                            border-t border-gray-100 hover:bg-gray-50"
                 >
                   <div>{index + 1}</div>
                   <div>{att.date}</div>

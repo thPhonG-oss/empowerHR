@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const PORT = import.meta.env.VITE_PORT_BE;
+
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8081",
+  baseURL: `http://localhost:${PORT}`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -45,7 +47,7 @@ axiosClient.interceptors.response.use(
 
         try {
           const res = await axios.post(
-            "http://localhost:8081/auth/refresh-token",
+            `http://localhost:${PORT}/auth/refresh-token`,
             {
               refreshToken: getRefreshToken(),
             }

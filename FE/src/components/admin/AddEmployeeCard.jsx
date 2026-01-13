@@ -6,8 +6,9 @@ import positionApi from "../../api/positionApi";
 import departmentApi from "../../api/departmentApi";
 
 import { getProvinces } from "vn-provinces-wards";
+import toast from "react-hot-toast";
 
-const AddEmployeeCard = ({ onClose }) => {
+const AddEmployeeCard = ({ onClose, onAddSuccess }) => {
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
     employeeName: "",
@@ -60,15 +61,6 @@ const AddEmployeeCard = ({ onClose }) => {
 
   const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
 
-  // const handleDeleteEmployee = () => {
-  //   // Xóa giả
-  //   setEmployeeList((prev) =>
-  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
-  //   );
-  //   // Gọi API xóa ở đây
-  //   setIsConfirmPopupOpen(false);
-  // };
-
   // Load danh sách departments
   useEffect(() => {
     const fetchData = async () => {
@@ -116,14 +108,12 @@ const AddEmployeeCard = ({ onClose }) => {
   const handleSubmit = async () => {
     try {
       const response = await adminApi.addUser(formData);
-
-      alert("Tạo nhân viên thành công!");
       onClose(); // Đóng modal sau khi submit thành công
-      // reload
-      window.location.reload();
+      onAddSuccess();
+      toast.success("Tạo nhân viên thành công");
     } catch (error) {
       console.error("Lỗi khi tạo nhân viên:", error);
-      alert("Tạo nhân viên thất bại. Vui lòng thử lại!");
+      toast.error("Tạo nhân viên thất bại");
     }
   };
 
@@ -344,7 +334,7 @@ const AddEmployeeCard = ({ onClose }) => {
                         key={role}
                         type="button"
                         onClick={() => handleRoleToggle(role)}
-                        className={`px-4 py-2 border rounded-lg cursor-pointer font-medium transition cursor-pointer ${
+                        className={`px-4 py-2 border rounded-lg cursor-pointer font-medium transition ${
                           formData.roles.includes(role)
                             ? "bg-blue-600 text-white border-blue-600"
                             : "bg-white text-gray-700 border-gray-300 hover:border-blue-600"

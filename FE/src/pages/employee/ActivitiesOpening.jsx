@@ -18,7 +18,6 @@ import CustomButton from "../../components/common/Button";
 import Header from "../../components/common/Header";
 import ActivitiesRegistered from "../../components/employee/ActivitiesRegistered";
 import ActivitiesDetailDialog from "../../components/employee/ActivitiesDetailDialog";
-import CustomCard from "../../components/common/CustomCard";
 
 import Fuse from "fuse.js";
 import toast from "react-hot-toast";

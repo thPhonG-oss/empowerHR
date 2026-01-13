@@ -53,12 +53,6 @@ const navConfig = [
     icon: Activity,
     roles: ["admin"],
   },
-  {
-    title: "Chính sách công ty",
-    path: "company-policy",
-    icon: Wrench,
-    roles: ["admin"],
-  },
 
   // ──────────────────────────────── EMPLOYEE COMMON ────────────────────────────────
   {
