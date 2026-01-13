@@ -1,7 +1,8 @@
 import axiosClient from "./axiosClient";
 
 const requestApi = {
-  getUnresolved: () => axiosClient.get("/api/v1/requests/unresolved"),
+  getUnresolved: () =>
+    axiosClient.get(`/api/v1/requests/unresolved?pageNumber=1&pageSize=9999`),
   approve: (requestId, note) =>
     axiosClient.patch(`/api/v1/requests/${requestId}`, {
       requestStatus: "Approved",

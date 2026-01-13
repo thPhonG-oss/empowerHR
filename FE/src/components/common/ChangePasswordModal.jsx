@@ -2,6 +2,7 @@ import { Eye, EyeClosed, Lock, CheckCircle2, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import authApi from "../../api/authApi";
 import { useAlphanumericInput } from "../../hooks/useAlphanumericInput";
+import toast from "react-hot-toast";
 
 function ChangePasswordModal({ isOpen, onClose }) {
   const [currentPassword, handleCurrentChange, setCurrentPassword] =
@@ -62,7 +63,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
       if (error.response?.status === 401 || error.response?.status === 400) {
         setWrongInput(true);
       } else {
-        alert("Đổi mật khẩu thất bại! Vui lòng thử lại.");
+        toast.error("Đổi mật khẩu thất bại! Vui lòng thử lại.");
       }
     } finally {
       setIsLoading(false);

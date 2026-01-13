@@ -93,15 +93,6 @@ function StaffManagement() {
     return pages;
   };
 
-  // const handleDeleteEmployee = () => {
-  //   // Xóa giả
-  //   setEmployeeList((prev) =>
-  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
-  //   );
-  //   // Gọi API xóa ở đây
-  //   setIsConfirmPopupOpen(false);
-  // };
-
   // Load danh sách departments
   useEffect(() => {
     const fetchData = async () => {
@@ -233,7 +224,10 @@ function StaffManagement() {
               {currentStaff.map((staff) => (
                 <div
                   key={staff.employeeId}
-                  className="group border border-gray-200 rounded-lg p-4 hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white"
+                  onClick={() =>
+                    navigate(`/admin/employee-management/${staff.employeeId}`)
+                  }
+                  className="cursor-pointer group border border-gray-200 rounded-lg p-4 hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -264,17 +258,6 @@ function StaffManagement() {
                         </div>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/admin/employee-management/${staff.employeeId}`
-                        )
-                      }
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                    >
-                      <Edit2 className="size-4 text-gray-500" />
-                    </button>
                   </div>
                 </div>
               ))}

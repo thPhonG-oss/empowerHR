@@ -4,11 +4,7 @@ import TransactionPage from "./TransactionPage";
 import EmployeeRewardPage from "./EmployeeRewardPage";
 import Header from "../../components/common/Header";
 
-
-import {
-    Contact,
-} from "lucide-react";
-
+import { Contact } from "lucide-react";
 import { useState } from "react";
 
 const tabs = [
@@ -20,38 +16,42 @@ const tabs = [
 
 export default function RewardPolicy() {
   const [activeTab, setActiveTab] = useState("rate");
-  return (
-    <main className="p-0 relative">
-        <div className="mx-auto">
-          <Header title={"Quản lý điểm thưởng"} icon={Contact} />
-    
-          {/* Content */}
-          <div className="px-6 space-y-6">
-            {/* {activeTab} */}
-            <div className="border-b border-gray-200 flex gap-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`pb-2 text-sm font-medium transition
-                  ${
-                    activeTab === tab.key
-                      ? "text-black-600 border-b-2 border-black-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-            </div>
 
-            {/* {content} */}
+  return (
+    <main className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
+      <div className="mx-auto">
+        <Header title={"Quản lý điểm thưởng"} icon={Contact} />
+
+        {/* Content */}
+        <div className="px-6 space-y-6 mt-6">
+          {/* Tabs Navigation */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-2">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`shrink-0 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    activeTab === tab.key
+                      ? "bg-linear-to-br from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/30"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 min-h-[400px]">
             {activeTab === "rate" && <RatePage />}
             {activeTab === "point_monthly" && <MonthlyPointPage />}
             {activeTab === "transaction" && <TransactionPage />}
             {activeTab === "employee_point" && <EmployeeRewardPage />}
           </div>
         </div>
+      </div>
     </main>
   );
 }

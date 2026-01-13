@@ -213,7 +213,8 @@ function Dashboard() {
 
                 <button
                   onClick={() => navigate("/employee/activities")}
-                  className="cursor-pointer text-md font-medium text-blue-600 hover:text-blue-700 hover:font-bold flex justify-between items-center gap-1 transition duration-200"
+                  className="cursor-pointer text-md font-medium text-blue-600 hover:text-blue-700 
+                  hover:font-bold flex justify-between items-center gap-1 transition duration-200"
                 >
                   <span>Xem tất cả</span> <MoveRight size={16} />
                 </button>
