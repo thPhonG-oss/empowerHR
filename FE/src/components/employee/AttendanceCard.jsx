@@ -1,10 +1,10 @@
-import { CalendarClock, Clock, LogIn, LogOut } from "lucide-react";
+import { Clock, LogIn, LogOut } from "lucide-react";
 import { getCurrentDateParts } from "../../utils/date";
 import { useState, useEffect } from "react";
 import employeeApi from "../../api/employeeApi";
 import toast from "react-hot-toast";
 
-function AttendanceCard() {
+function AttendanceCard({ isDashboard = false, className = "" }) {
   const [checkInTime, setCheckInTime] = useState("--:--");
   const [checkOutTime, setCheckOutTime] = useState("--:--");
 
@@ -18,6 +18,8 @@ function AttendanceCard() {
     try {
       const res = await fetch("https://api.ipify.org?format=json");
       const data = await res.json();
+      console.log(res);
+      console.log(data);
       return data.ip;
     } catch (err) {
       console.error("Error getting public IP:", err);
@@ -100,11 +102,13 @@ function AttendanceCard() {
 
   return (
     <>
-      <div className="rounded-2xl bg-white p-6 shadow-md border border-gray-100">
+      <div
+        className={`rounded-2xl bg-white p-6 shadow-lg border border-gray-100  ${className}`}
+      >
         {/* Header */}
         <div className="mb-6">
-          <h1 className="font-semibold text-xl text-gray-900">
-            Chấm công hôm nay
+          <h1 className="font-bold text-xl text-gray-900">
+            {isDashboard ? "Chấm công nhanh" : "Chấm công hôm nay"}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {dayOfWeek}, {day} tháng {month}, {year}

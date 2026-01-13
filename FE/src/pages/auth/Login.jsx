@@ -123,34 +123,46 @@ function Login() {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-100">
-      <div className="bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-gray-100 to-gray-200">
+      <div className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         {/* Header Section */}
-        <div className="bg-linear-to-br from-gray-900 to-black p-8 pb-12">
-          <div className="flex justify-center mb-4">
-            <div className="bg-white rounded-2xl p-4 shadow-xl">
-              <Users className="text-black" size={48} />
-            </div>
+        <div className="bg-linear-to-br from-gray-900 via-gray-800 to-black p-10 pb-14 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+                backgroundSize: "32px 32px",
+              }}
+            ></div>
           </div>
-          <h1 className="text-center text-3xl font-bold text-white mb-2">
-            Chào mừng trở lại
-          </h1>
-          <p className="text-center text-gray-300 text-sm">
-            Đăng nhập vào hệ thống quản lý nhân sự
-          </p>
+          <div className="relative">
+            <div className="flex justify-center mb-6">
+              <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-3xl p-5 shadow-2xl ring-1 ring-white ring-opacity-20">
+                <Users className="text-black" size={52} strokeWidth={1.5} />
+              </div>
+            </div>
+            <h1 className="text-center text-4xl font-bold text-white mb-3 tracking-tight">
+              Chào mừng trở lại
+            </h1>
+            <p className="text-center text-gray-300 text-sm font-medium">
+              Đăng nhập vào hệ thống quản lý nhân sự
+            </p>
+          </div>
         </div>
 
         {/* Form Section */}
-        <div className="p-8 -mt-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="px-8 py-10 -mt-8 bg-white rounded-t-3xl relative">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username Input */}
             <div className="relative">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-bold text-gray-800 mb-3 tracking-wider uppercase">
                 Tên tài khoản
               </label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <User size={20} />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors">
+                  <User size={20} strokeWidth={2} />
                 </div>
                 <input
                   ref={inputRef}
@@ -173,8 +185,7 @@ function Login() {
                   placeholder="Tên tài khoản (chỉ chữ và số)"
                   required
                   autoComplete="off"
-                  className="w-full pl-11 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black 
-                  focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:bg-white hover:border-gray-300 transition-all duration-200"
                 />
               </div>
 
@@ -182,27 +193,31 @@ function Login() {
               {showSuggestions && filteredAccounts.length > 0 && (
                 <div
                   ref={suggestionsRef}
-                  className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto"
                 >
-                  <div className="p-2">
-                    <div className="text-xs font-semibold text-gray-500 px-3 py-2">
-                      TÀI KHOẢN ĐÃ LƯU
+                  <div className="p-3">
+                    <div className="text-xs font-bold text-gray-500 px-3 py-2 uppercase tracking-wider">
+                      Tài khoản đã lưu
                     </div>
                     {filteredAccounts.map((account, index) => (
                       <div
                         key={index}
                         onClick={() => handleSelectAccount(account)}
-                        className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
+                        className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-xl cursor-pointer transition-all group"
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-900 to-gray-700 flex items-center justify-center shrink-0">
-                            <User size={16} className="text-white" />
+                          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-gray-900 to-gray-700 flex items-center justify-center shrink-0 shadow-lg">
+                            <User
+                              size={18}
+                              className="text-white"
+                              strokeWidth={2.5}
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 truncate">
+                            <div className="font-semibold text-gray-900 truncate text-sm">
                               {account.userName}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-400 mt-0.5">
                               {"•".repeat(account.password.length)}
                             </div>
                           </div>
@@ -212,9 +227,13 @@ function Login() {
                           onClick={(e) =>
                             handleDeleteAccount(e, account.userName)
                           }
-                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded-md transition-all cursor-pointer"
+                          className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 rounded-lg transition-all"
                         >
-                          <X size={16} className="text-red-500" />
+                          <X
+                            size={16}
+                            className="text-red-500"
+                            strokeWidth={2.5}
+                          />
                         </button>
                       </div>
                     ))}
@@ -225,12 +244,12 @@ function Login() {
 
             {/* Password Input */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-bold text-gray-800 mb-3 tracking-wider uppercase">
                 Mật khẩu
               </label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <Lock size={20} />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors">
+                  <Lock size={20} strokeWidth={2} />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -246,30 +265,35 @@ function Login() {
                   }
                   required
                   autoComplete="current-password"
-                  className="w-full pl-11 pr-12 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+                  className="w-full pl-12 pr-14 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:bg-white hover:border-gray-300 transition-all duration-200"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                  className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors p-1 rounded-lg hover:bg-gray-100"
                 >
-                  {showPassword ? <Eye size={20} /> : <EyeClosed size={20} />}
+                  {showPassword ? (
+                    <Eye size={20} strokeWidth={2} />
+                  ) : (
+                    <EyeClosed size={20} strokeWidth={2} />
+                  )}
                 </button>
               </div>
             </div>
 
             {/* Remember Me Checkbox */}
-            <div className="flex items-center">
+            <div className="flex items-center pt-2">
               <input
                 type="checkbox"
                 id="rememberMe"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 accent-black  cursor-pointer"
+                className="w-5 h-5 rounded-md border-2 border-gray-300 cursor-pointer"
+                style={{ accentColor: "#111827" }}
               />
               <label
                 htmlFor="rememberMe"
-                className="ml-2 text-sm text-gray-700 cursor-pointer select-none"
+                className="ml-3 text-sm font-medium text-gray-700 cursor-pointer select-none hover:text-gray-900 transition-colors"
               >
                 Lưu tài khoản và mật khẩu
               </label>
@@ -277,8 +301,8 @@ function Login() {
 
             {/* Error */}
             {wrongInput && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-                <p className="text-red-600 text-sm font-medium text-center">
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                <p className="text-red-700 text-sm font-semibold text-center">
                   Tên tài khoản hoặc mật khẩu không chính xác
                 </p>
               </div>
@@ -288,19 +312,27 @@ function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-black text-white font-semibold py-3.5 rounded-xl hover:bg-gray-800 disabled:opacity-50 cursor-pointer 
-              disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+              className="w-full bg-linear-to-r from-gray-900 via-gray-800 to-black text-white font-bold 
+              py-4 rounded-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all 
+              duration-300 shadow-xl transform hover:scale-102 active:scale-95"
             >
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Đang xử lý...
+                <span className="flex items-center justify-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2.5} />
+                  <span className="font-bold tracking-wide">Đang xử lý...</span>
                 </span>
               ) : (
-                "Đăng nhập"
+                <span className="tracking-wide">Đăng nhập</span>
               )}
             </button>
           </form>
+
+          {/* Footer hint */}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-gray-400 font-medium">
+              Chỉ sử dụng chữ cái và số cho tên tài khoản & mật khẩu
+            </p>
+          </div>
         </div>
       </div>
     </div>
