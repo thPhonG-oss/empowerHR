@@ -40,6 +40,7 @@ export default function RequestManagement() {
       try {
         setLoading(true);
         const res = await requestApi.getUnresolved();
+        console.log(res.result.requestResponseDTOS);
         setRequests(res.result.requestResponseDTOS || []);
       } catch (err) {
         console.error(err);
@@ -94,44 +95,45 @@ export default function RequestManagement() {
     setCurrentPage(1);
   };
 
-  const handleApprove = (requestId, note) => {
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? {
-              ...r,
-              status: "Approved",
-              handleAt: new Date().toISOString(),
-              responseReason: note || "Đã phê duyệt",
-            }
-          : r
-      )
-    );
+  // const handleApprove = (requestId, note) => {
+  //   setRequests((prev) =>
+  //     prev.map((r) =>
+  //       r.requestId === requestId
+  //         ? {
+  //             ...r,
+  //             status: "Approved",
+  //             handleAt: new Date().toISOString(),
+  //             responseReason: note || "Đã phê duyệt",
+  //           }
+  //         : r
+  //     )
+  //   );
 
-    setSelectedRequest(null);
-  };
+  //   setSelectedRequest(null);
+  // };
 
-  const handleReject = (requestId, reason) => {
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? {
-              ...r,
-              status: "Rejected",
-              handleAt: new Date().toISOString(),
-              responseReason: reason,
-            }
-          : r
-      )
-    );
+  // const handleReject = (requestId, reason) => {
+  //   setRequests((prev) =>
+  //     prev.map((r) =>
+  //       r.requestId === requestId
+  //         ? {
+  //             ...r,
+  //             status: "Rejected",
+  //             handleAt: new Date().toISOString(),
+  //             responseReason: reason,
+  //           }
+  //         : r
+  //     )
+  //   );
 
-    setSelectedRequest(null);
-  };
+  //   setSelectedRequest(null);
+  // };
 
   const reloadData = async () => {
     try {
       setLoading(true);
       const res = await requestApi.getUnresolved();
+
       setRequests(res.result.requestResponseDTOS || []);
     } catch (err) {
       console.error(err);
@@ -281,7 +283,7 @@ export default function RequestManagement() {
                 paginatedRequests.map((request) => (
                   <div
                     key={request.requestId}
-                    className={`border rounded-lg p-5 hover:border-gray-400 transition-all duration-200 ${
+                    className={`border rounded-lg p-5 hover:shadow-md transition-all duration-200 ${
                       request.requestType === "LEAVE"
                         ? "bg-blue-50/30 border-blue-200"
                         : request.requestType === "TIMESHEET_UPDATE"
@@ -334,6 +336,16 @@ export default function RequestManagement() {
                             </span>{" "}
                             {request.employeeName}
                             <br />
+                            {request.requestType === "TIMESHEET_UPDATE" &&
+                              request.attendanceDate && (
+                                <>
+                                  <span className="font-medium text-gray-700">
+                                    Ngày chấm công:
+                                  </span>{" "}
+                                  {formatDate(request.attendanceDate)}
+                                  <br />
+                                </>
+                              )}
                             <span className="font-medium text-gray-700">
                               Lý do:
                             </span>{" "}

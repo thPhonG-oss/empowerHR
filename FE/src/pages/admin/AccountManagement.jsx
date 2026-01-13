@@ -13,6 +13,7 @@ import {
 
 import positionApi from "../../api/positionApi";
 import departmentApi from "../../api/departmentApi";
+import toast from "react-hot-toast";
 
 function AccountManagement() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,17 +29,18 @@ function AccountManagement() {
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await adminApi.getAllUsers();
+  const fetchData = async () => {
+    try {
+      const res = await adminApi.getAllUsers();
 
-        setAccountList(res.result);
-        localStorage.setItem("employeeList", JSON.stringify(res.result));
-      } catch (err) {
-        console.error("Lỗi khi load danh sách nhân viên:", err);
-      }
-    };
+      setAccountList(res.result);
+      localStorage.setItem("employeeList", JSON.stringify(res.result));
+    } catch (err) {
+      console.error("Lỗi khi load danh sách nhân viên:", err);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -74,8 +76,11 @@ function AccountManagement() {
           emp.employeeId === idBlock ? { ...emp, isActive: false } : emp
         )
       );
+      toast.success("Khóa tài khoản thành công");
+      fetchData();
     } catch (err) {
       console.error("Không thể khóa tài khoản", err);
+      toast.error("Khóa tài khoản thất bại");
     }
     setIsConfirmPopupOpen(false);
   };
@@ -88,8 +93,11 @@ function AccountManagement() {
           emp.employeeId === id ? { ...emp, isActive: true } : emp
         )
       );
+      toast.success("Mở khóa tài khoản thành công");
+      fetchData();
     } catch (err) {
       console.error("Không thể mở khóa tài khoản", err);
+      toast.error("Mở khóa tài khoản không thành công");
     }
   };
 
@@ -285,7 +293,9 @@ function AccountManagement() {
       {isConfirmPopupOpen && (
         <ConfirmPopup
           isOpen={isConfirmPopupOpen}
-          onClose={() => setIsConfirmPopupOpen(false)}
+          onClose={() => {
+            setIsConfirmPopupOpen(false);
+          }}
           message="Bạn có chắc chắn muốn khóa tài khoản này?"
           onConfirm={handleBlockAccount}
         />

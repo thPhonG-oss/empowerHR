@@ -27,7 +27,7 @@ const runningActivityApi = {
     ),
 
   deleteActivity: (activityId) =>
-    axiosClient.delete(`/api/v1/activities/admin/${activityId}`),
+    axiosClient.delete(`/api/v1/activities/${activityId}`),
 };
 
 export default runningActivityApi;

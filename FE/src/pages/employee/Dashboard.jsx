@@ -126,7 +126,10 @@ function Dashboard() {
           {/* ===== TOP CARDS ===== */}
           <div className="grid grid-cols-4 pt-8 px-8 gap-6">
             {/* ===== POINT CARD ===== */}
-            <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/employee/rewards")}
+              className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            >
               <div className="p-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
                 <Gem className="size-7 text-white" />
               </div>
@@ -149,7 +152,10 @@ function Dashboard() {
             </div>
 
             {/* ===== ATTENDANCE COUNT CARD ===== */}
-            <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/employee/attendance")}
+              className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            >
               <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
                 <Calendar className="size-7 text-white" />
               </div>
@@ -206,7 +212,8 @@ function Dashboard() {
                   {currentRequest.map((req) => (
                     <li
                       key={req.requestId}
-                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                      onClick={() => navigate("/employee/request-history")}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100 cursor-pointer"
                     >
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
@@ -266,7 +273,8 @@ function Dashboard() {
                   {currentActivities.map((act) => (
                     <li
                       key={act.participateInId}
-                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                      onClick={() => navigate("/employee/activities")}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100 cursor-pointer"
                     >
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
@@ -305,8 +313,8 @@ function Dashboard() {
               )}
             </div>
 
-            {/* So so so */}
-            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+            {/* ===== SỐ DƯ NGHỈ PHÉP ===== */}
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 cursor-pointer">
               <h3 className="text-lg font-bold text-gray-900 mb-5 pb-4 border-b border-gray-100">
                 Số dư nghỉ phép
               </h3>

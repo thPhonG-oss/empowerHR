@@ -43,6 +43,8 @@ export default function ActivitiesOpening() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortType, setSortType] = useState("nearest");
 
+  const [registerKey, setRegisterKey] = useState(0);
+
   //=====================================================
   // PROFILE
   //=====================================================
@@ -264,7 +266,7 @@ export default function ActivitiesOpening() {
               className="cursor-pointer flex items-center justify-center gap-2 px-5 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-300  hover:border-gray-300 transition-all duration-200 shadow-sm whitespace-nowrap font-medium"
             >
               <ArrowUpDown size={18} />
-              {sortType === "nearest" ? "Xa nhất" : "Gần nhất"}
+              {sortType === "nearest" ? "Gần nhất" : "Xa nhất"}
             </button>
           </div>
 
@@ -313,10 +315,14 @@ export default function ActivitiesOpening() {
             <ActivitiesRegistered
               employeeID={employeeID}
               openDetails={openDetails}
-              handleUnregister={handleUnregister}
+              handleUnregisterActivity={(id) => {
+                handleUnregister(id);
+                setRegisterKey((prev) => prev + 1);
+              }}
               formatDate={formatDate}
               searchQuery={searchQuery}
               sortType={sortType}
+              registerKey={registerKey}
             />
           ) : (
             <>
@@ -448,10 +454,14 @@ export default function ActivitiesOpening() {
           resultsLoading={resultsLoading}
           resultsError={resultsError}
           handleRegister={handleRegister}
-          handleUnregister={handleUnregister}
+          handleUnregisterActivity={(id) => {
+            handleUnregister(id);
+            setRegisterKey((prev) => prev + 1);
+          }}
           isFull={isFull}
           isHistory={currentView === "registered" ? true : false}
           isCancelled={activityResults?.isCancelled}
+          registerKey={registerKey}
         />
       )}
     </div>

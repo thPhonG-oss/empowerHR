@@ -68,6 +68,7 @@ function EditProfile() {
   // Load initial profile
   useEffect(() => {
     const stored = JSON.parse(sessionStorage.getItem("profile"));
+    console.log(stored);
     if (stored) {
       setFormData({
         ...stored,
@@ -75,8 +76,16 @@ function EditProfile() {
         departmentName: stored.department?.departmentName,
         positionId: stored.position?.positionId,
         positionName: stored.position?.positionName,
-        bankName: stored.bank.bankName ?? "",
-        bankAccountNumber: stored.bank.bankAccountNumber ?? "",
+
+        bankName:
+          (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)
+            ? stored.bank
+            : stored.bank?.bankName) ?? "",
+
+        bankAccountNumber:
+          (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)
+            ? stored.bankAccountNumber
+            : stored.bank?.bankAccountNumber) ?? "",
       });
     }
   }, []);
@@ -147,7 +156,7 @@ function EditProfile() {
         );
       }
 
-      if (safeRole === "EMPLOYEE") {
+      if (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)) {
         const payload = {
           address: formData.address ?? "",
           email: formData.email ?? "",
@@ -175,8 +184,15 @@ function EditProfile() {
         departmentName: stored.department?.departmentName,
         positionId: stored.position?.positionId,
         positionName: stored.position?.positionName,
-        bankName: stored.bank ?? "",
-        bankAccountNumber: stored.bankAccountNumber ?? "",
+        bankName:
+          (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)
+            ? stored.bank
+            : stored.bank?.bankName) ?? "",
+
+        bankAccountNumber:
+          (safeRole === "EMPLOYEE" || (safeRole === "MANAGER" && !employeeId)
+            ? stored.bankAccountNumber
+            : stored.bank?.bankAccountNumber) ?? "",
       });
     }
   };

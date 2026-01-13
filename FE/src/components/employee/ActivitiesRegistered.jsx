@@ -7,11 +7,12 @@ import runningActivityApi from "../../api/runningActivityApi";
 
 export default function ActivitiesRegistered({
   employeeID,
-  handleUnregister,
+  handleUnregisterActivity,
   openDetails,
   formatDate,
   searchQuery,
   sortType,
+  registerKey,
 }) {
   const [registeredActivities, setRegisteredActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ export default function ActivitiesRegistered({
   useEffect(() => {
     if (!employeeID) return;
     fetchRegistered();
-  }, [employeeID]);
+  }, [employeeID, registerKey]);
 
   if (loading)
     return (
@@ -139,7 +140,7 @@ export default function ActivitiesRegistered({
                   <CustomButton
                     variant="danger"
                     onClick={async () => {
-                      await handleUnregister(ra.runningActivityId);
+                      await handleUnregisterActivity(ra.runningActivityId);
                       fetchRegistered();
                     }}
                     className="w-full bg-gray-900 hover:bg-gray-800  text-xs font-medium py-2.5 rounded-md transition-colors cursor-pointer"

@@ -16,9 +16,8 @@ import DetailActivityOverlay from "../../components/admin/DetailActivityOverlay"
 export default function RunningActivityManagement() {
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize] = useState(6);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage] = useState(6);
   const [loading, setLoading] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
@@ -38,15 +37,14 @@ export default function RunningActivityManagement() {
     minMatchCharLength: 2,
   };
 
-  const fetchActivities = async (page = 0) => {
+  const fetchActivities = async () => {
     setLoading(true);
     try {
-      const res = await runningActivityApi.adminGetAllActivity(page, pageSize);
+      const res = await runningActivityApi.adminGetAllActivity(0, 9999);
       const list = res.result?.content || [];
+      console.log(list);
       setActivities(list);
       setFilteredActivities(list);
-      setTotalPages(res.result?.totalPages || 1);
-      setPageNumber(page);
     } catch (err) {
       console.error("❌ Lỗi tải hoạt động:", err);
     } finally {
@@ -55,7 +53,7 @@ export default function RunningActivityManagement() {
   };
 
   useEffect(() => {
-    fetchActivities(0);
+    fetchActivities();
   }, []);
 
   useEffect(() => {
@@ -77,7 +75,20 @@ export default function RunningActivityManagement() {
     });
 
     setFilteredActivities(result);
+    setCurrentPage(0); // Reset về trang đầu khi filter thay đổi
   }, [searchTerm, sortOrder, statusFilter, activities]);
+
+  // Tính toán phân trang ở frontend
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filteredActivities.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
@@ -85,7 +96,7 @@ export default function RunningActivityManagement() {
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* FILTER */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50 ">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             <div className="relative flex-1 max-w-md">
               <Search
@@ -158,7 +169,7 @@ export default function RunningActivityManagement() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredActivities.map((act) => (
+              {currentItems.map((act) => (
                 <div
                   key={act.runningActivityId}
                   onClick={() => {
@@ -189,20 +200,28 @@ export default function RunningActivityManagement() {
                         className={`shrink-0 text-xs px-3 py-1.5 rounded-full font-semibold tracking-wide ${
                           act.status === "Active"
                             ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                            : act.status === "Open"
+                            ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
                             : act.status === "Completed"
                             ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
                             : act.status === "Cancelled"
                             ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                            : act.status === "Draft"
+                            ? "bg-gray-100 text-gray-700 ring-1 ring-gray-200"
                             : "bg-gray-100 text-gray-700 ring-1 ring-gray-200"
                         }`}
                       >
-                        {act.status === "Active"
+                        {act.status === "Draft"
+                          ? "Chuẩn bị"
+                          : act.status === "Open"
                           ? "Đang mở"
+                          : act.status === "Active"
+                          ? "Đang diễn ra"
                           : act.status === "Completed"
                           ? "Đã kết thúc"
                           : act.status === "Cancelled"
                           ? "Đã hủy"
-                          : "Chuẩn bị"}
+                          : "Không xác định"}
                       </span>
                     </div>
 
@@ -228,29 +247,34 @@ export default function RunningActivityManagement() {
             </div>
 
             {/* PAGINATION */}
-            <div className="flex justify-center items-center gap-4 pt-4">
-              <button
-                onClick={() => fetchActivities(pageNumber - 1)}
-                disabled={pageNumber === 0}
-                className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              >
-                ← Trước
-              </button>
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 pt-4">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  ← Trước
+                </button>
 
-              <div className="px-6 py-3 bg-white rounded-xl shadow-md border border-gray-100">
-                <span className="text-sm text-gray-700 font-semibold">
-                  Trang {pageNumber + 1} / {totalPages}
-                </span>
+                <div className="px-6 py-3 bg-white rounded-xl shadow-md border border-gray-100">
+                  <span className="text-sm text-gray-700 font-semibold">
+                    Trang {currentPage + 1} / {totalPages}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-2">
+                    ({filteredActivities.length} kết quả)
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage + 1 >= totalPages}
+                  className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  Sau →
+                </button>
               </div>
-
-              <button
-                onClick={() => fetchActivities(pageNumber + 1)}
-                disabled={pageNumber + 1 >= totalPages}
-                className="px-6 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-white text-sm font-medium shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              >
-                Sau →
-              </button>
-            </div>
+            )}
           </>
         )}
       </div>
@@ -258,14 +282,14 @@ export default function RunningActivityManagement() {
       <CreateActivityOverlay
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        onSuccess={() => fetchActivities(0)}
+        onSuccess={() => fetchActivities()}
       />
 
       <DetailActivityOverlay
         open={openDetail}
         onClose={() => setOpenDetail(false)}
         activity={selectedActivity}
-        onSuccess={() => fetchActivities(0)}
+        onSuccess={() => fetchActivities()}
       />
     </main>
   );

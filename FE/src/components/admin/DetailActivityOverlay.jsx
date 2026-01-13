@@ -118,19 +118,27 @@ export default function DetailActivityOverlay({
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-semibold text-gray-700 min-w-24">
-                    Bắt đầu:
+                    Người tham gia:
+                  </span>
+                  <span className="text-gray-600">
+                    {activity.minParticipant} – {activity.maxParticipant}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-gray-700 min-w-24">
+                    Diễn ra từ:
                   </span>
                   <span className="text-gray-600">{activity.startDate}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-semibold text-gray-700 min-w-24">
-                    Kết thúc:
+                    Diễn ra đến:
                   </span>
                   <span className="text-gray-600">{activity.endDate}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-semibold text-gray-700 min-w-24">
-                    ĐK từ:
+                    Đăng ký từ:
                   </span>
                   <span className="text-gray-600">
                     {activity.registrationStartDate}
@@ -138,18 +146,10 @@ export default function DetailActivityOverlay({
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-semibold text-gray-700 min-w-24">
-                    ĐK đến:
+                    Đăng ký đến:
                   </span>
                   <span className="text-gray-600">
                     {activity.registrationEndDate}
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold text-gray-700 min-w-24">
-                    Người tham gia:
-                  </span>
-                  <span className="text-gray-600">
-                    {activity.minParticipant} – {activity.maxParticipant}
                   </span>
                 </div>
               </div>
