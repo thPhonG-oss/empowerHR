@@ -1,15 +1,14 @@
 package com.hr_management.hr_management.controller;
 
 import com.hr_management.hr_management.dto.ApiResponse;
+import com.hr_management.hr_management.dto.request.BudgetDepartmentRequest;
+import com.hr_management.hr_management.dto.response.BudgeDepartmentResponse;
 import com.hr_management.hr_management.dto.response.DepartmentBudgetResponseDTO;
 import com.hr_management.hr_management.service.DepartmentBudgetService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,6 +49,12 @@ public class DepartmentBudgetController {
         return ApiResponse.<List<DepartmentBudgetResponseDTO>>builder()
                 .message("Get department budgets by department id successfully")
                 .data(budgets)
+                .build();
+    }
+    @PutMapping("/{departmentBudgeId}")
+    public  ApiResponse<BudgeDepartmentResponse> updateBudge(@PathVariable Integer departmentBudgeId, @RequestBody BudgetDepartmentRequest budgetDepartmentRequest){
+        return ApiResponse.<BudgeDepartmentResponse>builder()
+                .data(departmentBudgetService.updateDepartmentBudge(departmentBudgeId,budgetDepartmentRequest))
                 .build();
     }
 }
