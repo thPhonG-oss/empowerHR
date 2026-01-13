@@ -46,15 +46,11 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
         password: currentPassword,
       });
 
-      console.log(res1);
-
       // Nếu xác minh thành công, đổi mật khẩu
       const res2 = await authApi.changePassword({
         userName: userName,
         newpassword: newPassword,
       });
-
-      console.log(res2);
 
       setSuccess(true);
       setTimeout(() => {

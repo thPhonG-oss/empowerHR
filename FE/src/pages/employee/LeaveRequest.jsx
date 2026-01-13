@@ -162,7 +162,6 @@ function LeaveRequest() {
       const data = await res.json();
 
       if (data.secure_url) {
-        console.log("✅ Upload thành công:", data.secure_url);
         setFormData((prev) => ({
           ...prev,
           proofDocument: data.secure_url,
@@ -179,10 +178,6 @@ function LeaveRequest() {
       setIsUploading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(formData.proofDocument);
-  }, [formData.proofDocument]);
 
   // -----------------------------
   // Submit form

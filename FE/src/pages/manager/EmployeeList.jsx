@@ -57,10 +57,8 @@ function ManagerEmployeeList() {
 
         const data = empRes.result;
 
-        // ✅ Lấy ID của chính mình
         const myId = await getMyId();
 
-        // ✅ Lọc bỏ chính bản thân ra khỏi danh sách
         const filteredEmployees = (data.employeeResponseDTOS || []).filter(
           (emp) => emp.employeeId !== myId
         );
@@ -113,7 +111,7 @@ function ManagerEmployeeList() {
   };
 
   const handleGiveReward = (e, employee) => {
-    e.stopPropagation(); // Prevent card click navigation
+    e.stopPropagation();
     setSelectedEmployee(employee);
     setShowRewardsModal(true);
   };

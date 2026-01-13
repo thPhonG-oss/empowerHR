@@ -3,44 +3,61 @@ import {
   History,
   Award,
   Calendar,
-  User,
   TrendingUp,
   Search,
+  Gift,
 } from "lucide-react";
 import Fuse from "fuse.js";
 import Header from "../../components/common/Header";
 import transactionsApi from "../../api/transactionsApi";
+import { getMyDepartmentEmployeeIds } from "../../utils/getMyDepartmentEmployeeIds";
 import GiveRewardsModal from "../../components/manager/GiveRewardsModal";
-import { Gift } from "lucide-react";
 
 function PerformancePoints() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [myEmployeeIds, setMyEmployeeIds] = useState([]);
 
   useEffect(() => {
-    fetchTransactions();
+    const init = async () => {
+      try {
+        // 1️⃣ Lấy danh sách nhân viên trong phòng ban (trừ tôi)
+        const ids = await getMyDepartmentEmployeeIds();
+        setMyEmployeeIds(ids);
+
+        // 2️⃣ Sau đó mới fetch transactions
+        await fetchTransactions(ids);
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      }
+    };
+    init();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (validEmployeeIds = []) => {
     try {
       setLoading(true);
       const response = await transactionsApi.getAllTransactions();
+      const allTransactions = response.result || [];
 
-      // Lọc chỉ lấy transactions có type là PerformanceReward
-      const performanceRewards = (response.result || []).filter(
-        (transaction) => transaction.transactionType === "PerformanceReward"
+      // 1️⃣ Lọc chỉ lấy transactions loại "PerformanceReward"
+      const performanceRewards = allTransactions.filter(
+        (t) => t.transactionType === "PerformanceReward"
       );
 
-      // Sắp xếp theo thời gian mới nhất
-      const sortedTransactions = performanceRewards.sort(
+      // 2️⃣ Lọc chỉ những giao dịch thuộc nhân viên trong phòng ban của tôi
+      const departmentTransactions = performanceRewards.filter((t) =>
+        validEmployeeIds.includes(t.employeeId)
+      );
+
+      // 3️⃣ Sắp xếp theo thời gian mới nhất
+      const sorted = departmentTransactions.sort(
         (a, b) => new Date(b.createAt) - new Date(a.createAt)
       );
 
-      console.log(sortedTransactions);
-
-      setTransactions(sortedTransactions);
+      setTransactions(sorted);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
@@ -48,17 +65,17 @@ function PerformancePoints() {
     }
   };
 
-  // Tìm kiếm với Fuse.js
+  // Tìm kiếm bằng Fuse.js
   const fuse = new Fuse(transactions, {
     keys: ["employeeName"],
     threshold: 0.2,
   });
 
   const filteredTransactions = searchTerm
-    ? fuse.search(searchTerm).map((result) => result.item)
+    ? fuse.search(searchTerm).map((r) => r.item)
     : transactions;
 
-  // Format date
+  // Format ngày giờ
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("vi-VN", {
@@ -70,9 +87,8 @@ function PerformancePoints() {
     }).format(date);
   };
 
-  // Tính tổng điểm đã trao
   const totalPoints = filteredTransactions.reduce(
-    (sum, transaction) => sum + transaction.points,
+    (sum, t) => sum + t.points,
     0
   );
 
@@ -135,7 +151,7 @@ function PerformancePoints() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">
-                  Danh sách giao dịch
+                  Giao dịch tặng thưởng
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   Lịch sử trao thưởng điểm hiệu suất
@@ -146,10 +162,10 @@ function PerformancePoints() {
                   onClick={() => setIsOpenModal(true)}
                   className="flex items-center gap-2 px-3 py-2 bg-gray-900 text-white font-medium
                            rounded-lg hover:bg-gray-800 transition-colors cursor-pointer hover:opacity-80 text-md"
-                  title="Trao thưởng"
+                  title="Tặng điểm cho nhân viên"
                 >
                   <Gift className="size-4" />
-                  <span className="">Thưởng</span>
+                  <span className="">Tặng thưởng</span>
                 </button>
               </div>
             </div>
@@ -222,11 +238,13 @@ function PerformancePoints() {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
       <GiveRewardsModal
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
         employee={null}
-        onSuccess={fetchTransactions}
+        onSuccess={() => fetchTransactions(myEmployeeIds)}
       />
     </main>
   );

@@ -64,7 +64,6 @@ export default function ActivitiesOpening() {
   //=====================================================
   useEffect(() => {
     if (!employeeID) return;
-    console.log("kết nối strava");
     const checkStravaConnection = async () => {
       try {
         const connectionRes = await stravaApi.getStatusconnetion(employeeID);
@@ -85,12 +84,9 @@ export default function ActivitiesOpening() {
 
     try {
       const response = await stravaApi.RedirectURL();
-      console.log(response);
       const redirectUrl = response.redirectUrl;
       if (redirectUrl) {
         setRedirect_uri(redirectUrl);
-
-        console.log(redirectUrl);
 
         window.open(redirectUrl, "_blank");
       }
@@ -265,7 +261,6 @@ export default function ActivitiesOpening() {
               title="Thời gian hoạt động bắt đầu"
               onClick={() => {
                 setSortType(sortType === "nearest" ? "furthest" : "nearest");
-                console.log(sortType);
               }}
               className="cursor-pointer flex items-center justify-center gap-2 px-5 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-300  hover:border-gray-300 transition-all duration-200 shadow-sm whitespace-nowrap font-medium"
             >

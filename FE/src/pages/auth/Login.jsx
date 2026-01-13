@@ -28,7 +28,6 @@ function Login() {
       // Lấy role từ token
       const role = localStorage.getItem("role");
 
-      console.log(`/${role}/dashboard`);
       localStorage.setItem("userName", userName);
       navigate(`/${role}/dashboard`);
 
