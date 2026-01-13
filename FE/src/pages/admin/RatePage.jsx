@@ -12,6 +12,7 @@ const initialData = {
   maxPoint: 0,
   expiredTime: 0,
   isActive: true,
+  endDate:"",
 };
 
 export default function RatePage() {
@@ -33,6 +34,7 @@ export default function RatePage() {
         maxPoint: policy.maxPoints,
         expiredTime: policy.expiry,
         isActive: policy.isActive,
+        endDate: policy.endDate,
       };
 
       setFormData(mappedData);
@@ -68,6 +70,10 @@ export default function RatePage() {
       newErrors.maxPoint = "Số điểm tối đa phải ≥ số điểm tối thiểu";
     }
 
+    if (!formData.endDate) {
+      newErrors.endDate = "Vui lòng chọn ngày kết thúc";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -85,9 +91,10 @@ export default function RatePage() {
         maxPoints: Number(formData.maxPoint),
         expiry: Number(formData.expiredTime),
         isActive: formData.isActive,
+        endDate: formData.endDate,
       };
       await pointPolicyApi.updatePointPolicy(formData.policyID, dataToUpdate);
-      setOriginData(dataToUpdate);
+      setOriginData(formData);
       setIsEdit(false);
       setShowConfirm(false);
     } catch (err) {
@@ -99,6 +106,12 @@ export default function RatePage() {
     setFormData(originData);
     setErrors({});
     setIsEdit(false);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
   };
 
   return (
@@ -213,6 +226,21 @@ export default function RatePage() {
                     suffix="điểm"
                   />
                 </Field>
+
+                {/* End Date */}
+                <Field
+                  label="Ngày kết thúc chính sách"
+                  error={errors.endDate}
+                >
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    disabled={!isEdit}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-50 disabled:text-gray-600 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </Field>
               </div>
             </div>
           </div>
@@ -266,6 +294,16 @@ export default function RatePage() {
                 <span className="text-gray-600">Điểm tối đa:</span>
                 <span className="font-semibold text-gray-900">{formData.maxPoint} điểm</span>
               </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Hạn sử dụng:</span>
+                <span className="font-semibold text-gray-900">{formData.expiredTime} ngày</span>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Ngày kết thúc:</span>
+                <span className="font-semibold text-gray-900">{formatDate(formData.endDate)}</span>
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -288,5 +326,3 @@ export default function RatePage() {
     </>
   );
 }
-
-
