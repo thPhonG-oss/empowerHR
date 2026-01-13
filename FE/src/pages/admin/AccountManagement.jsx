@@ -32,6 +32,7 @@ function AccountManagement() {
     const fetchData = async () => {
       try {
         const res = await adminApi.getAllUsers();
+
         setAccountList(res.result);
         localStorage.setItem("employeeList", JSON.stringify(res.result));
       } catch (err) {
@@ -204,15 +205,17 @@ function AccountManagement() {
                     <div className="flex items-center gap-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          employee.isActive
+                          employee?.account?.accountStatus
                             ? "bg-green-100 text-green-700"
                             : "bg-gray-200 text-gray-600"
                         }`}
                       >
-                        {employee.isActive ? "Hoạt động" : "Không hoạt động"}
+                        {employee?.account?.accountStatus
+                          ? "Hoạt động"
+                          : "Không hoạt động"}
                       </span>
 
-                      {employee.isActive ? (
+                      {employee?.account?.accountStatus ? (
                         <button
                           onClick={() => {
                             setIdBlock(employee.employeeId);

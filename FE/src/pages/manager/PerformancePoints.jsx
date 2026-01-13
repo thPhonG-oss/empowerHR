@@ -71,7 +71,7 @@ function PerformancePoints() {
   // Tìm kiếm bằng Fuse.js
   const fuse = new Fuse(transactions, {
     keys: ["employeeName"],
-    threshold: 0.2,
+    threshold: 0.1,
   });
 
   const filteredTransactions = searchTerm
@@ -90,10 +90,7 @@ function PerformancePoints() {
     }).format(date);
   };
 
-  const totalPoints = filteredTransactions.reduce(
-    (sum, t) => sum + t.points,
-    0
-  );
+  const totalPoints = transactions.reduce((sum, t) => sum + t.points, 0);
 
   return (
     <main className="p-0 relative">
@@ -125,7 +122,7 @@ function PerformancePoints() {
                 <div>
                   <p className="text-xs text-gray-500">Số lần trao thưởng</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {filteredTransactions.length}
+                    {transactions.length}
                   </p>
                 </div>
               </div>

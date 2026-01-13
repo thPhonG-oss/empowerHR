@@ -65,7 +65,6 @@ function Login() {
     setWrongInput(false);
 
     try {
-      console.log("Đang đăng nhập...");
       const res = await authApi.login({ userName, password });
 
       if (!res || !res.result || !res.result.acessToken) {
@@ -92,7 +91,6 @@ function Login() {
       const role = localStorage.getItem("role");
       localStorage.setItem("userName", userName);
 
-      console.log("Đăng nhập thành công, chuyển hướng...");
       navigate(`/${role}/dashboard`);
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
@@ -139,7 +137,7 @@ function Login() {
           </div>
           <div className="relative">
             <div className="flex justify-center mb-6">
-              <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-3xl p-5 shadow-2xl ring-1 ring-white ring-opacity-20">
+              <div className="bg-white bg-opacity-10  rounded-3xl p-5 shadow-2xl ring-1 ring-white ring-opacity-20">
                 <Users className="text-black" size={52} strokeWidth={1.5} />
               </div>
             </div>

@@ -28,6 +28,7 @@ function DetailProfile({}) {
           (safeRole === "MANAGER" && !employeeId)
         ) {
           const res = await employeeApi.getMyProfile();
+
           setProfile(res.result);
 
           sessionStorage.setItem("profile", JSON.stringify(res.result));
@@ -153,7 +154,8 @@ function DetailProfile({}) {
                 <InfoField label="Mã nhân viên" value={profile?.employeeCode} />
                 <InfoField label="Tên phòng ban" value={departmentName} />
                 <InfoField label="Vị trí" value={positionName} />
-                {safeRole === "MANAGER" && !employeeId ? (
+                {safeRole === "EMPLOYEE" ||
+                (safeRole === "MANAGER" && !employeeId) ? (
                   <InfoField
                     label="Tài khoản ngân hàng"
                     value={`${profile?.bankAccountNumber} - ${profile?.bank}`}

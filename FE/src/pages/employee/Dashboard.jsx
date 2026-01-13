@@ -9,6 +9,7 @@ import runningActivityApi from "../../api/runningActivityApi";
 import employeeApi from "../../api/employeeApi";
 import { getCurrentDateParts } from "../../utils/date";
 import { getMyId } from "../../utils/getMyId";
+import { getLeaveTypes } from "../../utils/leaveType";
 
 function Dashboard() {
   const [pointData, setPointData] = useState(null);
@@ -16,8 +17,30 @@ function Dashboard() {
   const [attendanceCount, setAttendanceCount] = useState(0);
   const [currentRequest, setCurrentRequest] = useState([]);
   const [currentActivities, setCurrentActivities] = useState([]);
+  const [leaveBalances, setLeaveBalances] = useState([]);
   const navigate = useNavigate();
   const { month, year } = getCurrentDateParts();
+
+  const fetchLeaveBalances = async () => {
+    // 1. Lấy danh sách leave type
+    const leaveTypes = await getLeaveTypes();
+
+    // 2. Gọi API filterLeaveType cho từng id
+    const balances = await Promise.all(
+      leaveTypes.map(async (type) => {
+        const res = await employeeApi.filterLeaveType(type.id);
+
+        return {
+          leaveTypeId: type.id,
+          leaveTypeName: type.name,
+          remainingLeave: res.result?.remainingLeave ?? 0,
+          usedLeave: res.result?.usedLeave ?? 0,
+        };
+      })
+    );
+
+    return balances;
+  };
 
   useEffect(() => {
     fetchData();
@@ -30,13 +53,20 @@ function Dashboard() {
       // 🔥 lấy myId trước
       const myId = await getMyId();
 
-      const [pointRes, resAttendances, requests, activitiesRes] =
-        await Promise.all([
-          pointAccountApi.getMyPoint(),
-          employeeApi.getMyAttendances(),
-          employeeApi.getMyRequest(1, 10000),
-          runningActivityApi.employeeGetAllRegisteredActivity(myId),
-        ]);
+      const [
+        pointRes,
+        resAttendances,
+        requests,
+        activitiesRes,
+        leaveBalanceData,
+      ] = await Promise.all([
+        pointAccountApi.getMyPoint(),
+        employeeApi.getMyAttendances(),
+        employeeApi.getMyRequest(1, 10000),
+        runningActivityApi.employeeGetAllRegisteredActivity(myId),
+        fetchLeaveBalances(), // 🔥 thêm dòng này
+      ]);
+      setLeaveBalances(leaveBalanceData);
 
       /* ================== ĐIỂM THƯỞNG ================== */
       setPointData(pointRes.data);
@@ -86,7 +116,7 @@ function Dashboard() {
   };
 
   return (
-    <main className="p-0">
+    <main className="p-0 bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 min-h-screen">
       <div className="mx-auto">
         {/* ================== HEADER ================== */}
         <Header title="Tổng quan" icon={Home} />
@@ -94,22 +124,24 @@ function Dashboard() {
         {/* ================== CONTENT ================== */}
         <div className="flex flex-col">
           {/* ===== TOP CARDS ===== */}
-          <div className="grid grid-cols-4 pt-6 px-6 gap-6">
+          <div className="grid grid-cols-4 pt-8 px-8 gap-6">
             {/* ===== POINT CARD ===== */}
-            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 flex items-center gap-4">
-              <div className="p-4 bg-gray-900 rounded-xl">
+            <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+              <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
                 <Gem className="size-7 text-white" />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Điểm thưởng hiện tại</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Điểm thưởng hiện tại
+                </p>
 
                 {loading ? (
                   <p className="text-xl font-semibold text-gray-400">
                     Đang tải...
                   </p>
                 ) : (
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
                     {pointData?.currentPoints?.toLocaleString() ?? 0} pts
                   </p>
                 )}
@@ -117,20 +149,22 @@ function Dashboard() {
             </div>
 
             {/* ===== ATTENDANCE COUNT CARD ===== */}
-            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 flex items-center gap-4">
-              <div className="p-4 bg-gray-900 rounded-xl">
+            <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+              <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
                 <Calendar className="size-7 text-white" />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Ngày đi làm trong tháng</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Ngày đi làm trong tháng
+                </p>
 
                 {loading ? (
                   <p className="text-xl font-semibold text-gray-400">
                     Đang tải...
                   </p>
                 ) : (
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-3xl font-bold bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
                     {attendanceCount} ngày
                   </p>
                 )}
@@ -145,51 +179,53 @@ function Dashboard() {
           </div>
 
           {/* ===== BOTTOM CARDS ===== */}
-          <div className="grid grid-cols-2 p-6 gap-6">
+          <div className="grid grid-cols-3 p-8 gap-6">
             {/* ===== RECENT REQUESTS ===== */}
-            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900">
                   Yêu cầu gần đây
                 </h3>
 
                 <button
                   onClick={() => navigate("/employee/request-history")}
-                  className="cursor-pointer text-md font-medium text-blue-600 hover:text-blue-700 hover:font-bold flex justify-between items-center gap-1 transition duration-200"
+                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
                 >
                   <span>Xem tất cả</span> <MoveRight size={16} />
                 </button>
               </div>
 
               {loading ? (
-                <p className="text-gray-400">Đang tải...</p>
+                <p className="text-gray-400 text-center py-8">Đang tải...</p>
               ) : currentRequest.length === 0 ? (
-                <p className="text-gray-400">Chưa có yêu cầu nào</p>
+                <p className="text-gray-400 text-center py-8">
+                  Chưa có yêu cầu nào
+                </p>
               ) : (
                 <ul className="space-y-3">
                   {currentRequest.map((req) => (
                     <li
                       key={req.requestId}
-                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
                     >
                       <div>
-                        <p className="font-medium text-gray-800">
+                        <p className="font-semibold text-gray-900 mb-1">
                           {req.requestType === "LEAVE"
                             ? "Nghỉ phép"
                             : "Cập nhật chấm công"}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-gray-500 font-medium">
                           {new Date(req.submitAt).toLocaleString("vi-VN")}
                         </p>
                       </div>
 
                       <span
-                        className={`text-sm font-medium ${
+                        className={`text-xs font-bold px-3 py-1.5 rounded-full ${
                           req.status === "Approved"
-                            ? "text-green-600"
+                            ? "bg-green-100 text-green-700"
                             : req.status === "Rejected"
-                            ? "text-red-600"
-                            : "text-yellow-600"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
                         }`}
                       >
                         {req.status === "Approved"
@@ -205,38 +241,39 @@ function Dashboard() {
             </div>
 
             {/* ===== PLACEHOLDER: HOẠT ĐỘNG GẦN ĐÂY ===== */}
-            <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900">
                   Hoạt động sắp diễn ra
                 </h3>
 
                 <button
                   onClick={() => navigate("/employee/activities")}
-                  className="cursor-pointer text-md font-medium text-blue-600 hover:text-blue-700 
-                  hover:font-bold flex justify-between items-center gap-1 transition duration-200"
+                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
                 >
                   <span>Xem tất cả</span> <MoveRight size={16} />
                 </button>
               </div>
 
               {loading ? (
-                <p className="text-gray-400">Đang tải...</p>
+                <p className="text-gray-400 text-center py-8">Đang tải...</p>
               ) : currentActivities.length === 0 ? (
-                <p className="text-gray-400">Chưa đăng ký hoạt động nào</p>
+                <p className="text-gray-400 text-center py-8">
+                  Chưa đăng ký hoạt động nào
+                </p>
               ) : (
                 <ul className="space-y-3">
                   {currentActivities.map((act) => (
                     <li
                       key={act.participateInId}
-                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
                     >
                       <div>
-                        <p className="font-medium text-gray-800">
+                        <p className="font-semibold text-gray-900 mb-1">
                           {act.activityTitle || act.runningActivity?.title}
                         </p>
 
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-gray-500 font-medium">
                           {act.completedDate
                             ? `Hoàn thành: ${new Date(
                                 act.completedDate
@@ -248,12 +285,12 @@ function Dashboard() {
                       </div>
 
                       <span
-                        className={`text-sm font-medium ${
+                        className={`text-xs font-bold px-3 py-1.5 rounded-full ${
                           act.isCompleted
-                            ? "text-green-600"
+                            ? "bg-green-100 text-green-700"
                             : act.isCancelled
-                            ? "text-red-600"
-                            : "text-blue-600"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-blue-100 text-blue-700"
                         }`}
                       >
                         {act.isCompleted
@@ -267,7 +304,64 @@ function Dashboard() {
                 </ul>
               )}
             </div>
+
+            {/* So so so */}
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-5 pb-4 border-b border-gray-100">
+                Số dư nghỉ phép
+              </h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="text-left text-xs font-bold text-gray-500 uppercase tracking-wide border-b-2 border-gray-200">
+                      <th className="pb-3">Loại nghỉ</th>
+                      <th className="pb-3 text-center">Còn lại</th>
+                      <th className="pb-3 text-center">Đã dùng</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {leaveBalances.map((item) => (
+                      <tr
+                        key={item.leaveTypeId}
+                        className="border-b border-gray-100 last:border-none hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="py-4 font-semibold text-gray-900">
+                          {item.leaveTypeName}
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-lg">
+                            {item.remainingLeave}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ngày
+                          </span>
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="font-semibold text-gray-600">
+                            {item.usedLeave}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ngày
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {leaveBalances.length === 0 && (
+                <p className="text-gray-400 text-sm text-center mt-6 py-4">
+                  Chưa có dữ liệu nghỉ phép
+                </p>
+              )}
+            </div>
           </div>
+          <div className="px-6 grid grid-cols-2"></div>
         </div>
       </div>
     </main>

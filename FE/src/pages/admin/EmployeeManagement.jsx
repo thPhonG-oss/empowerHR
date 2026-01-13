@@ -36,7 +36,7 @@ function StaffManagement() {
   // Thêm Staff vào danh sách cục bộ
   const [employeeList, setEmployeeList] = useState([]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 6;
 
   const filteredEmployees = employeeList.filter((emp) => {
     // Search by name, employeeCode, or email
@@ -120,20 +120,19 @@ function StaffManagement() {
     fetchData();
   }, []);
 
+  const fetchDataUser = async () => {
+    try {
+      const res = await adminApi.getAllUsers();
+
+      setEmployeeList(res.result);
+      localStorage.setItem("employeeList", JSON.stringify(res.result));
+    } catch (err) {
+      console.error("Lỗi khi load danh sách nhân viên:", err);
+    }
+  };
   // Load danh sách nhân viên từ API
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await adminApi.getAllUsers();
-
-        setEmployeeList(res.result);
-        localStorage.setItem("employeeList", JSON.stringify(res.result));
-      } catch (err) {
-        console.error("Lỗi khi load danh sách nhân viên:", err);
-      }
-    };
-
-    fetchData();
+    fetchDataUser();
   }, []);
 
   useEffect(() => {
@@ -213,7 +212,7 @@ function StaffManagement() {
               <button
                 onClick={() => setIsAddCardOpen(true)}
                 className="px-5 py-2.5 text-sm font-medium rounded-lg
-              bg-gray-900 text-white hover:bg-gray-800 transition-colors cursor-pointer"
+              bg-blue-600 text-white hover:bg-blue-800 transition-colors cursor-pointer"
               >
                 Thêm nhân viên
               </button>
@@ -318,10 +317,9 @@ function StaffManagement() {
       {/* Add Employee Card */}{" "}
       {isAddCardOpen && (
         <AddEmployeeCard
-          positions={positions}
-          departments={departments}
           isOpen={isAddCardOpen}
           onClose={() => setIsAddCardOpen(false)}
+          onAddSuccess={fetchDataUser}
         />
       )}
     </main>

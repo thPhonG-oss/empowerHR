@@ -85,7 +85,7 @@ export default function RunningActivityManagement() {
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* FILTER */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50 backdrop-blur-sm">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50 ">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             <div className="relative flex-1 max-w-md">
               <Search

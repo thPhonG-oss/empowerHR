@@ -18,8 +18,7 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
     try {
       const res = await fetch("https://api.ipify.org?format=json");
       const data = await res.json();
-      console.log(res);
-      console.log(data);
+
       return data.ip;
     } catch (err) {
       console.error("Error getting public IP:", err);

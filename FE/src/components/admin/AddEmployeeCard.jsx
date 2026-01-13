@@ -8,7 +8,7 @@ import departmentApi from "../../api/departmentApi";
 import { getProvinces } from "vn-provinces-wards";
 import toast from "react-hot-toast";
 
-const AddEmployeeCard = ({ onClose }) => {
+const AddEmployeeCard = ({ onClose, onAddSuccess }) => {
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
     employeeName: "",
@@ -61,15 +61,6 @@ const AddEmployeeCard = ({ onClose }) => {
 
   const roleOptions = ["ADMIN", "MANAGER", "EMPLOYEE"];
 
-  // const handleDeleteEmployee = () => {
-  //   // Xóa giả
-  //   setEmployeeList((prev) =>
-  //     prev.filter((emp) => emp.employeeId !== employeeToDelete)
-  //   );
-  //   // Gọi API xóa ở đây
-  //   setIsConfirmPopupOpen(false);
-  // };
-
   // Load danh sách departments
   useEffect(() => {
     const fetchData = async () => {
@@ -117,11 +108,9 @@ const AddEmployeeCard = ({ onClose }) => {
   const handleSubmit = async () => {
     try {
       const response = await adminApi.addUser(formData);
-
-      toast.success("Tạo nhân viên thành công");
       onClose(); // Đóng modal sau khi submit thành công
-      // reload
-      window.location.reload();
+      onAddSuccess();
+      toast.success("Tạo nhân viên thành công");
     } catch (error) {
       console.error("Lỗi khi tạo nhân viên:", error);
       toast.error("Tạo nhân viên thất bại");

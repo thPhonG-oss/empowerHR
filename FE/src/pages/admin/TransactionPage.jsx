@@ -84,7 +84,6 @@ export default function TransactionPage() {
       try {
         const response = await pointApi.getAllTransactions();
         const data = response.result;
-        //console.log("trans ",data);
 
         setTransactions(data);
       } catch (error) {
@@ -219,7 +218,28 @@ export default function TransactionPage() {
                       : "border-gray-300"
                   }`}
                 />
-                <Calendar className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <div></div>
+
+            {/* Mô tả */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Chủ giao dịch
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Nhập tên người giao dịch"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all"
+                />
+                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
             </div>
 
@@ -244,39 +264,15 @@ export default function TransactionPage() {
                       : "border-gray-300"
                   }`}
                 />
-                <Calendar className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
             </div>
-
-            {/* Mô tả */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Chủ giao dịch
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Nhập tên người giao dịch"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all"
-                />
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
-
-            <div></div>
 
             {/* Buttons */}
-            <div className="flex items-end justify-start">
+            <div className="flex items-end justify-center">
               <button
                 onClick={handleReset}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 font-semibold border-2 border-gray-300 transition-all"
+                className="cursor-pointer flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 font-semibold border-2 border-gray-300 transition-all"
               >
-                <X className="w-4 h-4" />
                 Xóa bộ lọc
               </button>
             </div>
@@ -379,7 +375,7 @@ export default function TransactionPage() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-all"
+              className="cursor-pointer  p-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-all"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -388,7 +384,7 @@ export default function TransactionPage() {
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
-                className={`px-4 py-2.5 rounded-lg font-bold transition-all ${
+                className={`cursor-pointer px-4 py-2.5 rounded-lg font-bold transition-all ${
                   currentPage === page
                     ? "bg-black text-white"
                     : "border-2 border-gray-300 text-gray-900 hover:bg-gray-50 active:bg-gray-100"
@@ -401,7 +397,7 @@ export default function TransactionPage() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-all"
+              className="cursor-pointer p-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-all"
             >
               <ChevronRight className="w-5 h-5" />
             </button>

@@ -34,7 +34,6 @@ const EmployeeRewardPage = () => {
       setLoading(true);
       const response = await pointApi.getPointAllEmployees();
       const employeesData = response.data;
-      console.log("Employee: ", employeesData);
       setEmployees(employeesData);
       setLoading(false);
     } catch (error) {
@@ -162,7 +161,7 @@ const EmployeeRewardPage = () => {
                 onClick={() =>
                   setShowDepartmentDropdown(!showDepartmentDropdown)
                 }
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
+                className="cursor-pointer w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
               >
                 <span className="text-gray-700">
                   {selectedDepartment || "Chọn phòng ban"}
@@ -170,7 +169,7 @@ const EmployeeRewardPage = () => {
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               </button>
               {showDepartmentDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="cursor-pointer absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   <div
                     onClick={() => {
                       setSelectedDepartment("");
@@ -200,7 +199,7 @@ const EmployeeRewardPage = () => {
             <div className="relative w-full md:w-64">
               <button
                 onClick={() => setShowPositionDropdown(!showPositionDropdown)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
+                className="cursor-pointer w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:bg-gray-50"
               >
                 <span className="text-gray-700">
                   {selectedPosition || "Chọn chức vụ"}
@@ -291,7 +290,7 @@ const EmployeeRewardPage = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleViewHistory(employee)}
-                    className="ml-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 
+                    className="cursor-pointer ml-3 px-4 py-2 bg-gray-200 text-black rounded-lg hover:shadow-md hover:bg-gray-300 
                     transition-colors text-sm font-medium flex items-center gap-2 shrink-0"
                   >
                     <History className="w-4 h-4" />

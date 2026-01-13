@@ -3,7 +3,9 @@ import pointApi from "../../api/pointApi";
 import pointPolicyApi from "../../api/pointPolicyApi";
 import Input from "../../components/common/Input";
 import Field from "../../components/common/Field";
-import { Pencil, Settings, Info } from "lucide-react";
+import { Pencil, Settings, Info, Percent } from "lucide-react";
+
+import toast from "react-hot-toast";
 
 const initialData = {
   policyID: "",
@@ -12,6 +14,7 @@ const initialData = {
   maxPoint: 0,
   expiredTime: 0,
   isActive: true,
+  endDate: "",
 };
 
 export default function RatePage() {
@@ -33,6 +36,7 @@ export default function RatePage() {
         maxPoint: policy.maxPoints,
         expiredTime: policy.expiry,
         isActive: policy.isActive,
+        endDate: policy.endDate,
       };
 
       setFormData(mappedData);
@@ -68,6 +72,10 @@ export default function RatePage() {
       newErrors.maxPoint = "Số điểm tối đa phải ≥ số điểm tối thiểu";
     }
 
+    if (!formData.endDate) {
+      newErrors.endDate = "Vui lòng chọn ngày kết thúc";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -85,11 +93,14 @@ export default function RatePage() {
         maxPoints: Number(formData.maxPoint),
         expiry: Number(formData.expiredTime),
         isActive: formData.isActive,
+        endDate: formData.endDate,
       };
       await pointPolicyApi.updatePointPolicy(formData.policyID, dataToUpdate);
       setOriginData(formData);
+
       setIsEdit(false);
       setShowConfirm(false);
+      toast.success("Cập nhật chính sách điểm thưởng thành công!");
     } catch (err) {
       console.error(err);
     }
@@ -99,6 +110,12 @@ export default function RatePage() {
     setFormData(originData);
     setErrors({});
     setIsEdit(false);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN");
   };
 
   return (
@@ -131,7 +148,7 @@ export default function RatePage() {
               {!isEdit ? (
                 <button
                   onClick={() => setIsEdit(true)}
-                  className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
+                  className="cursor-pointer flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
                 >
                   <Pencil className="w-4 h-4" />
                   Cập nhật
@@ -140,13 +157,13 @@ export default function RatePage() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleCancel}
-                    className="border-2 border-gray-300 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 active:bg-gray-100 transition-all text-gray-700"
+                    className="cursor-pointer border-2 border-gray-300 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 active:bg-gray-100 transition-all text-gray-700"
                   >
                     Hủy
                   </button>
                   <button
                     onClick={handleSave}
-                    className="bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
+                    className="cursor-pointer bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
                   >
                     Lưu thay đổi
                   </button>
@@ -215,6 +232,19 @@ export default function RatePage() {
                     suffix="điểm"
                   />
                 </Field>
+
+                {/* End Date */}
+                <Field label="Ngày kết thúc chính sách" error={errors.endDate}>
+                  <input
+                    type="date"
+                    name="endDate"
+                    min={new Date().toISOString().split("T")[0]}
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    disabled={!isEdit}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-50 disabled:text-gray-600 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </Field>
               </div>
             </div>
           </div>
@@ -241,7 +271,7 @@ export default function RatePage() {
 
       {/* Confirm Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60  flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all">
             <div className="mb-6">
               <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-5">
@@ -280,6 +310,12 @@ export default function RatePage() {
                 </span>
                 <span className="font-bold text-gray-900">
                   {formData.maxPoint} điểm
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Ngày kết thúc:</span>
+                <span className="font-semibold text-gray-900">
+                  {formatDate(formData.endDate)}
                 </span>
               </div>
             </div>

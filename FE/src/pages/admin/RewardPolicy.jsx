@@ -4,14 +4,20 @@ import TransactionPage from "./TransactionPage";
 import EmployeeRewardPage from "./EmployeeRewardPage";
 import Header from "../../components/common/Header";
 
-import { Contact } from "lucide-react";
+import {
+  Contact,
+  Percent,
+  Calendar,
+  ArrowLeftRight,
+  Award,
+} from "lucide-react";
 import { useState } from "react";
 
 const tabs = [
-  { key: "rate", label: "Tỉ lệ quy đổi" },
-  { key: "point_monthly", label: "Phân bổ hàng tháng" },
-  { key: "transaction", label: "Giao dịch điểm" },
-  { key: "employee_point", label: "Điểm thưởng nhân viên" },
+  { key: "rate", label: "Tỉ lệ quy đổi", icon: Percent },
+  { key: "point_monthly", label: "Phân bổ hàng tháng", icon: Calendar },
+  { key: "transaction", label: "Giao dịch điểm", icon: ArrowLeftRight },
+  { key: "employee_point", label: "Điểm thưởng nhân viên", icon: Award },
 ];
 
 export default function RewardPolicy() {
@@ -31,10 +37,10 @@ export default function RewardPolicy() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`shrink-0 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`cursor-pointer shrink-0 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     activeTab === tab.key
                       ? "bg-linear-to-br from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/30"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
                   {tab.label}
