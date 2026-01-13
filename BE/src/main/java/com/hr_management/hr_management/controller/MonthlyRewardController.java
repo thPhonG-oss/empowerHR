@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("api/v1/monthly-reward")
+@RequestMapping("/api/v1/monthly-reward")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,7 +23,7 @@ public class MonthlyRewardController {
                 .result(monthlyRewardService.getAllMonthlyReward())
                 .build();
     }
-    @PutMapping("{rewardId}")
+    @PutMapping("/{rewardId}")
     public ApiResponse<MonthlyRewardResponse> updatePointPosition(@PathVariable Integer rewardId, @RequestBody MonthlyRewardRequest monthlyRewardRequest){
         return ApiResponse.<MonthlyRewardResponse>builder()
                 .result(monthlyRewardService.updateMonthlyReward(rewardId,monthlyRewardRequest))
