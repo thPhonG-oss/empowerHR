@@ -1,8 +1,12 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.request.BudgetDepartmentRequest;
+import com.hr_management.hr_management.dto.response.BudgeDepartmentResponse;
 import com.hr_management.hr_management.dto.response.DepartmentBudgetResponseDTO;
+import com.hr_management.hr_management.dto.response.DepartmentResponse;
 import com.hr_management.hr_management.entity.Department;
 import com.hr_management.hr_management.entity.DepartmentBudget;
+import com.hr_management.hr_management.entity.PointPolicy;
 import com.hr_management.hr_management.exception.AppException;
 import com.hr_management.hr_management.exception.ErrorCode;
 import com.hr_management.hr_management.mapper.DepartmentBudgetMapper;
@@ -56,5 +60,17 @@ public class DepartmentBudgetServiceImpl implements DepartmentBudgetService {
         return budgets.stream()
                 .map(departmentBudgetMapper::toDepartmentBudgetResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BudgeDepartmentResponse updateDepartmentBudge(Integer departmentId, BudgetDepartmentRequest budgetDepartmentRequest) {
+        DepartmentBudget departmentBudget=departmentBudgetRepository.findById(departmentId).orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        PointPolicy pointPolicy=departmentBudget.getPointPolicy();
+        if(pointPolicy.getEndDate().isBefore(LocalDate.now()))
+            throw  new AppException(ErrorCode.NOT_EDIT_PAST_TIME);
+        if(budgetDepartmentRequest.getBudget()< pointPolicy.getMinPoints() || budgetDepartmentRequest.getBudget()> pointPolicy.getMaxPoints())
+            throw new AppException(ErrorCode.VALUE_INVALID);
+        departmentBudget.setBudget(budgetDepartmentRequest.getBudget());
+        return departmentBudgetMapper.toBudgeDepartmentResponse(departmentBudgetRepository.save(departmentBudget));
     }
 }
