@@ -123,8 +123,8 @@ public class RewardServiceImpl implements RewardService {
             department.setPointBalance(department.getPointBalance() - request.getPoints());
         }
 
-        pointAccount.setCurrentPoints(pointAccount.getCurrentPoints() + request.getPoints());
-        pointAccount.setTotalEarns(pointAccount.getTotalEarns() + request.getPoints());
+        pointAccount.setCurrentPoints((pointAccount.getCurrentPoints()==null?0:pointAccount.getCurrentPoints()) + request.getPoints());
+        pointAccount.setTotalEarns(pointAccount.getTotalEarns()==null?0:pointAccount.getTotalEarns() + request.getPoints());
 
         pointAccountRepository.save(pointAccount);
         departmentRepository.save(department);
@@ -159,7 +159,7 @@ public class RewardServiceImpl implements RewardService {
         }
 
         // check valid of cash out request
-        if(pointAccount.getCurrentPoints() < request.getPointsToCashOut()){
+        if(pointAccount.getCurrentPoints() != null && pointAccount.getCurrentPoints() < request.getPointsToCashOut()){
             throw new IllegalStateException("Not enough points to cash out");
         }
 
@@ -168,10 +168,10 @@ public class RewardServiceImpl implements RewardService {
         }
 
         // proceed to cash out
-        pointAccount.setCurrentPoints(pointAccount.getCurrentPoints() - request.getPointsToCashOut());
+        pointAccount.setCurrentPoints((pointAccount.getCurrentPoints()==null?0:pointAccount.getCurrentPoints()) - request.getPointsToCashOut());
         Long cashAmount = Math.round(request.getPointsToCashOut() * pointPolicy.getConversionRate());
 
-        pointAccount.setTotalTransferred(pointAccount.getTotalTransferred() + request.getPointsToCashOut());
+        pointAccount.setTotalTransferred((pointAccount.getTotalTransferred()==null?0:pointAccount.getTotalTransferred()) + request.getPointsToCashOut());
 
         pointAccountRepository.save(pointAccount);
 
