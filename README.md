@@ -17,40 +17,47 @@ The Employee Management System is a web-based application designed to digitize a
 ## ✨ Key Modules
 
 ### 1. 👤 Profile Management
+
 Manage employee information including personal details, work information, documents, and organizational hierarchy.
 
 **Key Features:**
+
 - Employee CRUD operations
 - Work information tracking
 - Role-based access control
 - Search and filtering
 
 ### 2. 📝 Request Management
+
 Handle employee requests with approval workflows.
 
 **Key Features:**
+
 - Leave requests (Annual, Sick, Unpaid)
 - Timesheet submission and approval
 - Daily check-in/check-out
 - Work From Home (WFH) requests
 
 ### 3. 🏃 Activity Management
+
 Track employee participation in company campaigns and activities.
 
 **Key Features:**
+
 - Campaign creation and management
 - Activity registration and tracking
 - Running/exercise logging (km, time)
 - Leaderboards and rankings
 
 ### 4. 🏆 Reward Management
+
 Point-based reward system to recognize and motivate employees.
 
 **Key Features:**
+
 - Monthly automatic point distribution
-- Peer-to-peer point giving
 - Manager team rewards
-- Cash and gift redemption
+- Cash redemption
 - Recognition wall
 
 ---
@@ -59,20 +66,18 @@ Point-based reward system to recognize and motivate employees.
 
 - **Employee** (~200 users): Submit requests, track activities, manage rewards
 - **Manager** (~30 users): Approve requests, reward team members, view reports
-- **HR Admin** (~5 users): Full system administration and configuration
-- **System Admin** (~2 users): Technical configuration and monitoring
+- **System Admin** (~2 users): Full system administration and configuration
 
 ---
 
 ## 📊 Current Progress
 
-| Phase | Status |
-|-------|--------|
+| Phase                 | Status       |
+| --------------------- | ------------ |
 | Requirements Analysis | ✅ Completed |
-| System Design | 🔄 In Progress (80%) |
-| Development | ⏳ Starting Soon (Sprint 1) |
-| Testing | ⏳ Planned |
-| Deployment | ⏳ Planned |
+| System Design         | ✅ Completed |
+| Development           | ✅ Completed |
+| Testing               | ✅ Completed |
 
 ---
 
@@ -86,12 +91,12 @@ Point-based reward system to recognize and motivate employees.
 
 ## 📧 Contact
 
-**Team:** Software Engineering Students - Academic Year 2024
+**Team:** Team 06 - Information Systems Development
 
-**Instructor:** [Instructor Name]
+**Instructor:** Pham Minh Tu
 
-**Institution:** [University Name]
+**Institution:** VNU-HCMUS
 
 ---
 
-**Last Updated:** October 09, 2024
+**Last Updated:** January 14, 2026

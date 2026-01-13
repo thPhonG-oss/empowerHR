@@ -1,5 +1,6 @@
 package com.hr_management.hr_management.mapper;
 
+import com.hr_management.hr_management.dto.response.DeparmentPointResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponseDTO;
 import com.hr_management.hr_management.entity.Department;
@@ -14,4 +15,5 @@ public interface DepartmentMapper {
     @Mapping(target = "employeeCode", source = "manager.employeeCode")
     @Mapping(target = "employeeName", source = "manager.employeeName")
     DepartmentResponse toDepartmentResponse(Department department);
+    DeparmentPointResponse toDepartmentPoinResponse(Department department);
 }

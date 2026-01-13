@@ -19,6 +19,8 @@ const employeeApi = {
   checkOut: (data) => axiosClient.post("/api/v1/employees/checkout", data),
   getAttendanceToday: () =>
     axiosClient.get("/api/v1/employees/time-checkin-checkout"),
+  makeCashOut: (data) =>
+    axiosClient.post("/api/v1/employees/redeem-points", data),
 };
 
 export default employeeApi;

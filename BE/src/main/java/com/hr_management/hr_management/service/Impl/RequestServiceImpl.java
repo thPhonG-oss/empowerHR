@@ -217,6 +217,22 @@ public class RequestServiceImpl implements RequestService {
             handleLeaveRequestApproval((LeaveRequest) request);
         }
 
+        if(request instanceof TimesheetUpdateRequest && requestHandleDTO.getRequestStatus() == RequestStatus.Approved){
+            TimesheetUpdateRequest timesheetUpdateRequest = (TimesheetUpdateRequest) request;
+            Attendance attendance = attendanceRepository.findByEmployee_EmployeeIdAndAttendanceDate(
+                    timesheetUpdateRequest.getEmployee().getEmployeeId(),
+                    timesheetUpdateRequest.getAttendanceDate()
+            ).orElseThrow(() -> new AppException(ErrorCode.EMPTY_ATTENDANCE));
+
+            if(timesheetUpdateRequest.getCheckinTime() != null){
+                attendance.setCheckinTime(timesheetUpdateRequest.getCheckinTime());
+            }
+            if(timesheetUpdateRequest.getCheckoutTime() != null){
+                attendance.setCheckoutTime(timesheetUpdateRequest.getCheckoutTime());
+            }
+            attendanceRepository.save(attendance);
+        }
+
         request.setStatus(requestHandleDTO.getRequestStatus());
         request.setResponseReason(requestHandleDTO.getResponseReason());
         request.setHandleAt(LocalDateTime.now());

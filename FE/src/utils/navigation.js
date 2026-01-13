@@ -28,12 +28,7 @@ const navConfig = [
   },
 
   // ──────────────────────────────── ADMIN ONLY ────────────────────────────────
-  {
-    title: "Quản lý gian hàng",
-    path: "store-management",
-    icon: ShoppingCart,
-    roles: ["admin"],
-  },
+
   {
     title: "Điểm thưởng",
     path: "rewards",
@@ -58,12 +53,6 @@ const navConfig = [
     icon: Activity,
     roles: ["admin"],
   },
-  {
-    title: "Chính sách công ty",
-    path: "company-policy",
-    icon: Wrench,
-    roles: ["admin"],
-  },
 
   // ──────────────────────────────── EMPLOYEE COMMON ────────────────────────────────
   {
@@ -74,7 +63,7 @@ const navConfig = [
   },
   {
     title: "Nghỉ phép",
-    path: "leavee",
+    path: "leave",
     icon: CalendarX,
     roles: ["employee", "manager"],
   },
@@ -103,14 +92,6 @@ const navConfig = [
     roles: ["employee", "manager"],
   },
 
-  // ──────────────────────────────── EMPLOYEE ONLY ────────────────────────────────
-  {
-    title: "Lịch sử lương",
-    path: "salary-history",
-    icon: DollarSign,
-    roles: ["employee"],
-  },
-
   // ──────────────────────────────── MANAGER ONLY ────────────────────────────────
   {
     title: "Quản lý nhóm",
@@ -125,8 +106,8 @@ const navConfig = [
     roles: ["manager"],
   },
   {
-    title: "Tặng điểm nhân viên",
-    path: "give-rewards",
+    title: "Thưởng điểm",
+    path: "performance-points",
     icon: PartyPopper,
     roles: ["manager"],
   },

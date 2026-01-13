@@ -1,147 +1,367 @@
-import { BarChart3, Clock, AlertCircle, Calendar, Home } from "lucide-react";
+import { Home, Gem, Calendar, MoveRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Header from "../../components/common/Header";
+import AttendanceCard from "../../components/employee/AttendanceCard";
+import pointAccountApi from "../../api/pointAccountApi";
+import runningActivityApi from "../../api/runningActivityApi";
+import employeeApi from "../../api/employeeApi";
+import { getCurrentDateParts } from "../../utils/date";
+import { getMyId } from "../../utils/getMyId";
+import { getLeaveTypes } from "../../utils/leaveType";
+
 function Dashboard() {
+  const [pointData, setPointData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [attendanceCount, setAttendanceCount] = useState(0);
+  const [currentRequest, setCurrentRequest] = useState([]);
+  const [currentActivities, setCurrentActivities] = useState([]);
+  const [leaveBalances, setLeaveBalances] = useState([]);
+  const navigate = useNavigate();
+  const { month, year } = getCurrentDateParts();
+
+  const fetchLeaveBalances = async () => {
+    // 1. Lấy danh sách leave type
+    const leaveTypes = await getLeaveTypes();
+
+    // 2. Gọi API filterLeaveType cho từng id
+    const balances = await Promise.all(
+      leaveTypes.map(async (type) => {
+        const res = await employeeApi.filterLeaveType(type.id);
+
+        return {
+          leaveTypeId: type.id,
+          leaveTypeName: type.name,
+          remainingLeave: res.result?.remainingLeave ?? 0,
+          usedLeave: res.result?.usedLeave ?? 0,
+        };
+      })
+    );
+
+    return balances;
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // 🔥 lấy myId trước
+      const myId = await getMyId();
+
+      const [
+        pointRes,
+        resAttendances,
+        requests,
+        activitiesRes,
+        leaveBalanceData,
+      ] = await Promise.all([
+        pointAccountApi.getMyPoint(),
+        employeeApi.getMyAttendances(),
+        employeeApi.getMyRequest(1, 10000),
+        runningActivityApi.employeeGetAllRegisteredActivity(myId),
+        fetchLeaveBalances(), // 🔥 thêm dòng này
+      ]);
+      setLeaveBalances(leaveBalanceData);
+
+      /* ================== ĐIỂM THƯỞNG ================== */
+      setPointData(pointRes.data);
+
+      /* ================== CHẤM CÔNG THÁNG HIỆN TẠI ================== */
+      const attendances = resAttendances.result || [];
+
+      const attendanceCountInMonth = new Set(
+        attendances
+          .filter((item) => {
+            const d = new Date(item.attendanceDate);
+            return d.getMonth() === month - 1 && d.getFullYear() === year;
+          })
+          .map((item) => item.attendanceDate)
+      ).size;
+
+      setAttendanceCount(attendanceCountInMonth);
+
+      /* ================== 4 REQUEST GẦN NHẤT ================== */
+      const rawRequests = requests?.result?.requestResponseDTOS || [];
+
+      const latestRequests = rawRequests
+        .slice()
+        .sort((a, b) => new Date(b.submitAt) - new Date(a.submitAt))
+        .slice(0, 4);
+
+      setCurrentRequest(latestRequests);
+
+      /* ================== 4 HOẠT ĐỘNG ĐÃ ĐĂNG KÝ GẦN NHẤT (SORT THEO START DATE) ================== */
+      const rawActivities = activitiesRes?.result || [];
+
+      const latestActivities = rawActivities
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.runningActivity?.startDate) -
+            new Date(a.runningActivity?.startDate)
+        )
+        .slice(0, 4);
+
+      setCurrentActivities(latestActivities);
+    } catch (error) {
+      console.error("Failed to fetch dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <main className="p-0">
+    <main className="p-0 bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 min-h-screen">
       <div className="mx-auto">
-        {/* Header */}
+        {/* ================== HEADER ================== */}
         <Header title="Tổng quan" icon={Home} />
 
-        {/* Content */}
-        <div className="p-6">
-          {/* Stats Cards - 4 columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {/* Stat Card 1 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Điểm thưởng hiện tại</h3>
-                <BarChart3 className="w-5 h-5 " />
+        {/* ================== CONTENT ================== */}
+        <div className="flex flex-col">
+          {/* ===== TOP CARDS ===== */}
+          <div className="grid grid-cols-4 pt-8 px-8 gap-6">
+            {/* ===== POINT CARD ===== */}
+            <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+              <div className="p-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
+                <Gem className="size-7 text-white" />
               </div>
-              <p className="text-2xl font-bold ">2,450</p>
+
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Điểm thưởng hiện tại
+                </p>
+
+                {loading ? (
+                  <p className="text-xl font-semibold text-gray-400">
+                    Đang tải...
+                  </p>
+                ) : (
+                  <p className="text-3xl font-bold bg-linear-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
+                    {pointData?.currentPoints?.toLocaleString() ?? 0} pts
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Stat Card 2 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">
-                  Số ngày đi làm tháng này
+            {/* ===== ATTENDANCE COUNT CARD ===== */}
+            <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+              <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
+                <Calendar className="size-7 text-white" />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Ngày đi làm trong tháng
+                </p>
+
+                {loading ? (
+                  <p className="text-xl font-semibold text-gray-400">
+                    Đang tải...
+                  </p>
+                ) : (
+                  <p className="text-3xl font-bold bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+                    {attendanceCount} ngày
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* ===== ATTENDANCE CARD ===== */}
+            <AttendanceCard
+              isDashboard={true}
+              className="col-start-3 col-span-2"
+            />
+          </div>
+
+          {/* ===== BOTTOM CARDS ===== */}
+          <div className="grid grid-cols-3 p-8 gap-6">
+            {/* ===== RECENT REQUESTS ===== */}
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Yêu cầu gần đây
                 </h3>
-                <Clock className="w-5 h-5 " />
+
+                <button
+                  onClick={() => navigate("/employee/request-history")}
+                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                >
+                  <span>Xem tất cả</span> <MoveRight size={16} />
+                </button>
               </div>
-              <p className="text-2xl font-bold ">15</p>
+
+              {loading ? (
+                <p className="text-gray-400 text-center py-8">Đang tải...</p>
+              ) : currentRequest.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">
+                  Chưa có yêu cầu nào
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {currentRequest.map((req) => (
+                    <li
+                      key={req.requestId}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900 mb-1">
+                          {req.requestType === "LEAVE"
+                            ? "Nghỉ phép"
+                            : "Cập nhật chấm công"}
+                        </p>
+                        <p className="text-xs text-gray-500 font-medium">
+                          {new Date(req.submitAt).toLocaleString("vi-VN")}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                          req.status === "Approved"
+                            ? "bg-green-100 text-green-700"
+                            : req.status === "Rejected"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {req.status === "Approved"
+                          ? "Chấp nhận"
+                          : req.status === "Rejected"
+                          ? "Từ chối"
+                          : "Chờ xử lý"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {/* Stat Card 3 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Ngày nghỉ phép còn lại</h3>
-                <Calendar className="w-5 h-5 " />
+            {/* ===== PLACEHOLDER: HOẠT ĐỘNG GẦN ĐÂY ===== */}
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Hoạt động sắp diễn ra
+                </h3>
+
+                <button
+                  onClick={() => navigate("/employee/activities")}
+                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                >
+                  <span>Xem tất cả</span> <MoveRight size={16} />
+                </button>
               </div>
-              <p className="text-2xl font-bold ">15</p>
+
+              {loading ? (
+                <p className="text-gray-400 text-center py-8">Đang tải...</p>
+              ) : currentActivities.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">
+                  Chưa đăng ký hoạt động nào
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {currentActivities.map((act) => (
+                    <li
+                      key={act.participateInId}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900 mb-1">
+                          {act.activityTitle || act.runningActivity?.title}
+                        </p>
+
+                        <p className="text-xs text-gray-500 font-medium">
+                          {act.completedDate
+                            ? `Hoàn thành: ${new Date(
+                                act.completedDate
+                              ).toLocaleDateString("vi-VN")}`
+                            : `Bắt đầu: ${new Date(
+                                act.runningActivity?.startDate
+                              ).toLocaleDateString("vi-VN")}`}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                          act.isCompleted
+                            ? "bg-green-100 text-green-700"
+                            : act.isCancelled
+                            ? "bg-red-100 text-red-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {act.isCompleted
+                          ? "Hoàn thành"
+                          : act.isCancelled
+                          ? "Đã huỷ"
+                          : "Đang tham gia"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {/* Stat Card 4 */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-medium ">Yêu cầu chờ duyệt</h3>
-                <AlertCircle className="w-5 h-5 " />
+            {/* So so so */}
+            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-5 pb-4 border-b border-gray-100">
+                Số dư nghỉ phép
+              </h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="text-left text-xs font-bold text-gray-500 uppercase tracking-wide border-b-2 border-gray-200">
+                      <th className="pb-3">Loại nghỉ</th>
+                      <th className="pb-3 text-center">Còn lại</th>
+                      <th className="pb-3 text-center">Đã dùng</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {leaveBalances.map((item) => (
+                      <tr
+                        key={item.leaveTypeId}
+                        className="border-b border-gray-100 last:border-none hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="py-4 font-semibold text-gray-900">
+                          {item.leaveTypeName}
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-lg">
+                            {item.remainingLeave}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ngày
+                          </span>
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="font-semibold text-gray-600">
+                            {item.usedLeave}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ngày
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <p className="text-2xl font-bold ">2</p>
+
+              {leaveBalances.length === 0 && (
+                <p className="text-gray-400 text-sm text-center mt-6 py-4">
+                  Chưa có dữ liệu nghỉ phép
+                </p>
+              )}
             </div>
           </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Left Column - My Requests */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <h2 className="text-lg font-semibold  mb-4">Yêu cầu của tôi</h2>
-              <p className="text-sm  mb-4">Các yêu cầu gần đây</p>
-
-              <div className="space-y-3">
-                {/* Request Card 1 */}
-                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex gap-2">
-                      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                        Nghỉ phép
-                      </span>
-                      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                        Chờ phê duyệt
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm  mb-1">
-                    <Clock className="w-4 h-4" />
-                    <span>01/01/2025 - 01/01/2026</span>
-                  </div>
-                  <p className="text-sm ">Nghỉ phép năm</p>
-                </div>
-
-                {/* Request Card 2 */}
-                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex gap-2">
-                      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-slate-700 text-white dark:bg-slate-600">
-                        WFH
-                      </span>
-                      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        Đã phê duyệt
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm  mb-1">
-                    <Clock className="w-4 h-4" />
-                    <span>01/01/2025 - 01/01/2026</span>
-                  </div>
-                  <p className="text-sm ">Nghỉ phép năm</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - My Activities */}
-            <div className="bg-[#F2F2F2] border border-gray-300 rounded-lg p-6">
-              <h2 className="text-lg font-semibold  mb-4">Hoạt động của tôi</h2>
-              <p className="text-sm  mb-4">Các hoạt động gần đây</p>
-
-              <div className="space-y-3">
-                {/* Activity Card 1 */}
-                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-sm font-medium  mb-1">
-                        FC Online Champions Cup
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm ">
-                        <Calendar className="w-4 h-4" />
-                        <span>Đến 01/01/2025</span>
-                      </div>
-                    </div>
-                    <button className="text-xs font-medium px-3 py-1 rounded  bg-slate-700 text-white dark:bg-slate-600 hover:bg-slate-800 dark:hover:bg-slate-500">
-                      Đã đăng ký
-                    </button>
-                  </div>
-                </div>
-
-                {/* Activity Card 2 */}
-                <div className="bg-white border border-gray-300 rounded-lg p-4 hover:bg-muted/30 ">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-sm font-medium  mb-1">
-                        FC Online Champions Cup
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm ">
-                        <Calendar className="w-4 h-4" />
-                        <span>Đến 01/01/2025</span>
-                      </div>
-                    </div>
-                    <button className="text-xs font-medium px-3 py-1 rounded  border  hover:bg-muted">
-                      Đăng điền ra
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="px-6 grid grid-cols-2"></div>
         </div>
       </div>
     </main>

@@ -16,9 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RunningActivityUpdateRequestDTO {
-    @NotBlank(message = "Title is required")
-    @Schema(example = "Marathon 2024")
-    String title;
+
 
     @NotBlank(message = "Image url is required")
     @Schema(example = "https://example.com/image.jpg")
@@ -26,10 +24,6 @@ public class RunningActivityUpdateRequestDTO {
 
     @Schema(example = "Join us for an exciting marathon event!")
     String description;
-
-    @Schema(example = "2024-01-01")
-    @NotNull(message = "registration start date must be provided")
-    LocalDateTime registrationStartDate;
 
     @Schema(example = "2024-01-31")
     @NotNull(message = "registration end date must be provided")

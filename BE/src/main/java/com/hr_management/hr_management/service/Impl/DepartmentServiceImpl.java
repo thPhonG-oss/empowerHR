@@ -1,6 +1,8 @@
 package com.hr_management.hr_management.service.Impl;
 
+import com.hr_management.hr_management.dto.request.DepartmentPointRequest;
 import com.hr_management.hr_management.dto.response.AllEmployeeResponse;
+import com.hr_management.hr_management.dto.response.DeparmentPointResponse;
 import com.hr_management.hr_management.dto.response.DepartmentResponse;
 import com.hr_management.hr_management.dto.response.EmployeesOfDepartmentResponseDTO;
 import com.hr_management.hr_management.entity.Account;
@@ -130,5 +132,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
         return dept;
+    }
+
+    @Override
+    public DeparmentPointResponse updatePointDeparment(Integer departmentId,DepartmentPointRequest departmentPointRequest) {
+        if(departmentPointRequest.getPointBalance()<0)
+            throw new AppException(ErrorCode.VALUE_INVALID);
+        Department department=departmentRepository.findById(departmentId).orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        department.setPointBalance(departmentPointRequest.getPointBalance());
+        return departmentMapper.toDepartmentPoinResponse(departmentRepository.save(department));
     }
 }

@@ -6,11 +6,14 @@ import EditProfile from "../../pages/common/EditProfile";
 import Attendance from "../../pages/employee/Attendance";
 import LeaveRequest from "../../pages/employee/LeaveRequest";
 import HistoryRequests from "../../pages/employee/HistoryRequests";
+import Rewards from "../../pages/employee/Rewards";
+import ActivitiesOpening from "../../pages/employee/ActivitiesOpening";
 
 import RoleRoute from "../RoleRoute";
 import RequestManagement from "../../pages/manager/RequestManagement";
 import RequestManagementHistory from "../../pages/manager/RequestManagementHistory";
-import ActivitiesOpening from "../../pages/employee/ActivitiesOpening";
+import PerformancePoints from "../../pages/manager/PerformancePoints";
+
 const managerRoutes = [
   {
     path: "/manager",
@@ -34,6 +37,8 @@ const managerRoutes = [
         element: <RequestManagementHistory />,
       },
       { path: "activities", element: <ActivitiesOpening /> },
+      { path: "rewards", element: <Rewards /> },
+      { path: "performance-points", element: <PerformancePoints /> },
     ],
   },
 ];
