@@ -142,6 +142,7 @@ function AttendanceCard() {
             {isIn && !isOut && (
               <button
                 onClick={handleCheckIn}
+                title=""
                 className="
                 inline-flex items-center gap-2
                 bg-black text-white
@@ -150,15 +151,17 @@ function AttendanceCard() {
                 hover:bg-gray-800
                 active:scale-95
                 transition-all
+                cursor-pointer
               "
               >
                 <LogIn size={18} />
-                <span>Check-in</span>
+                <span>Bắt đầu làm việc</span>
               </button>
             )}
 
             {!isIn && isOut && (
               <button
+                title=""
                 onClick={handleCheckOut}
                 className="
                 inline-flex items-center gap-2
@@ -172,7 +175,7 @@ function AttendanceCard() {
               "
               >
                 <LogOut size={18} />
-                <span>Check-out</span>
+                <span>Kết thúc làm việc</span>
               </button>
             )}
           </div>

@@ -24,7 +24,6 @@ const navSimple = [
   { title: "Điểm thưởng", path: "rewards" },
   { title: "Lịch sử yêu cầu", path: "request-history" },
 
-
   // EMPLOYEE ONLY
   { title: "Lịch sử lương", path: "salary-history" },
 
@@ -32,7 +31,7 @@ const navSimple = [
   { title: "Quản lý nhóm", path: "team-management" },
   { title: "Quản lý yêu cầu", path: "request-management" },
   { title: "Yêu cầu đã xử lý", path: "request-management/history" },
-  { title: "Tặng điểm nhân viên", path: "give-rewards" },
+  { title: "Thưởng điểm", path: "performance-points" },
   // { title: "404 Not Found", path: "" },
 ];
 

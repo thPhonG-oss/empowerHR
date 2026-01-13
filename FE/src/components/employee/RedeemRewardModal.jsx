@@ -89,7 +89,7 @@ function RedeemRewardModal({
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:bg-red-50 p-2 rounded-md"
+          className="absolute right-4 top-4 text-gray-400 hover:bg-red-50 p-2 rounded-md cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -158,7 +158,7 @@ function RedeemRewardModal({
             onClick={onClose}
             disabled={loading}
             className="px-4 py-2 rounded-xl border border-gray-300 text-gray-600
-                       hover:bg-gray-50 disabled:opacity-50"
+                       hover:bg-gray-50 disabled:opacity-50 cursor-pointer"
           >
             Hủy
           </button>
@@ -167,7 +167,7 @@ function RedeemRewardModal({
             onClick={handleRedeem}
             disabled={loading || isInvalid}
             className="px-4 py-2 rounded-xl bg-black text-white
-                       hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed"
+                       hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? "Đang xử lý..." : "Xác nhận đổi"}
           </button>

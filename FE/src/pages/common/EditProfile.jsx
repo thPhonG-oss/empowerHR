@@ -75,8 +75,8 @@ function EditProfile() {
         departmentName: stored.department?.departmentName,
         positionId: stored.position?.positionId,
         positionName: stored.position?.positionName,
-        bankName: stored.bank ?? "",
-        bankAccountNumber: stored.bankAccountNumber ?? "",
+        bankName: stored.bank.bankName ?? "",
+        bankAccountNumber: stored.bank.bankAccountNumber ?? "",
       });
     }
   }, []);
