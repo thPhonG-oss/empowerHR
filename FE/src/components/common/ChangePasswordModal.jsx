@@ -1,20 +1,23 @@
-import { Eye, EyeClosed, Lock, CheckCircle2, X } from "lucide-react";
+import { Eye, EyeClosed, Lock, CheckCircle2, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import authApi from "../../api/authApi";
+import { useAlphanumericInput } from "../../hooks/useAlphanumericInput";
 
 function ChangePasswordModal({ isOpen, onClose, userName }) {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, handleCurrentChange, setCurrentPassword] =
+    useAlphanumericInput("");
+  const [newPassword, handleNewChange, setNewPassword] =
+    useAlphanumericInput("");
+  const [confirmPassword, handleConfirmChange, setConfirmPassword] =
+    useAlphanumericInput("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [wrongInput, setWrongInput] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleClose = () => {
     // Reset form
@@ -41,21 +44,19 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
 
     try {
       // Xác minh mật khẩu hiện tại
-      const res1 = await authApi.confirmAccount({
-        userName: userName,
+      await authApi.confirmAccount({
+        userName,
         password: currentPassword,
       });
 
-      // Nếu xác minh thành công, đổi mật khẩu
-      const res2 = await authApi.changePassword({
-        userName: userName,
+      // Đổi mật khẩu
+      await authApi.changePassword({
+        userName,
         newpassword: newPassword,
       });
 
       setSuccess(true);
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
+      setTimeout(() => handleClose(), 2000);
     } catch (error) {
       console.error("Change password error:", error);
       if (error.response?.status === 401 || error.response?.status === 400) {
@@ -71,23 +72,23 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-500 flex items-center justify-center bg-black/50 ">
+    <div className="fixed inset-0 z-500 flex items-center justify-center bg-black/50">
       <div className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Modal Header */}
-        <div className="bg-linear-to-br from-gray-900 to-black p-6 relative">
+        {/* Header */}
+        <div className=" p-6 relative shadow-md">
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
           >
             <X size={24} />
           </button>
-          <h2 className="text-2xl font-bold text-white mb-1">Đổi mật khẩu</h2>
-          <p className="text-gray-300 text-sm">
+          <h2 className="text-2xl font-bold mb-1">Đổi mật khẩu</h2>
+          <p className="text-gray-600 text-sm">
             Tài khoản: <span className="font-semibold">{userName}</span>
           </p>
         </div>
 
-        {/* Modal Body */}
+        {/* Body */}
         <div className="p-6">
           {success ? (
             <div className="text-center py-8">
@@ -118,14 +119,15 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
                     type={showPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => {
-                      setCurrentPassword(e.target.value);
+                      handleCurrentChange(e);
                       setWrongInput(false);
                     }}
                     placeholder={
                       showPassword ? "Nhập mật khẩu hiện tại" : "••••••••••"
                     }
                     required
-                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all bg-gray-50 hover:bg-white"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 
+                    focus:ring-black transition-all bg-gray-50 hover:bg-white"
                   />
                   <button
                     type="button"
@@ -137,7 +139,6 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
                 </div>
               </div>
 
-              {/* ERROR MESSAGE */}
               {wrongInput && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3">
                   <p className="text-red-600 text-sm font-medium text-center">
@@ -171,14 +172,15 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
                     type={showPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => {
-                      setNewPassword(e.target.value);
+                      handleNewChange(e);
                       setPasswordMismatch(false);
                     }}
                     placeholder={
                       showPassword ? "Nhập mật khẩu mới" : "••••••••••"
                     }
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all bg-gray-50 hover:bg-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 
+                    focus:ring-black transition-all bg-gray-50 hover:bg-white"
                   />
                 </div>
               </div>
@@ -196,19 +198,19 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => {
-                      setConfirmPassword(e.target.value);
+                      handleConfirmChange(e);
                       setPasswordMismatch(false);
                     }}
                     placeholder={
                       showPassword ? "Nhập lại mật khẩu" : "••••••••••"
                     }
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all bg-gray-50 hover:bg-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black 
+                    transition-all bg-gray-50 hover:bg-white"
                   />
                 </div>
               </div>
 
-              {/* ERROR MESSAGE */}
               {passwordMismatch && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3">
                   <p className="text-red-600 text-sm font-medium text-center">
@@ -222,36 +224,19 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200"
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="flex-1 bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
+                    <span className="flex items-center justify-center gap-2 text-gray-600">
+                      <Loader2 className="h-5 w-5 animate-spin" />
                       Đang xử lý...
                     </span>
                   ) : (

@@ -93,6 +93,9 @@ function DetailProfile({}) {
       ? `Hồ sơ của ${profile?.employeeCode}`
       : "Hồ sơ của tôi";
 
+  // Xác định có hiển thị nút quay lại không
+  const showGoBack = pageTitle !== "Hồ sơ của tôi";
+
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
       <div className="mx-auto space-y-8">
@@ -101,7 +104,7 @@ function DetailProfile({}) {
 
         {/* Main Content */}
         <div className="px-8 pb-8">
-          <GoBackLink />
+          {showGoBack && <GoBackLink />}
 
           {/* Header Card với Gradient Border */}
           <div className="mb-8 overflow-hidden rounded-2xl shadow-2xl">

@@ -177,22 +177,10 @@ export default function RequestManagement() {
                 </div>
 
                 <Link
-                  to={"/manager/request-management/history"}
+                  to="/manager/request-management/history"
                   className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <Clock className="w-3.5 h-3.5" />
                   Đã xử lý
                 </Link>
               </div>

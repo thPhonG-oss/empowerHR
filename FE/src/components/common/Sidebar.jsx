@@ -1,7 +1,8 @@
 import { getNavByRole } from "../../utils/navigation";
 import { AuthContext } from "../../context/AuthContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import authApi from "../../api/authApi";
+import { getMyName } from "../../utils/employeeUtils";
 
 import { Link, useLocation } from "react-router-dom";
 
@@ -16,11 +17,34 @@ function Sidebar() {
   const [showModal, setShowModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
+  const userMenuRef = useRef(null);
 
   useEffect(() => {
     setCurrentPath(location.pathname);
-    setUserName(localStorage.getItem("userName") || "");
-  }, [location]);
+
+    const fetchUserName = async () => {
+      const name = await getMyName();
+      if (name) {
+        setUserName(name);
+      }
+    };
+
+    fetchUserName();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -118,7 +142,10 @@ function Sidebar() {
         </div>
 
         {/* User - Actions */}
-        <div className="border-t border-gray-200 bg-gray-50 relative shrink-0">
+        <div
+          ref={userMenuRef}
+          className="border-t border-gray-200 bg-gray-50 relative shrink-0"
+        >
           {/* Dropdown Menu */}
           {showUserMenu && (
             <div className="absolute bottom-full left-0 right-0 mb-2 mx-3 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
@@ -145,7 +172,7 @@ function Sidebar() {
           {/* User Info - Clickable */}
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-full flex justify-between p-5 items-center gap-3 hover:bg-gray-100 transition-colors group"
+            className="w-full flex justify-between p-5 items-center gap-3 hover:bg-gray-100 transition-colors group cursor-pointer"
           >
             <div className="flex items-center gap-3">
               <div className="bg-linear-to-br from-gray-800 to-black p-2 rounded-full shadow-md">

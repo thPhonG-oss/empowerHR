@@ -7,6 +7,7 @@ import {
   Send,
   AlertCircle,
   CheckCircle2,
+  RefreshCcw,
   X,
 } from "lucide-react";
 import { useEffect, useState, useContext } from "react";
@@ -54,6 +55,7 @@ function LeaveRequest() {
   const [validTotal, setValidTotal] = useState(true);
   //
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
 
   // -----------------------------
@@ -118,14 +120,9 @@ function LeaveRequest() {
   };
 
   // -----------------------------
-  // Handle file upload
+  // Handle file upload (đã tách riêng logic xử lý file)
   // -----------------------------
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    const file = files[0];
-
+  const processFile = async (file) => {
     // ======= 1️⃣ Kiểm tra định dạng ảnh =======
     const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
     if (!validTypes.includes(file.type)) {
@@ -141,7 +138,7 @@ function LeaveRequest() {
     }
 
     // ======= 3️⃣ Lưu file để hiển thị tên =======
-    setUploadedFiles(files);
+    setUploadedFiles([file]);
 
     // ======= 4️⃣ Upload lên Cloudinary =======
     const formDataCloud = new FormData();
@@ -177,6 +174,45 @@ function LeaveRequest() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    await processFile(files[0]);
+  };
+
+  // -----------------------------
+  // Handle Drag & Drop
+  // -----------------------------
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (isUploading) return;
+
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) return;
+
+    await processFile(files[0]);
   };
 
   // -----------------------------
@@ -308,7 +344,8 @@ function LeaveRequest() {
                   onChange={(e) => {
                     handleInputChange(e);
                   }}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-900 focus:ring-2 focus:ring-gray-200 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-900 focus:ring-2 
+                  focus:ring-gray-200 transition-all duration-200 font-medium"
                 >
                   <option value="">-- Chọn loại --</option>
                   {leaveTypes.map((leaveType) => (
@@ -316,7 +353,9 @@ function LeaveRequest() {
                       key={leaveType.leaveTypeId}
                       value={leaveType.leaveTypeId}
                     >
-                      {leaveType.leaveTypeName}
+                      {leaveType.leaveTypeName === "Remote"
+                        ? "Làm việc tại nhà"
+                        : leaveType.leaveTypeName}
                     </option>
                   ))}
                 </select>
@@ -444,7 +483,8 @@ function LeaveRequest() {
                 onChange={handleInputChange}
                 placeholder="Nhập lý do chi tiết..."
                 rows="4"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-900 focus:ring-2 focus:ring-gray-200 transition-all duration-200 resize-none font-medium"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-900 focus:ring-2 
+                focus:ring-gray-200 transition-all duration-200 resize-none font-medium"
               />
             </div>
           </div>
@@ -466,8 +506,16 @@ function LeaveRequest() {
             {!formData.proofDocument ? (
               <label
                 htmlFor="file-upload"
-                className={`group/upload flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl py-12 cursor-pointer transition-all duration-300 hover:border-gray-900 hover:bg-gray-50 ${
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`group/upload flex flex-col items-center justify-center border-2 border-dashed rounded-2xl py-12 cursor-pointer transition-all duration-300 ${
                   isUploading ? "opacity-50 cursor-not-allowed" : ""
+                } ${
+                  isDragging
+                    ? "border-gray-900 bg-gray-50 scale-105"
+                    : "border-gray-300 hover:border-gray-900 hover:bg-gray-50"
                 }`}
               >
                 {isUploading ? (
@@ -479,11 +527,23 @@ function LeaveRequest() {
                   </div>
                 ) : (
                   <>
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 group-hover/upload:bg-gray-900 transition-colors duration-300 mb-4">
-                      <Upload className="w-8 h-8 text-gray-400 group-hover/upload:text-white transition-colors duration-300" />
+                    <div
+                      className={`flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 transition-colors duration-300 mb-4 ${
+                        isDragging
+                          ? "bg-gray-900"
+                          : "group-hover/upload:bg-gray-900"
+                      }`}
+                    >
+                      <Upload
+                        className={`w-8 h-8 text-gray-400 transition-colors duration-300 ${
+                          isDragging
+                            ? "text-white"
+                            : "group-hover/upload:text-white"
+                        }`}
+                      />
                     </div>
                     <span className="text-gray-900 font-semibold mb-1">
-                      Tải minh chứng
+                      {isDragging ? "Thả ảnh vào đây" : "Tải minh chứng"}
                     </span>
                     <span className="text-gray-500 text-sm">
                       Kéo thả hoặc click để chọn file
@@ -510,17 +570,21 @@ function LeaveRequest() {
                     alt="Minh chứng"
                     className="w-64 h-64 object-contain rounded-2xl border-2 border-gray-200 shadow-lg"
                   />
-                  <div className="absolute inset-0 hover:bg-black/30 group-hover/image:bg-opacity-50 rounded-2xl transition-all duration-300 flex items-center justify-center">
+                  <div
+                    className="absolute inset-0 hover:bg-black/30 group-hover/image:bg-opacity-50 
+                  rounded-2xl transition-all duration-300 flex items-center justify-center"
+                  >
                     <button
                       type="button"
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, proofDocument: "" }));
                         setUploadedFiles([]);
                       }}
-                      className="cursor-pointer opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+                      className="cursor-pointer opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 
+                      flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700"
                     >
-                      <X className="h-4 w-4" />
-                      Xóa ảnh
+                      <RefreshCcw className="h-4 w-4" />
+                      Tải lại
                     </button>
                   </div>
                 </div>
@@ -548,9 +612,13 @@ function LeaveRequest() {
                   checked={formData.agreed}
                   onChange={handleInputChange}
                   disabled={!validTotal}
-                  className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-gray-300 checked:border-gray-900 checked:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+                  className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-gray-300 
+                  checked:border-gray-900 checked:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
                 />
-                <CheckCircle2 className="absolute top-0 left-0 h-5 w-5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                <CheckCircle2
+                  className="absolute top-0 left-0 h-5 w-5 text-white opacity-0 peer-checked:opacity-100 
+                transition-opacity duration-200 pointer-events-none"
+                />
               </div>
               <div className="flex-1">
                 <span className="text-gray-900 font-semibold group-hover:text-gray-700 transition-colors duration-200">
@@ -568,7 +636,9 @@ function LeaveRequest() {
             <button
               type="submit"
               disabled={!formData.agreed}
-              className="group w-full bg-linear-to-r from-gray-900 to-gray-700 text-white py-4 rounded-xl font-bold text-lg disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:from-gray-800 hover:to-gray-600 hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 flex items-center justify-center gap-3"
+              className="group w-full bg-linear-to-r from-gray-900 to-gray-700 text-white py-4 rounded-xl font-bold 
+              text-lg disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 
+              hover:from-gray-800 hover:to-gray-600 hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 flex items-center justify-center gap-3"
             >
               <Send className="h-5 w-5 transition-transform group-hover:translate-x-1 duration-300" />
               <span>Gửi yêu cầu</span>

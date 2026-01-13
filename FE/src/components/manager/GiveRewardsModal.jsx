@@ -4,6 +4,7 @@ import managerApi from "../../api/managerApi";
 import toast from "react-hot-toast";
 import departmentApi from "../../api/departmentApi";
 import { getMyDepartmentId } from "../../utils/getMyDepartmentId";
+import { getMyId } from "../../utils/getMyId";
 
 function GiveRewardsModal({ isOpen, onClose, employee, onSuccess }) {
   const [points, setPoints] = useState("");
@@ -46,7 +47,16 @@ function GiveRewardsModal({ isOpen, onClose, employee, onSuccess }) {
             departmentId,
             1
           );
-          setMyEmployees(res.result.employeeResponseDTOS || []);
+
+          // Lấy ID của chính mình
+          const myId = await getMyId();
+
+          // Lọc bỏ chính bản thân khỏi danh sách
+          const filteredEmployees = (
+            res.result.employeeResponseDTOS || []
+          ).filter((emp) => emp.employeeId !== myId);
+
+          setMyEmployees(filteredEmployees);
         } catch (err) {
           console.error("Lỗi khi lấy danh sách nhân viên:", err);
           toast.error("Không thể tải danh sách nhân viên");
@@ -146,7 +156,7 @@ function GiveRewardsModal({ isOpen, onClose, employee, onSuccess }) {
         {selectedEmployee ? (
           <div className="p-6 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="size-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-semibold text-gray-700 border border-gray-200">
+              <div className="size-12 rounded-full bg-linear-to-br from-gray-100 to-gray-200 flex items-center justify-center font-semibold text-gray-700 border border-gray-200">
                 {selectedEmployee.employeeName.charAt(0)}
               </div>
               <div>
