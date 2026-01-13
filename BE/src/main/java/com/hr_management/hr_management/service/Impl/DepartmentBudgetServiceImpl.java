@@ -68,8 +68,6 @@ public class DepartmentBudgetServiceImpl implements DepartmentBudgetService {
         PointPolicy pointPolicy=departmentBudget.getPointPolicy();
         if(pointPolicy.getEndDate().isBefore(LocalDate.now()))
             throw  new AppException(ErrorCode.NOT_EDIT_PAST_TIME);
-        if(budgetDepartmentRequest.getBudget()< pointPolicy.getMinPoints() || budgetDepartmentRequest.getBudget()> pointPolicy.getMaxPoints())
-            throw new AppException(ErrorCode.VALUE_INVALID);
         departmentBudget.setBudget(budgetDepartmentRequest.getBudget());
         return departmentBudgetMapper.toBudgeDepartmentResponse(departmentBudgetRepository.save(departmentBudget));
     }
