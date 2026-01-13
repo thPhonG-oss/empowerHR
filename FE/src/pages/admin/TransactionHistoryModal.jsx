@@ -52,20 +52,16 @@ const TransactionHistoryModal = ({onClose, employee }) => {
   };
 
   // Get transaction type label and color
-  const getTransactionTypeInfo = (type, points) => {
-    const isPositive = points > 0;
+  const getTransactionTypeInfo = (type) => {
     const typeMap = {
-      'CashOut': { label: 'Đổi tiền', color: 'text-red-600 bg-green-50' },
-      'ActivityReward': { label: 'Thưởng hoạt động', color: 'text-green-600 bg-red-50' },
+      'CashOut': { label: 'Đổi tiền', color: 'text-red-600 bg-red-50' },
+      'ActivityReward': { label: 'Thưởng hoạt động', color: 'text-green-600 bg-green-50' },
       'PerformanceReward': { label: 'Quản lý thưởng hiệu suất', color: 'text-blue-600 bg-blue-50' },
       'MonthlyReward': { label: 'Thưởng hàng tháng', color: 'text-orange-600 bg-orange-50' },
       'Other': { label: 'Khác', color: 'text-gray-600 bg-gray-50' }
     };
     
-    return typeMap[type] || { 
-      label: type, 
-      color: isPositive ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50' 
-    };
+    return typeMap[type] || { label: type, color: 'text-gray-600 bg-gray-50' };
   };
 
   return (
@@ -135,11 +131,12 @@ const TransactionHistoryModal = ({onClose, employee }) => {
               </div>
             ) : (
               transactions.map((transaction) => {
-                const typeInfo = getTransactionTypeInfo(
-                  transaction.transactionType,
-                  transaction.points
-                );
-                const isPositive = transaction.points > 0;
+                const typeInfo = getTransactionTypeInfo(transaction.transactionType);
+                // CashOut always negative, others positive
+                const isPositive = transaction.transactionType !== 'CashOut';
+                const pointValue = transaction.transactionType === 'CashOut' 
+                  ? -Math.abs(transaction.points)
+                  : Math.abs(transaction.points);
 
                 return (
                   <div
@@ -178,7 +175,7 @@ const TransactionHistoryModal = ({onClose, employee }) => {
                           <p className={`text-xl font-bold ${
                             isPositive ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            {isPositive ? '+' : ''}{formatNumber(transaction.points)}
+                            {isPositive ? '+' : ''}{formatNumber(pointValue)}
                           </p>
                           <p className="text-xs text-gray-500">điểm</p>
                         </div>
