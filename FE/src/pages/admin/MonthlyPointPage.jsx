@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Pencil, Check, X, TrendingUp, Users, Award } from "lucide-react";
 import monthlyRewardApi from "../../api/monthlyRewardApi";
 import pointApi from "../../api/pointApi";
+import toast from "react-hot-toast";
 
 export default function MonthlyPointPage() {
   const [positionData, setPositionData] = useState([]);
@@ -50,15 +51,13 @@ export default function MonthlyPointPage() {
 
   const saveEdit = async () => {
     if (editing.type === "position") {
-      console.log("Edit_id", editing.id);
-      console.log("point", value);
-
       await monthlyRewardApi.updateMonthlyReward(editing.id, { monthlyPoints: value });
       setPositionData((prev) =>
         prev.map((p) =>
           p.id === editing.id ? { ...p, point: value } : p
         )
       );
+      toast.success("Cập nhật điểm chức vụ thành công!");
     }
 
     if (editing.type === "department") {
@@ -68,6 +67,7 @@ export default function MonthlyPointPage() {
           d.id === editing.id ? { ...d, point: value } : d
         )
       );
+      toast.success("Cập nhật ngân sách phòng ban thành công!");
     }
 
     cancelEdit();
