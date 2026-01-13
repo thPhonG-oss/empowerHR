@@ -210,7 +210,7 @@ export default function MonthlyPointPage() {
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">Tổng điểm chức vụ</p>
+                <p className="text-gray-600 text-sm font-medium mb-1">Tổng ngân sách chức vụ</p>
                 <p className="text-3xl font-bold text-gray-900">{totalPositionPoints.toLocaleString()}</p>
                 <p className="text-gray-500 text-sm mt-2">{positionData.length} chức vụ</p>
               </div>
