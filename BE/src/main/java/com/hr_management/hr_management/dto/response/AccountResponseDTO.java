@@ -19,4 +19,5 @@ public class AccountResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     Set<RoleResponse> roles = new HashSet<>();
+    Boolean accountStatus;
 }
