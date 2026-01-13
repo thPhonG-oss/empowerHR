@@ -53,8 +53,9 @@ function PointCard({ onRedeemSuccess }) {
         <div className="flex flex-row items-center gap-2 p-2 rounded-xl">
           {/* Redeem Button */}
           <button
+            title="Quy đổi điểm"
             onClick={() => setOpenRedeem(true)}
-            className="flex-1 h-full bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition p-2 cursor-pointer"
+            className="flex-1 h-full bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition py-2 px-4  cursor-pointer"
           >
             Đổi thưởng
           </button>
@@ -80,10 +81,8 @@ function PointCard({ onRedeemSuccess }) {
           <Info className="w-4 h-4 text-gray-500" />
           <p className="text-sm text-gray-600">
             Tỉ lệ quy đổi:&nbsp;
-            <span className="font-semibold text-gray-800">
-              {pointPolicy.conversionRate.toLocaleString()} pts
-            </span>
-            &nbsp;= 1 đơn vị
+            <span className="font-semibold text-gray-800">1 pts</span>
+            &nbsp;= {pointPolicy.conversionRate.toLocaleString()} VNĐ
           </p>
         </div>
       )}
@@ -93,20 +92,24 @@ function PointCard({ onRedeemSuccess }) {
         <div className="bg-green-50 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-4 h-4 text-green-600" />
-            <p className="text-sm text-gray-600">Tổng điểm đã dùng</p>
+            <p className="text-sm text-gray-600">Tổng điểm đã nhận</p>
           </div>
           <p className="font-semibold text-green-700">
-            +{pointData.totalEarns.toLocaleString()} pts
+            {pointData?.totalEarns
+              ? `${pointData.totalEarns.toLocaleString()} pts`
+              : "Không có"}
           </p>
         </div>
 
         <div className="bg-red-50 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <ArrowLeftRight className="w-4 h-4 text-red-500" />
-            <p className="text-sm text-gray-600">Đã đổi</p>
+            <p className="text-sm text-gray-600">Điểm đã đổi</p>
           </div>
           <p className="font-semibold text-red-600">
-            {pointData.totalTransferred} lần
+            {pointData?.totalTransferred
+              ? `${pointData.totalTransferred.toLocaleString()} pts`
+              : "Không có"}
           </p>
         </div>
       </div>

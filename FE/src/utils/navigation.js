@@ -98,14 +98,6 @@ const navConfig = [
     roles: ["employee", "manager"],
   },
 
-  // ──────────────────────────────── EMPLOYEE ONLY ────────────────────────────────
-  {
-    title: "Lịch sử lương",
-    path: "salary-history",
-    icon: DollarSign,
-    roles: ["employee"],
-  },
-
   // ──────────────────────────────── MANAGER ONLY ────────────────────────────────
   {
     title: "Quản lý nhóm",
@@ -120,8 +112,8 @@ const navConfig = [
     roles: ["manager"],
   },
   {
-    title: "Tặng điểm nhân viên",
-    path: "give-rewards",
+    title: "Thưởng điểm",
+    path: "performance-points",
     icon: PartyPopper,
     roles: ["manager"],
   },

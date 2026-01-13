@@ -3,6 +3,7 @@ import { Gem } from "lucide-react";
 import TransactionsCard from "../../components/employee/TransactionsCard";
 import PointCard from "../../components/employee/PointCard";
 import { useState } from "react";
+
 function Rewards() {
   const [redeemKey, setRedeemKey] = useState(0);
 
