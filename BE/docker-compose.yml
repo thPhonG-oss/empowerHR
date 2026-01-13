@@ -8,6 +8,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-hrm_db}
+      MYSQL_USER: ${DB_USERNAME:-hrm_user}           # THÊM DÒNG NÀY
+      MYSQL_PASSWORD: ${DB_PASSWORD:-hrm_password}   # THÊM DÒNG NÀY
     ports:
       - "3306:3306"
     volumes:
@@ -16,7 +18,7 @@ services:
     networks:
       - hrm-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,7 +33,6 @@ services:
     container_name: hrm-backend
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      PORT: 8080
       DATABASE_URL: jdbc:mysql://mysql:3306/${DB_NAME:-hrm_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
       DB_USERNAME: ${DB_USERNAME:-hrm_user}
       DB_PASSWORD: ${DB_PASSWORD:-hrm_password}
@@ -54,24 +55,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-
-  # phpMyAdmin (Optional - for database management)
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: hrm-phpmyadmin
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: ${DB_USERNAME:-hrm_user}
-      PMA_PASSWORD: ${DB_PASSWORD:-hrm_password}
-      UPLOAD_LIMIT: 100M
-    ports:
-      - "8081:80"
-    depends_on:
-      - mysql
-    networks:
-      - hrm-network
-    restart: unless-stopped
 
 volumes:
   mysql_data:
