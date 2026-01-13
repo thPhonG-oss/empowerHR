@@ -100,6 +100,20 @@ public class EmployeeServiceImpl implements EmployeeService {
                     dto.setBankAccountNumber(emp.getBank().getBankAccountNumber());
                     dto.setDepartment(emp.getDepartment().getDepartmentName());
                     dto.setPosition(emp.getPosition().getPositionName());
+                    dto.setAccount(
+                            AccountResponseDTO.builder()
+                                    .username(emp.getAccount().getUsername())
+                                    .roles(
+                                            emp.getAccount().getRoles().stream()
+                                                    .map(role -> RoleResponse.builder()
+                                                            .name(role.getName())
+                                                            .build()
+                                                    )
+                                                    .collect(Collectors.toSet())
+                                    )
+                                    .accountStatus(emp.getAccount().isAccountStatus())
+                                    .build()
+                    );
                     return dto;
                 })
                 .toList();

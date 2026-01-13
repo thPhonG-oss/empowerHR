@@ -37,8 +37,6 @@ public class MonthlyRewardServiceImpl implements MonthlyRewardService {
 
         if(pointPolicy.getEndDate().isBefore(LocalDate.now()))
             throw  new AppException(ErrorCode.NOT_EDIT_PAST_TIME);
-        if(monthlyRewardRequest.getMonthlyPoints()< pointPolicy.getMinPoints() || monthlyRewardRequest.getMonthlyPoints()> pointPolicy.getMaxPoints())
-            throw new AppException(ErrorCode.VALUE_INVALID);
         monthlyReward.setMonthlyPoints(monthlyRewardRequest.getMonthlyPoints());
         return monthlyRewardMapper.toMonthlyRewardResponse(monthlyRewardRepository.save(monthlyReward));
     }

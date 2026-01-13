@@ -38,4 +38,5 @@ public class EmployeeResponseDTO {
     private String department;
     private String bank;
     private String bankAccountNumber;
+    private AccountResponseDTO account;
 }
