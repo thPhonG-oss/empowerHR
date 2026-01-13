@@ -44,11 +44,18 @@ function ChangePasswordModal({ isOpen, onClose }) {
     setWrongInput(false);
 
     try {
-      // Xác minh mật khẩu hiện tại
-      await authApi.confirmAccount({
+      const res = await authApi.confirmAccount({
         userName,
         password: currentPassword,
       });
+      console.log(userName, currentPassword);
+      console.log(res?.result?.valid);
+
+      if (!res?.result?.valid) {
+        const error = new Error("Wrong current password");
+        error.response = { status: 401 };
+        throw error;
+      }
 
       // Đổi mật khẩu
       await authApi.changePassword({
@@ -60,6 +67,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
       setTimeout(() => handleClose(), 2000);
     } catch (error) {
       console.error("Change password error:", error);
+
       if (error.response?.status === 401 || error.response?.status === 400) {
         setWrongInput(true);
       } else {
