@@ -12,36 +12,55 @@ function Dashboard() {
 
   const [employeeCount, setEmployeeCount] = useState(0);
   const [loadingEmployeeCount, setLoadingEmployeeCount] = useState(true);
+  const [errorEmployeeCount, setErrorEmployeeCount] = useState(null);
 
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [recentRequests, setRecentRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
+  const [errorRequests, setErrorRequests] = useState(null);
 
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const fetchData = async () => {
-    await Promise.all([fetchEmployeeCount(), fetchPendingRequests()]);
+  // Tách riêng API fetch employee count
+  const fetchEmployeeCount = async () => {
+    try {
+      setLoadingEmployeeCount(true);
+      setErrorEmployeeCount(null);
+      const employeeIds = await getMyDepartmentEmployeeIds();
+      setEmployeeCount(employeeIds.length);
+    } catch (error) {
+      console.error("Error fetching employee count:", error);
+      setErrorEmployeeCount("Không thể tải số lượng nhân viên");
+      setEmployeeCount(0);
+    } finally {
+      setLoadingEmployeeCount(false);
+    }
   };
 
-  async function fetchEmployeeCount() {
-    setLoadingEmployeeCount(true);
-    const employeeIds = await getMyDepartmentEmployeeIds();
-    setEmployeeCount(employeeIds.length);
-    setLoadingEmployeeCount(false);
-  }
+  // Tách riêng API fetch pending requests
+  const fetchPendingRequests = async () => {
+    try {
+      setLoadingRequests(true);
+      setErrorRequests(null);
+      const res = await requestApi.getUnresolved();
+      const requests = res?.result?.requestResponseDTOS || [];
 
-  async function fetchPendingRequests() {
-    setLoadingRequests(true);
-    const res = await requestApi.getUnresolved();
-    const requests = res?.result?.requestResponseDTOS || [];
+      setPendingRequestCount(requests.length);
+      setRecentRequests(requests.slice(0, 4));
+    } catch (error) {
+      console.error("Error fetching pending requests:", error);
+      setErrorRequests("Không thể tải danh sách yêu cầu");
+      setPendingRequestCount(0);
+      setRecentRequests([]);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
 
-    setPendingRequestCount(requests.length);
-    setRecentRequests(requests.slice(0, 4));
-    setLoadingRequests(false);
-  }
-
+  // Gọi API độc lập, không phụ thuộc nhau
   useEffect(() => {
-    fetchData();
+    fetchEmployeeCount();
+    fetchPendingRequests();
   }, []);
 
   const handleRequestClick = (request) => {
@@ -53,7 +72,9 @@ function Dashboard() {
   };
 
   const handleReloadData = () => {
-    fetchData();
+    // Reload cả 2 API
+    fetchEmployeeCount();
+    fetchPendingRequests();
   };
 
   return (
@@ -63,13 +84,13 @@ function Dashboard() {
 
         <div className="flex flex-col">
           <div className="grid grid-cols-2 pt-8 px-8 gap-6">
-            {/* ✅ SỐ LƯỢNG NHÂN VIÊN PHÒNG BAN */}
+            {/* SỐ LƯỢNG NHÂN VIÊN PHÒNG BAN */}
             <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
               <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
                 <Users className="size-7 text-white" />
               </div>
 
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   Nhân viên phòng ban
                 </p>
@@ -78,6 +99,18 @@ function Dashboard() {
                   <p className="text-xl font-semibold text-gray-400">
                     Đang tải...
                   </p>
+                ) : errorEmployeeCount ? (
+                  <div>
+                    <p className="text-sm text-red-500 mb-1">
+                      {errorEmployeeCount}
+                    </p>
+                    <button
+                      onClick={fetchEmployeeCount}
+                      className="text-xs text-blue-600 hover:text-blue-700 underline"
+                    >
+                      Thử lại
+                    </button>
+                  </div>
                 ) : (
                   <p className="text-3xl font-bold bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
                     {employeeCount}
@@ -92,7 +125,7 @@ function Dashboard() {
                 <ClipboardList className="size-7 text-white" />
               </div>
 
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   Yêu cầu chờ duyệt
                 </p>
@@ -101,6 +134,16 @@ function Dashboard() {
                   <p className="text-xl font-semibold text-gray-400">
                     Đang tải...
                   </p>
+                ) : errorRequests ? (
+                  <div>
+                    <p className="text-sm text-red-500 mb-1">{errorRequests}</p>
+                    <button
+                      onClick={fetchPendingRequests}
+                      className="text-xs text-blue-600 hover:text-blue-700 underline"
+                    >
+                      Thử lại
+                    </button>
+                  </div>
                 ) : (
                   <p className="text-3xl font-bold bg-linear-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
                     {pendingRequestCount}
@@ -127,6 +170,16 @@ function Dashboard() {
 
               {loadingRequests ? (
                 <p className="text-gray-400 text-center py-8">Đang tải...</p>
+              ) : errorRequests ? (
+                <div className="text-center py-8">
+                  <p className="text-red-500 mb-3">{errorRequests}</p>
+                  <button
+                    onClick={fetchPendingRequests}
+                    className="text-sm text-blue-600 hover:text-blue-700 underline font-medium"
+                  >
+                    Thử lại
+                  </button>
+                </div>
               ) : recentRequests.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">
                   Không có yêu cầu chờ duyệt

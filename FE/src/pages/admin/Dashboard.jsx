@@ -9,22 +9,52 @@ import Header from "../../components/common/Header";
 function Dashboard() {
   const navigate = useNavigate();
   const [totalUsers, setTotalUsers] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [totalActivities, setTotalActivities] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState([]);
 
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingActivities, setLoadingActivities] = useState(true);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
+
+  // Fetch users riêng
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Lấy nhân viên
+        setLoadingUsers(true);
         const res = await adminApi.getAllUsers();
         setTotalUsers(res?.result?.length ?? 0);
+      } catch (error) {
+        console.error("Lỗi lấy danh sách nhân viên:", error);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
 
-        // Lấy hoạt động
+    fetchUsers();
+  }, []);
+
+  // Fetch activities riêng
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        setLoadingActivities(true);
         const activityRes = await runningActivityApi.adminGetAllActivity();
         setTotalActivities(activityRes?.result?.totalElements ?? 0);
+      } catch (error) {
+        console.error("Lỗi lấy danh sách hoạt động:", error);
+      } finally {
+        setLoadingActivities(false);
+      }
+    };
 
-        // Transactions - TOP 5 GẦN NHẤT
+    fetchActivities();
+  }, []);
+
+  // Fetch transactions riêng
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoadingTransactions(true);
         const transactionRes = await transactionsApi.getAllTransactions();
 
         const top5Recent = (transactionRes?.result ?? [])
@@ -33,13 +63,13 @@ function Dashboard() {
 
         setRecentTransactions(top5Recent);
       } catch (error) {
-        console.error("Lỗi lấy danh sách nhân viên:", error);
+        console.error("Lỗi lấy danh sách giao dịch:", error);
       } finally {
-        setLoading(false);
+        setLoadingTransactions(false);
       }
     };
 
-    fetchUsers();
+    fetchTransactions();
   }, []);
 
   return (
@@ -65,7 +95,7 @@ function Dashboard() {
                   Tổng nhân viên
                 </p>
                 <p className="text-3xl font-bold bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-                  {loading ? "..." : totalUsers}
+                  {loadingUsers ? "..." : totalUsers}
                 </p>
               </div>
 
@@ -86,7 +116,7 @@ function Dashboard() {
                   Tổng hoạt động
                 </p>
                 <p className="text-3xl font-bold bg-linear-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
-                  {loading ? "..." : totalActivities}
+                  {loadingActivities ? "..." : totalActivities}
                 </p>
               </div>
 
@@ -108,7 +138,7 @@ function Dashboard() {
                 </button>
               </div>
 
-              {loading ? (
+              {loadingTransactions ? (
                 <p className="text-gray-400 text-center py-8">Đang tải...</p>
               ) : recentTransactions.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">
