@@ -247,7 +247,7 @@ export default function HistoryRequests() {
             </div>
 
             {/* DATE FILTERS */}
-            <div className="flex flex-wrap items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-lg border border-gray-200 mb-5">
+            <div className="flex flex-wrap items-center gap-3 p-4 bg-linear-to-r from-gray-50 to-gray-100/50 rounded-lg border border-gray-200 mb-5">
               <div className="flex items-center gap-2">
                 <label className="text-xs font-medium text-gray-600">
                   Từ ngày:

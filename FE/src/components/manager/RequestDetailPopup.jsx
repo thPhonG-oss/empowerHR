@@ -175,8 +175,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
       </div>
 
       {showConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30" />
+        <div className="fixed inset-0 z-100 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-xl border border-gray-300">
             <p>
               Xác nhận {showConfirm === "approve" ? "phê duyệt" : "từ chối"} yêu

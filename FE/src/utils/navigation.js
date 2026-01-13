@@ -28,12 +28,7 @@ const navConfig = [
   },
 
   // ──────────────────────────────── ADMIN ONLY ────────────────────────────────
-  {
-    title: "Quản lý gian hàng",
-    path: "store-management",
-    icon: ShoppingCart,
-    roles: ["admin"],
-  },
+
   {
     title: "Điểm thưởng",
     path: "rewards",
@@ -101,14 +96,6 @@ const navConfig = [
     path: "request-history",
     icon: History,
     roles: ["employee", "manager"],
-  },
-
-  // ──────────────────────────────── EMPLOYEE ONLY ────────────────────────────────
-  {
-    title: "Lịch sử lương",
-    path: "salary-history",
-    icon: DollarSign,
-    roles: ["employee"],
   },
 
   // ──────────────────────────────── MANAGER ONLY ────────────────────────────────

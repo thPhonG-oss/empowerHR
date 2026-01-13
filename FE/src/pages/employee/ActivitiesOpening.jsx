@@ -233,14 +233,10 @@ export default function ActivitiesOpening() {
   filteredActivities =
     sortType === "nearest"
       ? [...filteredActivities].sort(
-          (a, b) =>
-            new Date(a.runningActivity?.startDate) -
-            new Date(b.runningActivity?.startDate)
+          (a, b) => new Date(a.startDate) - new Date(b.startDate)
         )
       : [...filteredActivities].sort(
-          (a, b) =>
-            new Date(b.runningActivity?.startDate) -
-            new Date(a.runningActivity?.startDate)
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
         );
 
   //=====================================================
@@ -266,9 +262,11 @@ export default function ActivitiesOpening() {
             </div>
 
             <button
-              onClick={() =>
-                setSortType(sortType === "nearest" ? "furthest" : "nearest")
-              }
+              title="Thời gian hoạt động bắt đầu"
+              onClick={() => {
+                setSortType(sortType === "nearest" ? "furthest" : "nearest");
+                console.log(sortType);
+              }}
               className="cursor-pointer flex items-center justify-center gap-2 px-5 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-300  hover:border-gray-300 transition-all duration-200 shadow-sm whitespace-nowrap font-medium"
             >
               <ArrowUpDown size={18} />
@@ -281,6 +279,7 @@ export default function ActivitiesOpening() {
             <CustomButton
               variant="orange"
               onClick={handleStravaConnect}
+              title="Kết nối đến Strava"
               className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md  ${
                 !connectedStrava
                   ? "cursor-pointer hover:shadow-lg transition-all duration-200"
@@ -292,6 +291,7 @@ export default function ActivitiesOpening() {
 
             {currentView === "registered" ? (
               <CustomButton
+                title="Danh sách hoạt động đang diễn ra"
                 variant="green"
                 onClick={() => setCurrentView("active")}
                 className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
@@ -302,8 +302,9 @@ export default function ActivitiesOpening() {
             ) : (
               <CustomButton
                 variant="primary"
+                title="Danh sách hoạt động đã đăng ký"
                 onClick={() => setCurrentView("registered")}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
               >
                 <History size={20} />
                 Đã đăng ký
@@ -400,7 +401,7 @@ export default function ActivitiesOpening() {
                         <CustomButton
                           variant="link"
                           onClick={() => openDetails(activity)}
-                          className="w-full text-center py-2 text-gray-700 hover:text-gray-900 font-semibold transition-colors duration-200"
+                          className="w-full text-center py-2 text-gray-700 hover:text-gray-900 font-semibold transition-colors duration-200 cursor-pointer"
                         >
                           Xem chi tiết →
                         </CustomButton>

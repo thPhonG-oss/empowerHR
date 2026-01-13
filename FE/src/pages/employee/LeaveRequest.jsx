@@ -78,7 +78,6 @@ function LeaveRequest() {
   useEffect(() => {
     async function fetchInfo() {
       const res = await employeeApi.getLeaveType();
-      console.log(res.result);
       setLeaveTypes(res.result);
     }
 
@@ -123,12 +122,28 @@ function LeaveRequest() {
   // -----------------------------
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files || []);
-    setUploadedFiles(files);
-
     if (files.length === 0) return;
 
     const file = files[0];
 
+    // ======= 1️⃣ Kiểm tra định dạng ảnh =======
+    const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Chỉ chấp nhận file hình ảnh (JPG, PNG, WEBP)");
+      return;
+    }
+
+    // ======= 2️⃣ Kiểm tra dung lượng ảnh =======
+    const maxSizeMB = 5; // giới hạn 5MB
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast.error(`Kích thước file tối đa ${maxSizeMB}MB`);
+      return;
+    }
+
+    // ======= 3️⃣ Lưu file để hiển thị tên =======
+    setUploadedFiles(files);
+
+    // ======= 4️⃣ Upload lên Cloudinary =======
     const formDataCloud = new FormData();
     formDataCloud.append("file", file);
     formDataCloud.append("upload_preset", UPLOAD_PRESET);
@@ -147,17 +162,27 @@ function LeaveRequest() {
       const data = await res.json();
 
       if (data.secure_url) {
+        console.log("✅ Upload thành công:", data.secure_url);
         setFormData((prev) => ({
           ...prev,
           proofDocument: data.secure_url,
         }));
+        toast.success("Tải ảnh lên thành công!");
+      } else {
+        toast.error("Không thể tải lên Cloudinary");
+        console.error("Cloudinary upload error:", data);
       }
     } catch (err) {
       console.error("Upload Cloudinary error:", err);
+      toast.error("Lỗi khi tải ảnh lên");
     } finally {
       setIsUploading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(formData.proofDocument);
+  }, [formData.proofDocument]);
 
   // -----------------------------
   // Submit form
@@ -285,9 +310,8 @@ function LeaveRequest() {
                 <select
                   name="leaveTypeId"
                   value={formData.leaveTypeId}
-                  onChange={() => {
-                    handleInputChange();
-                    console.log(formData.leaveTypeId);
+                  onChange={(e) => {
+                    handleInputChange(e);
                   }}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-900 focus:ring-2 focus:ring-gray-200 transition-all duration-200 font-medium"
                 >
@@ -469,6 +493,9 @@ function LeaveRequest() {
                     <span className="text-gray-500 text-sm">
                       Kéo thả hoặc click để chọn file
                     </span>
+                    <span className="text-xs text-gray-400 mt-2 italic">
+                      (Chỉ chấp nhận file hình ảnh: JPG, PNG, WEBP)
+                    </span>
                   </>
                 )}
                 <input
@@ -488,14 +515,14 @@ function LeaveRequest() {
                     alt="Minh chứng"
                     className="w-64 h-64 object-contain rounded-2xl border-2 border-gray-200 shadow-lg"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover/image:bg-opacity-50 rounded-2xl transition-all duration-300 flex items-center justify-center">
+                  <div className="absolute inset-0 hover:bg-black/30 group-hover/image:bg-opacity-50 rounded-2xl transition-all duration-300 flex items-center justify-center">
                     <button
                       type="button"
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, proofDocument: "" }));
                         setUploadedFiles([]);
                       }}
-                      className="opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+                      className="cursor-pointer opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
                     >
                       <X className="h-4 w-4" />
                       Xóa ảnh
