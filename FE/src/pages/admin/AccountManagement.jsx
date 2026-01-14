@@ -209,22 +209,24 @@ function AccountManagement() {
 
                       {employee?.account?.accountStatus ? (
                         <button
+                          title="khóa tài khoản"
                           onClick={() => {
                             setIdBlock(employee.employeeId);
                             setIsConfirmPopupOpen(true);
                           }}
                           className="p-2 rounded-lg cursor-pointer hover:-translate-y-0.5  hover:shadow-sm
-                          text-gray-600 hover:bg-gray-100 transition-all"
+                          text-gray-600  transition-all hover:bg-red-50"
                         >
                           <Unlock size={18} />
                         </button>
                       ) : (
                         <button
+                          title="Mở khóa tài khoản"
                           onClick={() =>
                             handleUnLockAccount(employee.employeeId)
                           }
-                          className="p-2 rounded-lg
-                          text-gray-600 hover:bg-gray-100 transition-all"
+                          className="p-2 rounded-lg cursor-pointer hover:-translate-y-0.5  hover:shadow-sm
+                          text-gray-600  transition-all hover:bg-green-50"
                         >
                           <Lock size={18} />
                         </button>
@@ -240,8 +242,10 @@ function AccountManagement() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-2 border border-gray-200 rounded-lg
-                hover:bg-gray-100 disabled:opacity-40 transition-all"
+                className={`p-2 border border-gray-200 rounded-lg
+                hover:bg-gray-100 disabled:opacity-40 transition-all ${
+                  currentPage === 1 ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -257,8 +261,8 @@ function AccountManagement() {
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       page === currentPage
-                        ? "bg-gray-800 text-white border border-gray-800 shadow-sm"
-                        : "border border-gray-200 text-gray-600 hover:bg-gray-100"
+                        ? "bg-gray-800 text-white border border-gray-800 shadow-sm "
+                        : "border border-gray-200 text-gray-600 hover:bg-gray-100 cursor-pointer"
                     }`}
                   >
                     {page}
@@ -271,8 +275,12 @@ function AccountManagement() {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="p-2 border border-gray-200 rounded-lg
-                hover:bg-gray-100 disabled:opacity-40 transition-all"
+                className={`p-2 border border-gray-200 rounded-lg
+                hover:bg-gray-100 disabled:opacity-40 transition-all ${
+                  currentPage === totalPages
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
               >
                 <ChevronRight size={18} />
               </button>
