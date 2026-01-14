@@ -40,7 +40,7 @@ export default function RequestManagement() {
       try {
         setLoading(true);
         const res = await requestApi.getUnresolved();
-        console.log(res.result.requestResponseDTOS);
+
         setRequests(res.result.requestResponseDTOS || []);
       } catch (err) {
         console.error(err);
@@ -95,40 +95,6 @@ export default function RequestManagement() {
     setCurrentPage(1);
   };
 
-  // const handleApprove = (requestId, note) => {
-  //   setRequests((prev) =>
-  //     prev.map((r) =>
-  //       r.requestId === requestId
-  //         ? {
-  //             ...r,
-  //             status: "Approved",
-  //             handleAt: new Date().toISOString(),
-  //             responseReason: note || "Đã phê duyệt",
-  //           }
-  //         : r
-  //     )
-  //   );
-
-  //   setSelectedRequest(null);
-  // };
-
-  // const handleReject = (requestId, reason) => {
-  //   setRequests((prev) =>
-  //     prev.map((r) =>
-  //       r.requestId === requestId
-  //         ? {
-  //             ...r,
-  //             status: "Rejected",
-  //             handleAt: new Date().toISOString(),
-  //             responseReason: reason,
-  //           }
-  //         : r
-  //     )
-  //   );
-
-  //   setSelectedRequest(null);
-  // };
-
   const reloadData = async () => {
     try {
       setLoading(true);
@@ -145,7 +111,7 @@ export default function RequestManagement() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-400 text-sm">
+      <div className="p-8 text-center text-gray-500 text-sm">
         Đang tải dữ liệu...
       </div>
     );
@@ -160,52 +126,53 @@ export default function RequestManagement() {
   }
 
   return (
-    <div className="p-0 bg-gray-50">
+    <div className="p-0 bg-gray-50 min-h-screen">
       <div className="mx-auto">
         <Header title="Quản lý yêu cầu" icon={FileCheck} />
 
-        <div className="py-4 px-6">
-          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+        <div className="py-6 px-6">
+          <div className="rounded-xl p-6 bg-white shadow-sm border border-gray-100 mx-auto">
             {/* Header */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-lg font-semibold text-gray-900 mb-1">
+                  <h1 className="text-lg font-semibold text-gray-800 mb-1.5">
                     Danh sách yêu cầu
                   </h1>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-gray-500">
                     Cần xem chi tiết từng yêu cầu trước khi phê duyệt
                   </p>
                 </div>
 
                 <Link
                   to="/manager/request-management/history"
-                  className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  className="hover:-translate-y-0.5 flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gray-800 text-white 
+                  rounded-lg hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow"
                 >
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-4 h-4" />
                   Đã xử lý
                 </Link>
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-6 border-b border-gray-200 cursor-pointer">
+              <div className="flex items-center gap-8 border-b border-gray-100 cursor-pointer">
                 <button
                   onClick={() => handleTabChange("all")}
-                  className={`pb-3 px-1 text-sm font-medium transition-all relative cursor-pointer ${
+                  className={`pb-3.5 px-1 text-sm font-medium transition-all duration-200 relative cursor-pointer ${
                     activeTab === "all"
-                      ? "text-gray-900"
+                      ? "text-gray-800"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Tất cả
                   {activeTab === "all" && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-800 rounded-full"></div>
                   )}
                 </button>
 
                 <button
                   onClick={() => handleTabChange("leave")}
-                  className={`pb-3 px-1 text-sm font-medium transition-all relative cursor-pointer ${
+                  className={`pb-3.5 px-1 text-sm font-medium transition-all duration-200 relative cursor-pointer ${
                     activeTab === "leave"
                       ? "text-blue-700"
                       : "text-gray-500 hover:text-gray-700"
@@ -213,13 +180,13 @@ export default function RequestManagement() {
                 >
                   Nghỉ phép
                   {activeTab === "leave" && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></div>
                   )}
                 </button>
 
                 <button
                   onClick={() => handleTabChange("timesheet")}
-                  className={`pb-3 px-1 text-sm font-medium transition-all relative cursor-pointer ${
+                  className={`pb-3.5 px-1 text-sm font-medium transition-all duration-200 relative cursor-pointer ${
                     activeTab === "timesheet"
                       ? "text-amber-700"
                       : "text-gray-500 hover:text-gray-700"
@@ -227,34 +194,36 @@ export default function RequestManagement() {
                 >
                   Chấm công
                   {activeTab === "timesheet" && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 rounded-full"></div>
                   )}
                 </button>
               </div>
 
               {/* Filter by date */}
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
-                <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-600">
+              <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 mt-5">
+                <div className="flex items-center gap-2.5">
+                  <label className="text-sm font-medium text-gray-600">
                     Từ ngày
                   </label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 
+                    focus:border-gray-300 bg-white transition-all"
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-600">
+                <div className="flex items-center gap-2.5">
+                  <label className="text-sm font-medium text-gray-600">
                     Đến ngày
                   </label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 
+                    focus:border-gray-300 bg-white transition-all"
                   />
                 </div>
 
@@ -263,7 +232,8 @@ export default function RequestManagement() {
                     setStartDate("");
                     setEndDate("");
                   }}
-                  className="cursor-pointer px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 flex items-center gap-2 transition-colors"
+                  className="cursor-pointer px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white hover:border-gray-300 flex 
+                  items-center gap-2 transition-all duration-200"
                 >
                   <RefreshCw size={16} className="text-gray-600" />
                   <span className="text-gray-700 font-medium">
@@ -276,29 +246,29 @@ export default function RequestManagement() {
             {/* Request list */}
             <div className="mt-6 space-y-3">
               {paginatedRequests.length === 0 ? (
-                <div className="p-12 text-center text-gray-400 text-sm bg-gray-50 rounded-lg border border-gray-200">
+                <div className="p-16 text-center text-gray-400 text-sm bg-gray-50 rounded-xl border border-gray-100">
                   Không có yêu cầu nào cần xử lý
                 </div>
               ) : (
                 paginatedRequests.map((request) => (
                   <div
                     key={request.requestId}
-                    className={`border rounded-lg p-5 hover:shadow-md transition-all duration-200 ${
+                    className={`border rounded-xl p-5 hover:shadow-md transition-all duration-300 ${
                       request.requestType === "LEAVE"
-                        ? "bg-blue-50/30 border-blue-200"
+                        ? "bg-blue-50/40 border-blue-100 hover:border-blue-200"
                         : request.requestType === "TIMESHEET_UPDATE"
-                        ? "bg-amber-50/30 border-amber-200"
-                        : "bg-gray-50 border-gray-200"
+                        ? "bg-amber-50/40 border-amber-100 hover:border-amber-200"
+                        : "bg-white border-gray-100 hover:border-gray-200"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
                         <div
-                          className={`mt-0.5 p-2 rounded-lg ${
+                          className={`mt-0.5 p-2.5 rounded-lg ${
                             request.requestType === "LEAVE"
-                              ? "bg-blue-50"
+                              ? "bg-blue-100/60"
                               : request.requestType === "TIMESHEET_UPDATE"
-                              ? "bg-amber-50"
+                              ? "bg-amber-100/60"
                               : "bg-gray-100"
                           }`}
                         >
@@ -315,7 +285,7 @@ export default function RequestManagement() {
 
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`font-semibold mb-1.5 text-sm ${
+                            className={`font-semibold mb-2 text-base ${
                               request.requestType === "LEAVE"
                                 ? "text-blue-900"
                                 : request.requestType === "TIMESHEET_UPDATE"
@@ -330,7 +300,7 @@ export default function RequestManagement() {
                               : "Yêu cầu khác"}
                           </h3>
 
-                          <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                          <p className="text-sm text-gray-600 mb-3.5 leading-relaxed">
                             <span className="font-medium text-gray-700">
                               Người gửi:
                             </span>{" "}
@@ -352,34 +322,32 @@ export default function RequestManagement() {
                             {request.reason}
                           </p>
 
-                          <div className="flex flex-wrap gap-4 text-xs">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`inline-block px-2.5 py-1 text-xs font-medium rounded ${
-                                  request.requestType === "LEAVE"
-                                    ? "bg-blue-100 text-blue-700"
-                                    : request.requestType === "TIMESHEET_UPDATE"
-                                    ? "bg-amber-100 text-amber-700"
-                                    : "bg-gray-200 text-gray-700"
-                                }`}
-                              >
-                                Chờ phê duyệt
+                          <div className="flex flex-wrap items-center gap-3 text-xs">
+                            <span
+                              className={`inline-block px-3 py-1.5 text-xs font-medium rounded-lg ${
+                                request.requestType === "LEAVE"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : request.requestType === "TIMESHEET_UPDATE"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-gray-200 text-gray-700"
+                              }`}
+                            >
+                              Chờ phê duyệt
+                            </span>
+                            <p className="text-sm text-gray-600">
+                              Gửi lúc:{" "}
+                              <span className="font-medium text-gray-700">
+                                {formatDate(request.submitAt)}
                               </span>
-                              <p className="text-gray-600">
-                                Gửi lúc:{" "}
-                                <span className="font-medium text-gray-700">
-                                  {formatDate(request.submitAt)}
-                                </span>
-                              </p>
-                            </div>
+                            </p>
                           </div>
                         </div>
                       </div>
 
                       <button
                         onClick={() => setSelectedRequest(request)}
-                        className="cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium border bg-gray-900 text-white 
-                        border-gray-900 hover:bg-gray-800 transition-colors shrink-0"
+                        className="cursor-pointer px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-800 text-white 
+                        hover:bg-gray-700 transition-all duration-200 shrink-0 hover:shadow-sm hover:-translate-y-0.5"
                       >
                         Chi tiết →
                       </button>
@@ -391,8 +359,8 @@ export default function RequestManagement() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-                <p className="text-xs text-gray-500">
+              <div className="flex items-center justify-between mt-6 pt-5 border-t border-gray-100">
+                <p className="text-sm text-gray-500">
                   Hiển thị {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
                   {Math.min(
                     currentPage * ITEMS_PER_PAGE,
@@ -405,7 +373,8 @@ export default function RequestManagement() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1.5 text-sm font-medium border border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                    className="cursor-pointer px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-lg disabled:opacity-30 
+                    disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                   >
                     Trước
                   </button>
@@ -415,10 +384,10 @@ export default function RequestManagement() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                        className={`cursor-pointer min-w-10 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                           currentPage === page
-                            ? "bg-gray-900 text-white border border-gray-900"
-                            : "border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+                            ? "bg-gray-800 text-white shadow-sm"
+                            : "border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
                         }`}
                       >
                         {page}
@@ -431,7 +400,8 @@ export default function RequestManagement() {
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 text-sm font-medium border border-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                    className="cursor-pointer px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-lg disabled:opacity-30 
+                    disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                   >
                     Sau
                   </button>

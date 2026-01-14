@@ -41,15 +41,15 @@ export default function DetailActivityOverlay({
   const handleDelete = async () => {
     try {
       setLoading(true);
-      await runningActivityApi.deleteActivity(activity.runningActivityId);
+      await runningActivityApi.updateStatus(activity.runningActivityId);
 
       setOpenConfirm(false);
       onClose();
       onSuccess?.();
-      toast.success("Xóa hoạt động thành công");
+      toast.success("Hủy hoạt động thành công");
     } catch (err) {
-      console.error("Lỗi xóa hoạt động:", err);
-      toast.error("Xóa hoạt động không thành công");
+      console.error("Lỗi hủy hoạt động:", err);
+      toast.error("Hủy hoạt động không thành công");
     } finally {
       setLoading(false);
     }
@@ -214,24 +214,26 @@ export default function DetailActivityOverlay({
 
             {/* Actions */}
             <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-              {activity.status !== "Cancelled" &&
-                activity.status !== "Completed" && (
+              {/* CẬP NHẬT & hủy: chỉ Draft & Open */}
+              {(activity.status === "Draft" || activity.status === "Open") && (
+                <>
                   <button
                     onClick={() => setOpenEdit(true)}
-                    className="cursor-pointer px-6 py-3 bg-linear-to-br from-blue-600 to-blue-700 text-white rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-600/30 transition-all hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0"
+                    className="cursor-pointer px-6 py-3 bg-linear-to-br from-blue-600 to-blue-700 text-white rounded-xl 
+                    flex items-center gap-2 font-medium shadow-lg shadow-blue-600/30 transition-all hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <Pencil size={18} />
                     Cập nhật
                   </button>
-                )}
-              {activity.status !== "Completed" && (
-                <button
-                  onClick={() => setOpenConfirm(true)}
-                  className="cursor-pointer px-6 py-3 bg-linear-to-br from-red-600 to-red-700 text-white rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-red-600/30 transition-all hover:shadow-xl hover:shadow-red-600/40 hover:-translate-y-0.5 active:translate-y-0"
-                >
-                  <Trash2 size={18} />
-                  Xóa
-                </button>
+                  <button
+                    onClick={() => setOpenConfirm(true)}
+                    className="cursor-pointer px-6 py-3 bg-linear-to-br from-red-600 to-red-700 text-white rounded-xl 
+                    flex items-center gap-2 font-medium shadow-lg shadow-red-600/30 transition-all hover:shadow-xl hover:shadow-red-600/40 hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <Trash2 size={18} />
+                    Hủy hoạt động
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -242,7 +244,7 @@ export default function DetailActivityOverlay({
       <ConfirmPopup
         isOpen={openConfirm}
         onClose={() => !loading && setOpenConfirm(false)}
-        message="Bạn có chắc chắn muốn xóa hoạt động này? Hành động này không thể hoàn tác."
+        message="Bạn có chắc chắn muốn hủy hoạt động này? Hành động này không thể hoàn tác."
         onConfirm={handleDelete}
       />
 

@@ -119,17 +119,17 @@ export default function RequestManagementHistory() {
 
   // -------------------- RENDER --------------------
   return (
-    <div className="p-0 bg-gray-50">
+    <div className="p-0 bg-gray-50 min-h-screen">
       <div className="mx-auto">
         <Header title="Quản lý yêu cầu" icon={FileCheck} />
 
-        <div className="bg-gray-50 py-4 px-6">
-          <div className="bg-white rounded-lg p-6 shadow-2xl">
+        <div className="bg-gray-50 py-6 px-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mx-auto">
             {/* Header */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-xl font-semibold text-gray-900 mb-1">
+                  <h1 className="text-lg font-semibold text-gray-800 mb-1.5">
                     Danh sách yêu cầu đã xử lý
                   </h1>
                   <p className="text-sm text-gray-500">
@@ -139,14 +139,15 @@ export default function RequestManagementHistory() {
 
                 <Link
                   to={"/manager/request-management"}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                  className=" hover:-translate-y-0.5 flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gray-800 
+                  text-white rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
                 >
                   Yêu cầu chờ xử lý
                 </Link>
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-3 border-b border-gray-200 mb-4">
+              <div className="flex items-center gap-8 border-b border-gray-100 mb-5">
                 {[
                   { id: "all", name: "Tất cả" },
                   { id: "LEAVE", name: "Nghỉ phép" },
@@ -155,21 +156,24 @@ export default function RequestManagementHistory() {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                    className={`pb-3.5 px-1 text-sm font-medium transition-all duration-200 relative cursor-pointer ${
                       activeTab === tab.id
-                        ? "border-black text-black"
-                        : "border-transparent text-gray-600 hover:text-gray-900"
+                        ? "text-gray-800"
+                        : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
                     {tab.name}
+                    {activeTab === tab.id && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-800 rounded-full"></div>
+                    )}
                   </button>
                 ))}
               </div>
 
               {/* Date filters */}
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+              <div className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <label className="text-sm font-medium text-gray-600">
                     Từ ngày xử lý:
                   </label>
                   <input
@@ -178,12 +182,13 @@ export default function RequestManagementHistory() {
                     onChange={(e) =>
                       handleDateFilterChange("start", e.target.value)
                     }
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-black"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 
+                    focus:ring-gray-200 focus:border-gray-300 bg-white transition-all"
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                <div className="flex items-center gap-2.5">
+                  <label className="text-sm font-medium text-gray-600">
                     Đến ngày xử lý:
                   </label>
                   <input
@@ -192,14 +197,16 @@ export default function RequestManagementHistory() {
                     onChange={(e) =>
                       handleDateFilterChange("end", e.target.value)
                     }
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-black"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 
+                    focus:ring-gray-200 focus:border-gray-300 bg-white transition-all"
                   />
                 </div>
 
                 {(startDateFilter || endDateFilter) && (
                   <button
                     onClick={clearFilters}
-                    className="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md cursor-pointer"
+                    className="px-4 py-2 text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 
+                    rounded-lg cursor-pointer transition-all duration-200"
                   >
                     Xóa lọc
                   </button>
@@ -208,9 +215,9 @@ export default function RequestManagementHistory() {
             </div>
 
             {/* Request List */}
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-3">
               {paginatedRequests.length === 0 ? (
-                <div className="p-12 text-center text-gray-500 bg-gray-50 rounded-lg">
+                <div className="p-16 text-center text-gray-400 bg-gray-50 rounded-xl border border-gray-100">
                   Không có yêu cầu nào đã xử lý
                 </div>
               ) : (
@@ -221,17 +228,20 @@ export default function RequestManagementHistory() {
                   return (
                     <div
                       key={request.requestId}
-                      className="bg-white border  border-gray-300 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all"
+                      className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-300"
                     >
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-start gap-3 flex-1">
-                          <div className="w-11 h-11 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold">
+                        <div className="flex items-start gap-4 flex-1">
+                          <div
+                            className="size-12 rounded-full bg-linear-to-br from-gray-50 to-gray-100 flex 
+                          items-center justify-center text-sm font-semibold text-gray-600 border-2 border-gray-100"
+                          >
                             {getInitials(request.employeeName)}
                           </div>
 
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-gray-900">
+                            <div className="flex items-center gap-2.5 mb-2">
+                              <h3 className="font-semibold text-gray-800 text-base">
                                 {request.requestType === "LEAVE"
                                   ? "Nghỉ phép"
                                   : request.requestType === "TIMESHEET_UPDATE"
@@ -240,27 +250,27 @@ export default function RequestManagementHistory() {
                               </h3>
 
                               <span
-                                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border
-                                  ${
-                                    isApproved
-                                      ? "bg-green-100 text-green-700 border-green-300"
-                                      : "bg-red-100 text-red-700 border-red-300"
-                                  }`}
+                                className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                                  isApproved
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                                    : "bg-rose-50 text-rose-700 border border-rose-100"
+                                }`}
                               >
                                 {isApproved ? "Đã phê duyệt" : "Đã từ chối"}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <User className="w-4 h-4" />
-                              {request.employeeName}
+                              <User className="w-4 h-4 text-gray-400" />
+                              <span>{request.employeeName}</span>
                             </div>
                           </div>
                         </div>
 
                         <button
                           onClick={() => setSelectedRequest(request)}
-                          className="cursor-pointer px-4 py-2 text-sm flex items-center gap-1 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                          className="cursor-pointer px-4 py-2.5 text-sm flex items-center gap-1.5 text-gray-700 font-medium 
+                          hover:bg-gray-50 hover:shadow-sm hover:-translate-y-0.5 rounded-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
                         >
                           Chi tiết
                         </button>
@@ -272,15 +282,15 @@ export default function RequestManagementHistory() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center mt-6 gap-2">
+            <div className="flex justify-center mt-8 gap-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => setCurrentPage(p)}
-                  className={`px-3 py-1.5 rounded-md border border-gray-300 text-sm ${
+                  className={`min-w-10 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     p === currentPage
-                      ? "bg-black text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-100"
+                      ? "bg-gray-800 text-white shadow-sm"
+                      : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300"
                   }`}
                 >
                   {p}

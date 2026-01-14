@@ -76,6 +76,7 @@ export default function ActivitiesRegistered({
         return (
           <div
             key={activity.participateInId}
+            onClick={() => openDetails(ra)}
             className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden  hover:shadow-lg transition-all duration-300"
           >
             {/* IMAGE */}
@@ -126,20 +127,12 @@ export default function ActivitiesRegistered({
 
               {/* ACTION */}
               <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2.5">
-                <div className="flex justify-center">
-                  <CustomButton
-                    variant="link"
-                    onClick={() => openDetails(ra)}
-                    className="px-0 w-fit text-xs font-medium text-gray-900 hover:text-gray-600 cursor-pointer"
-                  >
-                    Xem chi tiết →
-                  </CustomButton>
-                </div>
                 {(ra.status === "Active" || ra.status === "Open") &&
                 !activity.isCancelled ? (
                   <CustomButton
                     variant="danger"
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       await handleUnregisterActivity(ra.runningActivityId);
                       fetchRegistered();
                     }}

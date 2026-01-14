@@ -94,7 +94,12 @@ function Login() {
       navigate(`/${role}/dashboard`);
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
+
       setWrongInput(true);
+      // Sau 10 giây thì reset lại trạng thái sai
+      setTimeout(() => {
+        setWrongInput(false);
+      }, 10000); // 10s
     } finally {
       setIsLoading(false);
     }

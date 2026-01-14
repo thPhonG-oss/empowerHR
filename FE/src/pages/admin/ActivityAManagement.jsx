@@ -42,7 +42,7 @@ export default function RunningActivityManagement() {
     try {
       const res = await runningActivityApi.adminGetAllActivity(0, 9999);
       const list = res.result?.content || [];
-      console.log(list);
+
       setActivities(list);
       setFilteredActivities(list);
     } catch (err) {
@@ -94,7 +94,7 @@ export default function RunningActivityManagement() {
     <main className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
       <Header title="Quản lý hoạt động" icon={Activity} />
 
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="mx-auto p-6 space-y-8">
         {/* FILTER */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg shadow-gray-200/50">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
@@ -130,7 +130,7 @@ export default function RunningActivityManagement() {
                 onClick={() =>
                   setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
                 }
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-sm font-medium text-white shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 active:translate-y-0"
+                className="cursor-pointer flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-gray-800 to-gray-900 text-sm font-medium text-white shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 active:translate-y-0"
               >
                 <ArrowUpDown size={16} />
                 {sortOrder === "desc" ? "Gần nhất" : "Xa nhất"}
@@ -138,7 +138,7 @@ export default function RunningActivityManagement() {
 
               <button
                 onClick={() => setOpenCreate(true)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-black to-gray-900 text-sm font-medium text-white shadow-lg shadow-black/20 transition-all hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 active:translate-y-0"
+                className="cursor-pointer flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-br from-black to-gray-900 text-sm font-medium text-white shadow-lg shadow-black/20 transition-all hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 active:translate-y-0"
               >
                 <PlusCircle size={16} />
                 Tạo hoạt động

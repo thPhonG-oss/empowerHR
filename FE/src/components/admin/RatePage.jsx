@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import pointApi from "../../api/pointApi";
 import pointPolicyApi from "../../api/pointPolicyApi";
-import Input from "../../components/common/Input";
-import Field from "../../components/common/Field";
+import Input from "../common/Input";
+import Field from "../common/Field";
 import { Pencil, Settings, Info, Percent } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -148,7 +148,7 @@ export default function RatePage() {
               {!isEdit ? (
                 <button
                   onClick={() => setIsEdit(true)}
-                  className="cursor-pointer flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
+                  className="hover:-translate-y-0.5 cursor-pointer flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
                 >
                   <Pencil className="w-4 h-4" />
                   Cập nhật
@@ -157,13 +157,13 @@ export default function RatePage() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleCancel}
-                    className="cursor-pointer border-2 border-gray-300 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 active:bg-gray-100 transition-all text-gray-700"
+                    className="hover:-translate-y-0.5 cursor-pointer border-2 border-gray-300 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 active:bg-gray-100 transition-all text-gray-700"
                   >
                     Hủy
                   </button>
                   <button
                     onClick={handleSave}
-                    className="cursor-pointer bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
+                    className="hover:-translate-y-0.5 cursor-pointer bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 active:bg-gray-900 transition-all"
                   >
                     Lưu thay đổi
                   </button>

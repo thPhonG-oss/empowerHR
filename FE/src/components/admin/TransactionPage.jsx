@@ -271,7 +271,7 @@ export default function TransactionPage() {
             <div className="flex items-end justify-center">
               <button
                 onClick={handleReset}
-                className="cursor-pointer flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 font-semibold border-2 border-gray-300 transition-all"
+                className="hover:-translate-y-0.5 cursor-pointer flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 font-semibold border-2 border-gray-300 transition-all"
               >
                 Xóa bộ lọc
               </button>

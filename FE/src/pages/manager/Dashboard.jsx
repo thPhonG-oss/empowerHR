@@ -1,4 +1,11 @@
-import { Users, Home, ClipboardList, Clock, MoveRight } from "lucide-react";
+import {
+  Users,
+  Home,
+  ClipboardList,
+  Clock,
+  MoveRight,
+  ArrowRight,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -85,12 +92,16 @@ function Dashboard() {
         <div className="flex flex-col">
           <div className="grid grid-cols-2 pt-8 px-8 gap-6">
             {/* SỐ LƯỢNG NHÂN VIÊN PHÒNG BAN */}
-            <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/manager/team-management")}
+              className="cursor-pointer group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border 
+            border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
                 <Users className="size-7 text-white" />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 ">
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   Nhân viên phòng ban
                 </p>
@@ -117,10 +128,15 @@ function Dashboard() {
                   </p>
                 )}
               </div>
+              <ArrowRight className="size-5 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
 
             {/* YÊU CẦU CHỜ DUYỆT */}
-            <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/manager/request-management")}
+              className="cursor-pointer group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border 
+              border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="p-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
                 <ClipboardList className="size-7 text-white" />
               </div>
@@ -150,6 +166,7 @@ function Dashboard() {
                   </p>
                 )}
               </div>
+              <ArrowRight className="size-5 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </div>
 
@@ -162,7 +179,8 @@ function Dashboard() {
 
                 <button
                   onClick={() => navigate("/manager/request-management")}
-                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                  className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900 flex justify-between items-center 
+                  gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all duration-200"
                 >
                   <span>Xem tất cả</span> <MoveRight size={16} />
                 </button>
@@ -190,7 +208,8 @@ function Dashboard() {
                     <li
                       key={req.requestId}
                       onClick={() => handleRequestClick(req)}
-                      className="flex justify-between items-start p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 border border-gray-100 cursor-pointer group"
+                      className="flex justify-between items-start p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 
+                      border border-gray-100 cursor-pointer group"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

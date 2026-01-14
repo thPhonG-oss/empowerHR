@@ -125,7 +125,7 @@ export default function ActivitiesOpening() {
   //=====================================================
   const handleRegister = async (activity) => {
     try {
-      if(!connectedStrava){
+      if (!connectedStrava) {
         toast.error("Vui lòng kết nối Strava trước khi đăng ký");
         return;
       }
@@ -281,7 +281,7 @@ export default function ActivitiesOpening() {
               title="Kết nối đến Strava"
               className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md  ${
                 !connectedStrava
-                  ? "cursor-pointer hover:shadow-lg transition-all duration-200"
+                  ? "cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
                   : ""
               }`}
             >
@@ -293,7 +293,7 @@ export default function ActivitiesOpening() {
                 title="Danh sách hoạt động đang diễn ra"
                 variant="green"
                 onClick={() => setCurrentView("active")}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
+                className="hover:-translate-y-0.5 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
               >
                 <FastForward size={20} />
                 Đang diễn ra
@@ -344,7 +344,8 @@ export default function ActivitiesOpening() {
                 {filteredActivities.map((activity) => (
                   <div
                     key={activity.runningActivityId}
-                    className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                    onClick={() => openDetails(activity)}
+                    className="cursor-pointer group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:-translate-y-1"
                   >
                     {/* Image */}
                     <div className="relative h-48 bg-linear-to-br from-gray-200 to-gray-300 overflow-hidden">
@@ -361,7 +362,7 @@ export default function ActivitiesOpening() {
 
                     {/* Content */}
                     <div className="p-5">
-                      <h3 className="font-bold text-lg mb-4 text-gray-900 line-clamp-2 min-h-14">
+                      <h3 className=" font-bold text-lg mb-4 text-gray-900 line-clamp-2 min-h-14">
                         {activity.title}
                       </h3>
 
@@ -401,14 +402,6 @@ export default function ActivitiesOpening() {
 
                       {/* Buttons */}
                       <div className="flex flex-col gap-3">
-                        <CustomButton
-                          variant="link"
-                          onClick={() => openDetails(activity)}
-                          className="w-full text-center py-2 text-gray-700 hover:text-gray-900 font-semibold transition-colors duration-200 cursor-pointer"
-                        >
-                          Xem chi tiết →
-                        </CustomButton>
-
                         {activity.isRegistered && (
                           <CustomButton
                             variant="primary"

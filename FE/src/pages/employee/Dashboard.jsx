@@ -37,27 +37,14 @@ function Dashboard() {
       const resAttendances = await employeeApi.getMyAttendances();
       const attendances = resAttendances.result || [];
 
-      console.log("📅 Current month/year:", month, year);
-      console.log("📊 Raw attendances:", attendances);
-
       const attendanceCountInMonth = attendances.filter((item) => {
         const d = new Date(item.attendanceDate);
         const itemMonth = d.getMonth() + 1;
         const itemYear = d.getFullYear();
 
-        console.log("Checking attendance:", {
-          date: item.attendanceDate,
-          itemMonth,
-          itemYear,
-          targetMonth: month,
-          targetYear: year,
-          match: itemMonth === month && itemYear === year,
-        });
-
         return itemMonth === month && itemYear === year;
       }).length;
 
-      console.log("✅ Attendance count:", attendanceCountInMonth);
       setAttendanceCount(attendanceCountInMonth);
     } catch (error) {
       console.error("❌ Failed to fetch attendance data:", error);

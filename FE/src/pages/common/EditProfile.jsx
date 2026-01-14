@@ -68,7 +68,7 @@ function EditProfile() {
   // Load initial profile
   useEffect(() => {
     const stored = JSON.parse(sessionStorage.getItem("profile"));
-    console.log(stored);
+
     if (stored) {
       setFormData({
         ...stored,
