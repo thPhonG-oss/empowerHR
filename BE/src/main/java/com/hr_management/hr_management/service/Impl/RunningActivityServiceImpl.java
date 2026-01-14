@@ -234,11 +234,14 @@ public class RunningActivityServiceImpl implements RunningActivityService {
         }
 
         // Open → Active (khi đến registration_end_date AND start_date)
+        Integer numberRegistered = participateInRepository.countByRunningActivity_RunningActivityIdAndIsCancelledFalse(activity.getRunningActivityId());
+
         if (activity.getStatus() == ActivityStatus.Open
                 && activity.getRegistrationEndDate() != null
                 && activity.getStartDate() != null
                 && now.isAfter(activity.getRegistrationEndDate())
-                && today.isAfter(activity.getStartDate().atStartOfDay().toLocalDate())) {
+                && today.isAfter(activity.getStartDate().atStartOfDay().toLocalDate())
+                && numberRegistered >= activity.getMinParticipant()) {
             return ActivityStatus.Active;
         }
 
