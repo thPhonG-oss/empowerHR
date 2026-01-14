@@ -125,11 +125,11 @@ INSERT INTO Account_Role (account_id, role_id) VALUES
 
 -- 20 ví điểm cho 20 nhân viên
 INSERT INTO PointAccount (total_transferred, current_points, total_earns) VALUES
-(1, 1000, 1000), (2, 500, 500), (3, 200, 200), (4, 800, 900),
-(5, 150, 200), (6, 300, 300), (7, 50, 50), (8, 0, 0),
-(9, 120, 120), (10, 400, 450), (11, 100, 100), (12, 0, 0),
-(13, 1000, 2000), (14, 50, 50), (15, 600, 600), (16, 700, 750),
-(17, 0, 0), (18, 100, 100), (19, 20, 20), (20, 30, 30);
+(100, 1000, 1000), (200, 500, 500), (150, 200, 200), (100, 800, 900),
+(400, 150, 200), (200, 300, 300), (100, 50, 50), (80, 0, 0),
+(90, 120, 120), (100, 400, 450), (110, 100, 100), (250, 0, 0),
+(60, 1000, 2000), (450, 50, 50), (150, 600, 600), (300, 700, 750),
+(80, 0, 0), (180, 100, 100), (1000, 20, 20), (320, 30, 30);
 
 -- ============================================
 -- 2.4. EMPLOYEES (20 Nhân viên)
@@ -272,15 +272,15 @@ INSERT INTO TimesheetUpdateRequest (request_id, attendance_date, checkin_time, c
 (59, '2024-04-09', '08:00:00', '17:00:00'), (60, '2024-04-10', '08:00:00', '17:00:00');
 
 
-INSERT INTO RunningActivity (title, description, registration_start_date, registration_end_date, status, start_date, end_date, min_participant, max_participant, target_distance, completion_bonus, top_1_bonus, top_2_bonus, top_3_bonus) VALUES
-('Summer Run 2024', 'Giải chạy bộ vì sức khỏe hè 2024', '2024-05-01', '2024-05-16' , 'Completed', '2024-06-01', '2024-06-30', 20, 100, 20, 50, 1000, 500, 250),
-('Autumn Run 2024', 'Giải chạy bộ mùa thu 2024', '2024-08-01', '2024-08-16' , 'Cancelled', '2024-09-01', '2024-09-30', 15, 80, 15, 40, 800, 400, 200),
-('Winter Run 2024', 'Giải chạy bộ mùa đông 2024', '2024-11-01', '2024-11-16' , 'Completed', '2024-12-01', '2024-12-31', 10, 50, 10, 30, 500, 300, 150),
-('Spring Run 2025', 'Giải chạy bộ mùa xuân 2025', '2025-02-01', '2025-02-16' , 'Cancelled', '2025-03-01', '2025-03-31', 25, 120, 25, 60, 1200, 600, 300),
-('Charity Run 2025', 'Giải chạy bộ từ thiện 2025', '2025-04-01', '2025-04-16' , 'Completed', '2025-05-01', '2025-05-31', 30, 150, 30, 70, 1500, 700, 350),
-('City Marathon 2025', 'Giải marathon thành phố 2025', '2025-06-01', '2025-06-16' , 'Completed', '2025-07-01', '2025-07-31', 50, 200, 42, 100, 2000, 1000, 500),
-('Holiday Run 2025', 'Giải chạy bộ kỳ nghỉ 2025', '2025-12-01', '2025-12-16' , 'Active', '2026-01-01', '2026-01-31', 20, 100, 20, 50, 1000, 500, 250),
-('New Year Dash 2026', 'Giải chạy bộ đón năm mới 2026', '2025-12-15', '2025-12-31' , 'Draft', '2026-01-10', '2026-01-31', 15, 80, 15, 40, 800, 400, 200);
+INSERT INTO RunningActivity (title, image, description, registration_start_date, registration_end_date, status, start_date, end_date, min_participant, max_participant, target_distance, completion_bonus, top_1_bonus, top_2_bonus, top_3_bonus) VALUES
+('Summer Run 2024', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393526/he_jjv30d.jpg", 'Giải chạy bộ vì sức khỏe hè 2024', '2024-05-01', '2024-05-16' , 'Completed', '2024-06-01', '2024-06-30', 20, 100, 20, 50, 1000, 500, 250),
+('Autumn Run 2024', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393555/thu_olsbwx.webp", 'Giải chạy bộ mùa thu 2024', '2024-08-01', '2024-08-16' , 'Cancelled', '2024-09-01', '2024-09-30', 15, 80, 15, 40, 800, 400, 200),
+('Winter Run 2024', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393583/dong_rujjbw.jpg", 'Giải chạy bộ mùa đông 2024', '2024-11-01', '2024-11-16' , 'Completed', '2024-12-01', '2024-12-31', 10, 50, 10, 30, 500, 300, 150),
+('Spring Run 2025', "https://res.cloudinary.com/dznocieoi/image/upload/v1768392882/Hinh-anh-banner-chay-marathon-dep-75-600x600_xwbc7w.jpg", 'Giải chạy bộ mùa xuân 2025', '2025-02-01', '2025-02-16' , 'Cancelled', '2025-03-01', '2025-03-31', 25, 120, 25, 60, 1200, 600, 300),
+('Charity Run 2025', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393662/Charity_ew1r8k.jpg", 'Giải chạy bộ từ thiện 2025', '2025-04-01', '2025-04-16' , 'Completed', '2025-05-01', '2025-05-31', 30, 150, 30, 70, 1500, 700, 350),
+('City Marathon 2025', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393690/City_xgivsk.jpg", 'Giải marathon thành phố 2025', '2025-06-01', '2025-06-16' , 'Completed', '2025-07-01', '2025-07-31', 50, 200, 42, 100, 2000, 1000, 500),
+('Holiday Run 2025', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393712/Holiday_dxlclh.webp", 'Giải chạy bộ kỳ nghỉ 2025', '2025-12-01', '2025-12-16' , 'Active', '2026-01-01', '2026-01-31', 20, 100, 20, 50, 1000, 500, 250),
+('New Year Dash 2026', "https://res.cloudinary.com/dznocieoi/image/upload/v1768393717/New_pxesvo.webp", 'Giải chạy bộ đón năm mới 2026', '2025-12-15', '2026-01-16' , 'Draft', '2026-01-17', '2026-01-31', 15, 80, 15, 40, 800, 400, 200);
 
 INSERT INTO ParticipateIn (employee_id, running_activity_id, total_run) VALUES
 (5, 1, 12), (6, 1, 5), (13, 1, 20), (5, 2, 6), (2, 2, 4),
@@ -295,16 +295,16 @@ INSERT INTO Attendance (attendance_date, checkin_time, checkout_time, working_ho
 -- Nhân viên 5 (Dev) - Chăm chỉ
 ('2024-12-01', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-02', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
-('2024-12-03', '07:55:00', '17:05:00', 8.2, 'OnSite', 5),
+('2024-12-03', '07:55:00', '17:05:00', 8.2, 'Remote', 5),
 ('2024-12-04', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-05', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-06', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
-('2024-12-07', '08:00:00', '12:00:00', 4.0, 'OnSite', 5),
+('2024-12-07', '08:00:00', '12:00:00', 4.0, 'Remote', 5),
 ('2024-12-09', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-10', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-11', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-12', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
-('2024-12-13', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
+('2024-12-13', '08:00:00', '17:00:00', 8.0, 'Remote', 5),
 ('2024-12-14', '08:00:00', '12:00:00', 4.0, 'OnSite', 5),
 ('2024-12-16', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
 ('2024-12-17', '08:00:00', '17:00:00', 8.0, 'OnSite', 5),
@@ -681,11 +681,11 @@ INSERT INTO DepartmentBudget (department_id, point_policy_id, budget, start_date
 -- ============================================
 -- Tạo giao dịch "Other" (Welcome Bonus) để khớp với số tiền đang có trong PointAccount
 INSERT INTO Transaction (points, transaction_type, point_account_id, create_at) VALUES
-(1000, 'Other', 1, NOW()), (500, 'Other', 2, NOW()), (200, 'Other', 3, NOW()), (900, 'Other', 4, NOW()),
-(200, 'Other', 5, NOW()), (300, 'Other', 6, NOW()), (50, 'Other', 7, NOW()),
-(120, 'Other', 9, NOW()), (450, 'Other', 10, NOW()), (100, 'Other', 11, NOW()),
-(2000, 'Other', 13, NOW()), (50, 'Other', 14, NOW()), (600, 'Other', 15, NOW()), (750, 'Other', 16, NOW()),
-(100, 'Other', 18, NOW()), (20, 'Other', 19, NOW()), (30, 'Other', 20, NOW());
+(1000, 'PerformanceReward', 1, NOW()), (500, 'PerformanceReward', 2, NOW()), (200, 'CashOut', 3, NOW()), (900, 'CashOut', 4, NOW()),
+(200, 'PerformanceReward', 5, NOW()), (300, 'PerformanceReward', 6, NOW()), (50, 'PerformanceReward', 7, NOW()),
+(120, 'CashOut', 9, NOW()), (450, 'PerformanceReward', 10, NOW()), (100, 'CashOut', 11, NOW()),
+(2000, 'PerformanceReward', 13, NOW()), (50, 'CashOut', 14, NOW()), (600, 'PerformanceReward', 15, NOW()), (750, 'CashOut', 16, NOW()),
+(100, 'PerformanceReward', 18, NOW()), (20, 'CashOut', 19, NOW()), (30, 'PerformanceReward', 20, NOW());
 
 -- ============================================
 -- 7. LEAVE BALANCE (QUỸ PHÉP CHI TIẾT CHO 20 NHÂN VIÊN)

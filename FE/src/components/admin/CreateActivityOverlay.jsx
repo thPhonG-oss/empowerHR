@@ -63,7 +63,7 @@ function CreateActivityOverlay({
   if (!open) return null;
 
   const baseInput =
-    "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition";
+    "w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all duration-200";
 
   /* ================= IMAGE UPLOAD ================= */
   const handleImageUpload = async (e) => {
@@ -156,12 +156,12 @@ function CreateActivityOverlay({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 shadow-sm">
-          <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
-            <SquareActivity size={22} />{" "}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-linear-to-b from-gray-50 to-white">
+          <h2 className="inline-flex items-center gap-2.5 text-lg font-semibold text-gray-900">
+            <SquareActivity size={22} className="text-gray-700" />{" "}
             {mode === "edit" ? "Cập nhật hoạt động" : "Tạo hoạt động mới"}
           </h2>
           <button
@@ -169,18 +169,18 @@ function CreateActivityOverlay({
               onClose();
               if (mode === "create") setForm(defaultForm);
             }}
-            className="p-2 rounded-md hover:bg-red-100 transition"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 active:scale-95"
           >
-            <X size={20} />
+            <X size={20} className="text-gray-600" />
           </button>
         </div>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+          className="p-6 space-y-5 max-h-[80vh] overflow-y-auto"
         >
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Tiêu đề hoạt động
             </label>
@@ -190,6 +190,7 @@ function CreateActivityOverlay({
               onChange={handleChange}
               className={baseInput}
               required
+              placeholder="Nhập tiêu đề hoạt động"
             />
           </div>
 
@@ -200,14 +201,14 @@ function CreateActivityOverlay({
             </label>
 
             <label
-              className={`relative flex items-center justify-center w-full h-48
-                rounded-xl cursor-pointer overflow-hidden transition
+              className={`relative flex items-center justify-center w-full h-52
+                rounded-2xl cursor-pointer overflow-hidden transition-all duration-300
                 ${
                   uploading
                     ? "border-2 border-dashed border-gray-300 bg-gray-50"
                     : form.image
-                    ? "border border-gray-300"
-                    : "border-2 border-dashed border-gray-300 hover:border-black"
+                    ? "border border-gray-200 shadow-sm"
+                    : "border-2 border-dashed border-gray-200 hover:border-gray-400 hover:bg-gray-50"
                 }`}
             >
               <input
@@ -218,14 +219,38 @@ function CreateActivityOverlay({
               />
 
               {!form.image && !uploading && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Click để tải ảnh lên</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG</p>
+                <div className="text-center px-6">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-700">
+                    Click để tải ảnh lên
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1.5">
+                    PNG, JPG, JPEG (tối đa 10MB)
+                  </p>
                 </div>
               )}
 
               {uploading && (
-                <p className="text-sm text-gray-500">Đang upload ảnh...</p>
+                <div className="text-center">
+                  <div className="w-10 h-10 mx-auto mb-3 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Đang upload ảnh...
+                  </p>
+                </div>
               )}
 
               {form.image && !uploading && (
@@ -235,8 +260,8 @@ function CreateActivityOverlay({
                     alt="preview"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center">
-                    <span className="px-4 py-2 bg-white text-sm rounded-md">
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <span className="px-5 py-2.5 bg-white/95 backdrop-blur-sm text-sm font-medium text-gray-900 rounded-lg shadow-lg">
                       Đổi ảnh khác
                     </span>
                   </div>
@@ -245,7 +270,7 @@ function CreateActivityOverlay({
             </label>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Mô tả hoạt động
             </label>
@@ -254,13 +279,16 @@ function CreateActivityOverlay({
               value={form.description}
               onChange={handleChange}
               className={`${baseInput} h-24 resize-none`}
+              placeholder="Mô tả chi tiết cho hoạt động chạy bộ"
             />
           </div>
 
           {/* Registration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-600">Bắt đầu đăng ký</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Bắt đầu đăng ký
+              </label>
               <input
                 type="date"
                 name="registrationStartDate"
@@ -268,19 +296,21 @@ function CreateActivityOverlay({
                 onChange={handleChange}
                 min={today}
                 max={form.registrationEndDate}
-                className={`${baseInput} mt-1`}
+                className={baseInput}
                 required
               />
             </div>
-            <div>
-              <label className="text-sm text-gray-600">Kết thúc đăng ký</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Kết thúc đăng ký
+              </label>
               <input
                 type="date"
                 name="registrationEndDate"
                 value={form.registrationEndDate}
                 onChange={handleChange}
                 min={form.registrationStartDate}
-                className={`${baseInput} mt-1`}
+                className={baseInput}
                 required
               />
             </div>
@@ -288,8 +318,10 @@ function CreateActivityOverlay({
 
           {/* Activity time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-600">Ngày bắt đầu</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Ngày bắt đầu
+              </label>
               <input
                 type="date"
                 name="startDate"
@@ -297,26 +329,28 @@ function CreateActivityOverlay({
                 onChange={handleChange}
                 min={form.registrationEndDate}
                 max={form.endDate}
-                className={`${baseInput} mt-1`}
+                className={baseInput}
                 required
               />
             </div>
-            <div>
-              <label className="text-sm text-gray-600">Ngày kết thúc</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Ngày kết thúc
+              </label>
               <input
                 type="date"
                 name="endDate"
                 value={form.endDate}
                 onChange={handleChange}
                 min={form.startDate}
-                className={`${baseInput} mt-1`}
+                className={baseInput}
                 required
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Số người tối thiểu
               </label>
@@ -326,10 +360,11 @@ function CreateActivityOverlay({
                 value={form.minParticipant}
                 onChange={handleChange}
                 className={baseInput}
+                placeholder="VD: 10"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Số người tối đa
               </label>
@@ -339,11 +374,12 @@ function CreateActivityOverlay({
                 value={form.maxParticipant}
                 onChange={handleChange}
                 className={baseInput}
+                placeholder="VD: 100"
               />
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Cự ly mục tiêu (km)
             </label>
@@ -353,19 +389,24 @@ function CreateActivityOverlay({
               value={form.targetDistance}
               onChange={handleChange}
               className={baseInput}
-              placeholder="10"
+              placeholder="VD: 10"
             />
           </div>
 
-          <textarea
-            name="rules"
-            placeholder="Luật tham gia"
-            value={form.rules}
-            onChange={handleChange}
-            className={`${baseInput} h-20 resize-none`}
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Luật tham gia
+            </label>
+            <textarea
+              name="rules"
+              value={form.rules}
+              onChange={handleChange}
+              className={`${baseInput} h-20 resize-none`}
+              placeholder="Nhập các quy tắc tham gia hoạt động"
+            />
+          </div>
 
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Thưởng hoàn thành
             </label>
@@ -375,12 +416,12 @@ function CreateActivityOverlay({
               value={form.completionBonus}
               onChange={handleChange}
               className={baseInput}
-              placeholder="200"
+              placeholder="VD: 200"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Thưởng Top 1
               </label>
@@ -390,11 +431,11 @@ function CreateActivityOverlay({
                 value={form.top1Bonus}
                 onChange={handleChange}
                 className={baseInput}
-                placeholder="150"
+                placeholder="VD: 150"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Thưởng Top 2
               </label>
@@ -404,11 +445,11 @@ function CreateActivityOverlay({
                 value={form.top2Bonus}
                 onChange={handleChange}
                 className={baseInput}
-                placeholder="100"
+                placeholder="VD: 100"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Thưởng Top 3
               </label>
@@ -418,23 +459,25 @@ function CreateActivityOverlay({
                 value={form.top3Bonus}
                 onChange={handleChange}
                 className={baseInput}
-                placeholder="50"
+                placeholder="VD: 50"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer"
+              className="px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 
+              hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0 shadow-sm cursor-pointer"
             >
               Hủy
             </button>
             <button
               disabled={loading || uploading}
               type="submit"
-              className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition cursor-pointer"
+              className="px-6 py-2.5 rounded-lg bg-gray-900 text-white font-medium hover:bg-gray-800 hover:-translate-y-0.5 cursor-pointer
+              disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed transition-all duration-200 active:translate-y-0 shadow-sm"
             >
               {loading
                 ? mode === "edit"

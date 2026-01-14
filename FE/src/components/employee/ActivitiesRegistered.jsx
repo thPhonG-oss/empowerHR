@@ -77,7 +77,8 @@ export default function ActivitiesRegistered({
           <div
             key={activity.participateInId}
             onClick={() => openDetails(ra)}
-            className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden  hover:shadow-lg transition-all duration-300"
+            className="cursor-pointer group relative bg-white border border-gray-200 rounded-lg overflow-hidden 
+            hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
           >
             {/* IMAGE */}
             <div className="relative h-44 overflow-hidden bg-linear-to-br from-gray-100 to-gray-200">
