@@ -290,8 +290,8 @@ const EmployeeRewardPage = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleViewHistory(employee)}
-                    className="cursor-pointer ml-3 px-4 py-2 bg-gray-200 text-black rounded-lg hover:shadow-md hover:bg-gray-300 
-                    transition-colors text-sm font-medium flex items-center gap-2 shrink-0"
+                    className="hover:-translate-y-0.5 duration-300 cursor-pointer ml-3 px-4 py-2 bg-gray-200 text-black rounded-lg hover:shadow-md hover:bg-gray-300 
+                    transition-all text-sm font-medium flex items-center gap-2 shrink-0"
                   >
                     <History className="w-4 h-4" />
                     Lịch sử
@@ -314,7 +314,7 @@ const EmployeeRewardPage = () => {
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Trước
               </button>
@@ -332,7 +332,7 @@ const EmployeeRewardPage = () => {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`px-4 py-2 rounded-lg ${
+                        className={`cursor-pointer px-4 py-2 rounded-lg ${
                           currentPage === page
                             ? "bg-blue-600 text-white"
                             : "border border-gray-300 hover:bg-gray-50"
@@ -360,7 +360,7 @@ const EmployeeRewardPage = () => {
                   setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Sau
               </button>

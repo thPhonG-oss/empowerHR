@@ -12,7 +12,7 @@ export default function ActivitiesDetailDialog({
   resultsLoading,
   resultsError,
   handleRegister,
-  handleUnregister,
+  handleUnregisterActivity,
   isFull,
   isHistory = false,
   isCancelled = false,
@@ -44,18 +44,16 @@ export default function ActivitiesDetailDialog({
         {/* SCROLL AREA (CONTENT + FOOTER CUỘN CHUNG) */}
         <div className="overflow-y-auto flex-1 p-6 bg-gray-50">
           {/* IMAGE */}
-          {selectedActivity.image && (
-            <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
-              <img
-                src={
-                  selectedActivity.image ||
-                  "https://res.cloudinary.com/dznocieoi/image/upload/v1766487761/istockphoto-1396814518-612x612_upvria.jpg"
-                }
-                alt={selectedActivity.title}
-                className="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500 grayscale-0 hover:grayscale-0"
-              />
-            </div>
-          )}
+          <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+            <img
+              src={
+                selectedActivity.image ||
+                "https://res.cloudinary.com/dznocieoi/image/upload/v1766487761/istockphoto-1396814518-612x612_upvria.jpg"
+              }
+              alt={selectedActivity.title}
+              className="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500 grayscale-0 hover:grayscale-0"
+            />
+          </div>
 
           {/* Grid Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -112,54 +110,51 @@ export default function ActivitiesDetailDialog({
             </div>
           </div>
 
-          {/* Rewards */}
-          {isHistory && (
-            <div className="mb-6 p-5 bg-white rounded-xl shadow-sm border border-gray-200">
-              <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800 text-lg">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Award className="w-5 h-5 text-gray-700" />
+          <div className="mb-6 p-5 bg-white rounded-xl shadow-sm border border-gray-200">
+            <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800 text-lg">
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <Award className="w-5 h-5 text-gray-700" />
+              </div>
+              Phần thưởng
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-4 bg-gray-900  rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div className="font-medium text-white mb-1 text-lg">
+                  Giải nhất
                 </div>
-                Phần thưởng
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-4 bg-gray-900  rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                  <div className="font-medium text-white mb-1 text-lg">
-                    Giải nhất
-                  </div>
-                  <div className="text-gray-200 font-bold text-xl">
-                    {selectedActivity.top1Bonus} điểm
-                  </div>
+                <div className="text-gray-200 font-bold text-xl">
+                  {selectedActivity.top1Bonus} điểm
                 </div>
+              </div>
 
-                <div className="p-4 bg-gray-700 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                  <div className="font-medium text-white mb-1 text-lg">
-                    Giải nhì
-                  </div>
-                  <div className="text-gray-200 font-bold text-xl">
-                    {selectedActivity.top2Bonus} điểm
-                  </div>
+              <div className="p-4 bg-gray-700 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div className="font-medium text-white mb-1 text-lg">
+                  Giải nhì
                 </div>
-
-                <div className="p-4 bg-gray-500 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                  <div className="font-medium text-white mb-1 text-lg">
-                    Giải ba
-                  </div>
-                  <div className="text-gray-100 font-bold text-xl">
-                    {selectedActivity.top3Bonus} điểm
-                  </div>
+                <div className="text-gray-200 font-bold text-xl">
+                  {selectedActivity.top2Bonus} điểm
                 </div>
+              </div>
 
-                <div className="p-4 bg-gray-200 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-                  <div className="font-medium text-gray-900 mb-1 text-lg">
-                    Hoàn thành
-                  </div>
-                  <div className="text-gray-700 font-bold text-xl">
-                    {selectedActivity.completionBonus} điểm
-                  </div>
+              <div className="p-4 bg-gray-500 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div className="font-medium text-white mb-1 text-lg">
+                  Giải ba
+                </div>
+                <div className="text-gray-100 font-bold text-xl">
+                  {selectedActivity.top3Bonus} điểm
+                </div>
+              </div>
+
+              <div className="p-4 bg-gray-200 rounded-xl  hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div className="font-medium text-gray-900 mb-1 text-lg">
+                  Hoàn thành
+                </div>
+                <div className="text-gray-700 font-bold text-xl">
+                  {selectedActivity.completionBonus} điểm
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Rules */}
           {selectedActivity.rules && (
@@ -285,7 +280,10 @@ export default function ActivitiesDetailDialog({
                 <CustomButton
                   variant="danger"
                   onClick={() => {
-                    handleUnregister(selectedActivity?.runningActivityId);
+                    handleUnregisterActivity(
+                      selectedActivity?.runningActivityId
+                    );
+                    onClose();
                   }}
                   className="cursor-pointer w-full"
                 >

@@ -21,71 +21,40 @@ function Dashboard() {
   const navigate = useNavigate();
   const { month, year } = getCurrentDateParts();
 
-  const fetchLeaveBalances = async () => {
-    // 1. Lấy danh sách leave type
-    const leaveTypes = await getLeaveTypes();
-
-    // 2. Gọi API filterLeaveType cho từng id
-    const balances = await Promise.all(
-      leaveTypes.map(async (type) => {
-        const res = await employeeApi.filterLeaveType(type.id);
-
-        return {
-          leaveTypeId: type.id,
-          leaveTypeName: type.name,
-          remainingLeave: res.result?.remainingLeave ?? 0,
-          usedLeave: res.result?.usedLeave ?? 0,
-        };
-      })
-    );
-
-    return balances;
+  // ================== FETCH ĐIỂM THƯỞNG ==================
+  const fetchPointData = async () => {
+    try {
+      const pointRes = await pointAccountApi.getMyPoint();
+      setPointData(pointRes.data);
+    } catch (error) {
+      console.error("❌ Failed to fetch point data:", error);
+    }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  // ================== FETCH CHẤM CÔNG ==================
+  const fetchAttendanceData = async () => {
     try {
-      setLoading(true);
-
-      // 🔥 lấy myId trước
-      const myId = await getMyId();
-
-      const [
-        pointRes,
-        resAttendances,
-        requests,
-        activitiesRes,
-        leaveBalanceData,
-      ] = await Promise.all([
-        pointAccountApi.getMyPoint(),
-        employeeApi.getMyAttendances(),
-        employeeApi.getMyRequest(1, 10000),
-        runningActivityApi.employeeGetAllRegisteredActivity(myId),
-        fetchLeaveBalances(), // 🔥 thêm dòng này
-      ]);
-      setLeaveBalances(leaveBalanceData);
-
-      /* ================== ĐIỂM THƯỞNG ================== */
-      setPointData(pointRes.data);
-
-      /* ================== CHẤM CÔNG THÁNG HIỆN TẠI ================== */
+      const resAttendances = await employeeApi.getMyAttendances();
       const attendances = resAttendances.result || [];
 
-      const attendanceCountInMonth = new Set(
-        attendances
-          .filter((item) => {
-            const d = new Date(item.attendanceDate);
-            return d.getMonth() === month - 1 && d.getFullYear() === year;
-          })
-          .map((item) => item.attendanceDate)
-      ).size;
+      const attendanceCountInMonth = attendances.filter((item) => {
+        const d = new Date(item.attendanceDate);
+        const itemMonth = d.getMonth() + 1;
+        const itemYear = d.getFullYear();
+
+        return itemMonth === month && itemYear === year;
+      }).length;
 
       setAttendanceCount(attendanceCountInMonth);
+    } catch (error) {
+      console.error("❌ Failed to fetch attendance data:", error);
+    }
+  };
 
-      /* ================== 4 REQUEST GẦN NHẤT ================== */
+  // ================== FETCH YÊU CẦU ==================
+  const fetchRequestData = async () => {
+    try {
+      const requests = await employeeApi.getMyRequest(1, 10000);
       const rawRequests = requests?.result?.requestResponseDTOS || [];
 
       const latestRequests = rawRequests
@@ -94,8 +63,16 @@ function Dashboard() {
         .slice(0, 4);
 
       setCurrentRequest(latestRequests);
+    } catch (error) {
+      console.error("❌ Failed to fetch request data:", error);
+    }
+  };
 
-      /* ================== 4 HOẠT ĐỘNG ĐÃ ĐĂNG KÝ GẦN NHẤT (SORT THEO START DATE) ================== */
+  // ================== FETCH HOẠT ĐỘNG ==================
+  const fetchActivitiesData = async (myId) => {
+    try {
+      const activitiesRes =
+        await runningActivityApi.employeeGetAllRegisteredActivity(myId);
       const rawActivities = activitiesRes?.result || [];
 
       const latestActivities = rawActivities
@@ -109,11 +86,61 @@ function Dashboard() {
 
       setCurrentActivities(latestActivities);
     } catch (error) {
-      console.error("Failed to fetch dashboard data", error);
-    } finally {
-      setLoading(false);
+      console.error("❌ Failed to fetch activities data:", error);
     }
   };
+
+  // ================== FETCH NGHỈ PHÉP ==================
+  const fetchLeaveBalances = async () => {
+    try {
+      const leaveTypes = await getLeaveTypes();
+
+      const balances = await Promise.all(
+        leaveTypes.map(async (type) => {
+          const res = await employeeApi.filterLeaveType(type.id);
+
+          return {
+            leaveTypeId: type.id,
+            leaveTypeName: type.name,
+            remainingLeave: res.result?.remainingLeave ?? 0,
+            usedLeave: res.result?.usedLeave ?? 0,
+          };
+        })
+      );
+
+      setLeaveBalances(balances);
+    } catch (error) {
+      console.error("❌ Failed to fetch leave balance data:", error);
+    }
+  };
+
+  // ================== FETCH TẤT CẢ DỮ LIỆU ==================
+  const fetchAllData = async () => {
+    setLoading(true);
+
+    // Lấy myId trước
+    let myId = null;
+    try {
+      myId = await getMyId();
+    } catch (error) {
+      console.error("❌ Failed to get myId:", error);
+    }
+
+    // Gọi tất cả các hàm fetch độc lập
+    await Promise.allSettled([
+      fetchPointData(),
+      fetchAttendanceData(),
+      fetchRequestData(),
+      myId ? fetchActivitiesData(myId) : Promise.resolve(),
+      fetchLeaveBalances(),
+    ]);
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
   return (
     <main className="p-0 bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 min-h-screen">
@@ -126,7 +153,10 @@ function Dashboard() {
           {/* ===== TOP CARDS ===== */}
           <div className="grid grid-cols-4 pt-8 px-8 gap-6">
             {/* ===== POINT CARD ===== */}
-            <div className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/employee/rewards")}
+              className="group rounded-3xl bg-linear-to-br from-amber-50 to-white p-7 shadow-sm hover:shadow-xl border border-amber-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            >
               <div className="p-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-amber-200 transition-shadow duration-300">
                 <Gem className="size-7 text-white" />
               </div>
@@ -149,7 +179,10 @@ function Dashboard() {
             </div>
 
             {/* ===== ATTENDANCE COUNT CARD ===== */}
-            <div className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1">
+            <div
+              onClick={() => navigate("/employee/attendance")}
+              className="group rounded-3xl bg-linear-to-br from-blue-50 to-white p-7 shadow-sm hover:shadow-xl border border-blue-100 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            >
               <div className="p-4 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
                 <Calendar className="size-7 text-white" />
               </div>
@@ -206,7 +239,8 @@ function Dashboard() {
                   {currentRequest.map((req) => (
                     <li
                       key={req.requestId}
-                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                      onClick={() => navigate("/employee/request-history")}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100 cursor-pointer"
                     >
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
@@ -240,7 +274,7 @@ function Dashboard() {
               )}
             </div>
 
-            {/* ===== PLACEHOLDER: HOẠT ĐỘNG GẦN ĐÂY ===== */}
+            {/* ===== HOẠT ĐỘNG SẮP DIỄN RA ===== */}
             <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
               <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
                 <h3 className="text-lg font-bold text-gray-900">
@@ -266,7 +300,8 @@ function Dashboard() {
                   {currentActivities.map((act) => (
                     <li
                       key={act.participateInId}
-                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100"
+                      onClick={() => navigate("/employee/activities")}
+                      className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 border border-gray-100 cursor-pointer"
                     >
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
@@ -305,8 +340,11 @@ function Dashboard() {
               )}
             </div>
 
-            {/* So so so */}
-            <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+            {/* ===== SỐ DƯ NGHỈ PHÉP ===== */}
+            <div
+              onClick={() => navigate("/employee/leave-balance")}
+              className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 cursor-pointer"
+            >
               <h3 className="text-lg font-bold text-gray-900 mb-5 pb-4 border-b border-gray-100">
                 Số dư nghỉ phép
               </h3>
@@ -361,7 +399,6 @@ function Dashboard() {
               )}
             </div>
           </div>
-          <div className="px-6 grid grid-cols-2"></div>
         </div>
       </div>
     </main>

@@ -147,7 +147,7 @@ export default function UpdateActivityOverlay({
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error("Cập nhật thất bại ❌");
+      toast.error(err?.response?.data?.message);
     } finally {
       setLoading(false);
     }

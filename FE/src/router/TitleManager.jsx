@@ -32,6 +32,7 @@ const navSimple = [
   { title: "Quản lý yêu cầu", path: "request-management" },
   { title: "Yêu cầu đã xử lý", path: "request-management/history" },
   { title: "Thưởng điểm", path: "performance-points" },
+  { title: "Kết nối strava", path: "callback" },
   // { title: "404 Not Found", path: "" },
 ];
 

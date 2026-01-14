@@ -95,7 +95,7 @@ const TransactionHistoryModal = ({ onClose, employee }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="cursor-pointer p-2 hover:bg-red-100 rounded-lg transition-colors"
           >
             <X className="w-6 h-6 text-gray-600" />
           </button>
@@ -213,7 +213,7 @@ const TransactionHistoryModal = ({ onClose, employee }) => {
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
           <button
             onClick={onClose}
-            className="w-full md:w-auto px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="hover:-translate-y-0.5 duration-300 w-full md:w-auto px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
           >
             Đóng
           </button>

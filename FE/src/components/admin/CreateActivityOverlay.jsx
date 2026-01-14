@@ -279,7 +279,7 @@ function CreateActivityOverlay({
                 name="registrationEndDate"
                 value={form.registrationEndDate}
                 onChange={handleChange}
-                min={form.registrationStartDate || today}
+                min={form.registrationStartDate}
                 className={`${baseInput} mt-1`}
                 required
               />
@@ -295,7 +295,7 @@ function CreateActivityOverlay({
                 name="startDate"
                 value={form.startDate}
                 onChange={handleChange}
-                min={today}
+                min={form.registrationEndDate}
                 max={form.endDate}
                 className={`${baseInput} mt-1`}
                 required
@@ -308,7 +308,7 @@ function CreateActivityOverlay({
                 name="endDate"
                 value={form.endDate}
                 onChange={handleChange}
-                min={form.startDate || today}
+                min={form.startDate}
                 className={`${baseInput} mt-1`}
                 required
               />

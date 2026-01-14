@@ -63,7 +63,15 @@ export default function HistoryRequests() {
                 : "Chờ phê duyệt",
 
             person: item.employeeName,
-            deadline: item.handleAt || "—",
+            deadline: item.handleAt
+              ? new Date(item.handleAt).toLocaleString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—",
 
             notes:
               item.status === "Rejected" && item.responseReason

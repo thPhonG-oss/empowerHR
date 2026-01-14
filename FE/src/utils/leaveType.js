@@ -4,7 +4,6 @@ import employeeApi from "../api/employeeApi";
 export const getLeaveTypes = async () => {
   try {
     const res = await employeeApi.getLeaveType();
-    console.log(res);
     return res?.result.map(({ leaveTypeId, leaveTypeName }) => ({
       id: leaveTypeId,
       name: leaveTypeName,

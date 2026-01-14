@@ -56,7 +56,21 @@ function LeaveRequest() {
   //
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
+
+  const isFormValid = () => {
+    return (
+      Object.entries(formData).every(([key, value]) => {
+        // checkbox agreed phải là true
+        if (key === "agreed") return value === true;
+
+        // các field string không được rỗng
+        return value !== "" && value !== null && value !== undefined;
+      }) && validTotal
+    );
+  };
 
   // -----------------------------
   // Fetch info từ API
@@ -221,6 +235,10 @@ function LeaveRequest() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isFormValid() || isSubmitting) return;
+
+    setIsSubmitting(true);
+
     const { agreed, ...rest } = formData;
     const body = {
       ...rest,
@@ -228,17 +246,18 @@ function LeaveRequest() {
     };
 
     try {
-      const res = await employeeApi.makeLeaveRequest(body);
-
+      await employeeApi.makeLeaveRequest(body);
       toast.success("Đã gửi yêu cầu thành công");
 
-      await new Promise((r) => setTimeout(r, 1500));
-
-      // Qua trang Lịch sử yêu cầu
-      navigate(`/${safeRole}/request-history`);
+      // Disable nút trong 3s
+      setTimeout(() => {
+        setIsSubmitting(false);
+        navigate(`/${safeRole}/request-history`);
+      }, 3000);
     } catch (err) {
       toast.error("Gửi yêu cầu không thành công");
-      console.error("Lỗi", err);
+      setIsSubmitting(false);
+      console.error(err);
     }
   };
 
@@ -635,13 +654,23 @@ function LeaveRequest() {
           <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
             <button
               type="submit"
-              disabled={!formData.agreed}
-              className="group w-full bg-linear-to-r from-gray-900 to-gray-700 text-white py-4 rounded-xl font-bold 
-              text-lg disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 
-              hover:from-gray-800 hover:to-gray-600 hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 flex items-center justify-center gap-3"
+              disabled={!isFormValid() || isSubmitting}
+              className="cursor-pointer group w-full bg-linear-to-r from-gray-900 to-gray-700 text-white py-4 rounded-xl font-bold 
+  text-lg disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 
+  hover:from-gray-800 hover:to-gray-600 hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 
+  flex items-center justify-center gap-3"
             >
-              <Send className="h-5 w-5 transition-transform group-hover:translate-x-1 duration-300" />
-              <span>Gửi yêu cầu</span>
+              {isSubmitting ? (
+                <>
+                  <RefreshCcw className="h-5 w-5 animate-spin" />
+                  <span>Đang gửi...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="h-5 w-5 transition-transform group-hover:translate-x-1 duration-300" />
+                  <span>Gửi yêu cầu</span>
+                </>
+              )}
             </button>
           </div>
         </form>

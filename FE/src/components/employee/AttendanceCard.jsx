@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 function AttendanceCard({ isDashboard = false, className = "" }) {
   const [checkInTime, setCheckInTime] = useState("--:--");
   const [checkOutTime, setCheckOutTime] = useState("--:--");
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isIn, setIsIn] = useState(true);
   const [isOut, setIsOut] = useState(false);
 
@@ -61,7 +61,11 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
 
   // ---- Check-in ----
   const handleCheckIn = async () => {
+    if (isSubmitting) return;
+
     try {
+      setIsSubmitting(true);
+
       const ip = await getPublicIP();
 
       await employeeApi.checkIn({
@@ -70,32 +74,38 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
       });
 
       toast.success("Check-in thành công");
-      await new Promise((r) => setTimeout(r, 1000));
-      window.location.reload();
+
       await loadAttendance();
     } catch (error) {
       toast.error("Check-in thất bại");
       console.error("Check-in error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // ---- Check-out ----
   const handleCheckOut = async () => {
+    if (isSubmitting) return;
+
     try {
+      setIsSubmitting(true);
+
       const ip = await getPublicIP();
 
       await employeeApi.checkOut({
         ipCheckout: ip,
         checkoutLocationStatus: "OnSite",
       });
+
       toast.success("Check-out thành công");
-      await new Promise((r) => setTimeout(r, 1000));
-      window.location.reload();
+
       await loadAttendance();
     } catch (error) {
       toast.error("Check-out thất bại");
-
       console.error("Check-out error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -145,40 +155,48 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
             {isIn && !isOut && (
               <button
                 onClick={handleCheckIn}
-                title=""
-                className="
-                inline-flex items-center gap-2
-                bg-black text-white
-                px-4 py-2.5 rounded-xl
-                font-medium
-                hover:bg-gray-800
-                active:scale-95
-                transition-all
-                cursor-pointer
-              "
+                disabled={isSubmitting}
+                className={`
+                  hover:-translate-y-0.5
+                  cursor-pointer
+                  inline-flex items-center gap-2
+                  px-4 py-2.5 rounded-xl font-medium
+                  transition-all
+                  ${
+                    isSubmitting
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-gray-800 active:scale-95"
+                  }
+                `}
               >
                 <LogIn size={18} />
-                <span>Bắt đầu làm việc</span>
+                <span>
+                  {isSubmitting ? "Đang xử lý..." : "Bắt đầu làm việc"}
+                </span>
               </button>
             )}
 
             {!isIn && isOut && (
               <button
-                title=""
                 onClick={handleCheckOut}
-                className="
-                inline-flex items-center gap-2
-                bg-white text-gray-900
-                border border-gray-300
-                px-4 py-2.5 rounded-xl
-                font-medium
-                hover:bg-gray-100
-                active:scale-95
-                transition-all
-              "
+                disabled={isSubmitting}
+                className={`
+                  hover:-translate-y-0.5
+                  cursor-pointer
+                  inline-flex items-center gap-2
+                  px-4 py-2.5 rounded-xl font-medium
+                  transition-all
+                  ${
+                    isSubmitting
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 active:scale-95"
+                  }
+                `}
               >
                 <LogOut size={18} />
-                <span>Kết thúc làm việc</span>
+                <span>
+                  {isSubmitting ? "Đang xử lý..." : "Kết thúc làm việc"}
+                </span>
               </button>
             )}
           </div>
