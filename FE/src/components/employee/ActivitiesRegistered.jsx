@@ -7,11 +7,12 @@ import runningActivityApi from "../../api/runningActivityApi";
 
 export default function ActivitiesRegistered({
   employeeID,
-  handleUnregister,
+  handleUnregisterActivity,
   openDetails,
   formatDate,
   searchQuery,
   sortType,
+  registerKey,
 }) {
   const [registeredActivities, setRegisteredActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ export default function ActivitiesRegistered({
   useEffect(() => {
     if (!employeeID) return;
     fetchRegistered();
-  }, [employeeID]);
+  }, [employeeID, registerKey]);
 
   if (loading)
     return (
@@ -75,6 +76,7 @@ export default function ActivitiesRegistered({
         return (
           <div
             key={activity.participateInId}
+            onClick={() => openDetails(ra)}
             className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden  hover:shadow-lg transition-all duration-300"
           >
             {/* IMAGE */}
@@ -125,21 +127,13 @@ export default function ActivitiesRegistered({
 
               {/* ACTION */}
               <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2.5">
-                <div className="flex justify-center">
-                  <CustomButton
-                    variant="link"
-                    onClick={() => openDetails(ra)}
-                    className="px-0 w-fit text-xs font-medium text-gray-900 hover:text-gray-600 cursor-pointer"
-                  >
-                    Xem chi tiết →
-                  </CustomButton>
-                </div>
                 {(ra.status === "Active" || ra.status === "Open") &&
                 !activity.isCancelled ? (
                   <CustomButton
                     variant="danger"
-                    onClick={async () => {
-                      await handleUnregister(ra.runningActivityId);
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await handleUnregisterActivity(ra.runningActivityId);
                       fetchRegistered();
                     }}
                     className="w-full bg-gray-900 hover:bg-gray-800  text-xs font-medium py-2.5 rounded-md transition-colors cursor-pointer"

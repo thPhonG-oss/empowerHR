@@ -21,13 +21,12 @@ const runningActivityApi = {
     axiosClient.get(`/api/v1/employees/${employeeId}/activities/${activityId}`),
 
   updateActivity: (runningActivityId, data) =>
-    axiosClient.put(
-      `/api/v1/activities/admin/update-activities/${runningActivityId}`,
-      data
-    ),
+    axiosClient.put(`/api/v1/activities/${runningActivityId}`, data),
 
   deleteActivity: (activityId) =>
-    axiosClient.delete(`/api/v1/activities/admin/${activityId}`),
+    axiosClient.delete(`/api/v1/activities/${activityId}`),
+  updateStatus: (runningActivityId, data = { status: "Cancelled" }) =>
+    axiosClient.patch(`/api/v1/activities/status/${runningActivityId}`, data),
 };
 
 export default runningActivityApi;

@@ -1,7 +1,7 @@
-import RatePage from "./RatePage";
-import MonthlyPointPage from "./MonthlyPointPage";
-import TransactionPage from "./TransactionPage";
-import EmployeeRewardPage from "./EmployeeRewardPage";
+import RatePage from "../../components/admin/RatePage";
+import MonthlyPointPage from "../../components/admin/MonthlyPointPage";
+import TransactionPage from "../../components/admin/TransactionPage";
+import EmployeeRewardPage from "../../components/admin/EmployeeRewardPage";
 import Header from "../../components/common/Header";
 
 import {

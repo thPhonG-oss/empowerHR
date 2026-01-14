@@ -178,10 +178,10 @@ export default function MonthlyPointPage() {
     ) : (
       <button
         onClick={() => startEdit(type, item)}
-        className="cursor-pointer p-2 hover:bg-blue-50 rounded-lg transition-colors group"
+        className="cursor-pointer p-2 hover:bg-blue-50 rounded-lg transition-all duration-300 group hover:-translate-y-0.5"
         title="Chỉnh sửa"
       >
-        <Pencil className="w-4 h-4 text-blue-600 group-hover:text-blue-700" />
+        <Pencil className="w-4 h-4 text-blue-600 group-hover:text-blue-700 " />
       </button>
     );
   };

@@ -40,6 +40,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
       toast.success("Phê duyệt yêu cầu thành công");
     } catch (err) {
       toast.error("Phê duyệt yêu cầu thất bại");
+      console.error(err);
     }
   };
 
@@ -50,6 +51,7 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
       toast.success("Từ chối yêu cầu thành công");
     } catch (err) {
       toast.error("Từ chối yêu cầu thất bại");
+      console.error(err);
     }
   };
 
@@ -147,6 +149,22 @@ export function RequestDetailPopup({ request, onClose, reloadData }) {
                     </p>
                   </div>
                 </div>
+                {request.requestType === "TIMESHEET_UPDATE" &&
+                  request.attendanceDate && (
+                    <div className="flex items-start gap-3">
+                      <div className="bg-white p-2 rounded-lg shadow-sm">
+                        <Calendar size={18} className="text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">
+                          Ngày chấm công
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {formatDate(request.attendanceDate)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
 

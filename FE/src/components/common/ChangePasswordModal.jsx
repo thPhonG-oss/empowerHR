@@ -19,6 +19,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
   const [success, setSuccess] = useState(false);
   const [userName, setUserName] = useState(localStorage.getItem("userName"));
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const [passwordTooShort, setPasswordTooShort] = useState(false);
 
   const handleClose = () => {
     // Reset form
@@ -34,6 +35,11 @@ function ChangePasswordModal({ isOpen, onClose }) {
   const handleChangePassword = async (e) => {
     e.preventDefault();
 
+    if (newPassword.length < 6) {
+      setPasswordTooShort(true);
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setPasswordMismatch(true);
       return;
@@ -48,8 +54,6 @@ function ChangePasswordModal({ isOpen, onClose }) {
         userName,
         password: currentPassword,
       });
-      console.log(userName, currentPassword);
-      console.log(res?.result?.valid);
 
       if (!res?.result?.valid) {
         const error = new Error("Wrong current password");
@@ -187,6 +191,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
                     onChange={(e) => {
                       handleNewChange(e);
                       setPasswordMismatch(false);
+                      setPasswordTooShort(false);
                     }}
                     placeholder={
                       showPassword ? "Nhập mật khẩu mới" : "••••••••••"
@@ -213,6 +218,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
                     onChange={(e) => {
                       handleConfirmChange(e);
                       setPasswordMismatch(false);
+                      setPasswordTooShort(false);
                     }}
                     placeholder={
                       showPassword ? "Nhập lại mật khẩu" : "••••••••••"
@@ -232,6 +238,13 @@ function ChangePasswordModal({ isOpen, onClose }) {
                   </p>
                 </div>
               )}
+              {passwordTooShort && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                  <p className="text-red-600 text-sm font-medium text-center">
+                    Mật khẩu mới phải có ít nhất 6 ký tự
+                  </p>
+                </div>
+              )}
 
               {/* BUTTONS */}
               <div className="flex gap-3 pt-2">
@@ -239,7 +252,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
                   type="button"
                   onClick={handleClose}
                   className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl 
-                  hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                  hover:bg-gray-50 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md"
                 >
                   Hủy
                 </button>
@@ -247,7 +260,7 @@ function ChangePasswordModal({ isOpen, onClose }) {
                   type="submit"
                   disabled={isLoading}
                   className="flex-1 bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer
-                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200  hover:-translate-y-0.5 hover:shadow-md"
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2 text-gray-600">

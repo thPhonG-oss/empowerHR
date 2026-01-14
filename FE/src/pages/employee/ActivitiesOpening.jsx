@@ -43,6 +43,8 @@ export default function ActivitiesOpening() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortType, setSortType] = useState("nearest");
 
+  const [registerKey, setRegisterKey] = useState(0);
+
   //=====================================================
   // PROFILE
   //=====================================================
@@ -86,7 +88,6 @@ export default function ActivitiesOpening() {
       const redirectUrl = response.redirectUrl;
       if (redirectUrl) {
         setRedirect_uri(redirectUrl);
-
         window.open(redirectUrl, "_blank");
       }
     } catch (error) {
@@ -124,6 +125,10 @@ export default function ActivitiesOpening() {
   //=====================================================
   const handleRegister = async (activity) => {
     try {
+      if (!connectedStrava) {
+        toast.error("Vui lòng kết nối Strava trước khi đăng ký");
+        return;
+      }
       await runningActivityApi.employeeRegisterActivity(
         activity.runningActivityId
       );
@@ -264,7 +269,7 @@ export default function ActivitiesOpening() {
               className="cursor-pointer flex items-center justify-center gap-2 px-5 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-300  hover:border-gray-300 transition-all duration-200 shadow-sm whitespace-nowrap font-medium"
             >
               <ArrowUpDown size={18} />
-              {sortType === "nearest" ? "Xa nhất" : "Gần nhất"}
+              {sortType === "nearest" ? "Gần nhất" : "Xa nhất"}
             </button>
           </div>
 
@@ -276,7 +281,7 @@ export default function ActivitiesOpening() {
               title="Kết nối đến Strava"
               className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md  ${
                 !connectedStrava
-                  ? "cursor-pointer hover:shadow-lg transition-all duration-200"
+                  ? "cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
                   : ""
               }`}
             >
@@ -288,7 +293,7 @@ export default function ActivitiesOpening() {
                 title="Danh sách hoạt động đang diễn ra"
                 variant="green"
                 onClick={() => setCurrentView("active")}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
+                className="hover:-translate-y-0.5 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
               >
                 <FastForward size={20} />
                 Đang diễn ra
@@ -313,10 +318,14 @@ export default function ActivitiesOpening() {
             <ActivitiesRegistered
               employeeID={employeeID}
               openDetails={openDetails}
-              handleUnregister={handleUnregister}
+              handleUnregisterActivity={(id) => {
+                handleUnregister(id);
+                setRegisterKey((prev) => prev + 1);
+              }}
               formatDate={formatDate}
               searchQuery={searchQuery}
               sortType={sortType}
+              registerKey={registerKey}
             />
           ) : (
             <>
@@ -335,7 +344,8 @@ export default function ActivitiesOpening() {
                 {filteredActivities.map((activity) => (
                   <div
                     key={activity.runningActivityId}
-                    className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                    onClick={() => openDetails(activity)}
+                    className="cursor-pointer group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:-translate-y-1"
                   >
                     {/* Image */}
                     <div className="relative h-48 bg-linear-to-br from-gray-200 to-gray-300 overflow-hidden">
@@ -352,7 +362,7 @@ export default function ActivitiesOpening() {
 
                     {/* Content */}
                     <div className="p-5">
-                      <h3 className="font-bold text-lg mb-4 text-gray-900 line-clamp-2 min-h-14">
+                      <h3 className=" font-bold text-lg mb-4 text-gray-900 line-clamp-2 min-h-14">
                         {activity.title}
                       </h3>
 
@@ -392,14 +402,6 @@ export default function ActivitiesOpening() {
 
                       {/* Buttons */}
                       <div className="flex flex-col gap-3">
-                        <CustomButton
-                          variant="link"
-                          onClick={() => openDetails(activity)}
-                          className="w-full text-center py-2 text-gray-700 hover:text-gray-900 font-semibold transition-colors duration-200 cursor-pointer"
-                        >
-                          Xem chi tiết →
-                        </CustomButton>
-
                         {activity.isRegistered && (
                           <CustomButton
                             variant="primary"
@@ -448,10 +450,14 @@ export default function ActivitiesOpening() {
           resultsLoading={resultsLoading}
           resultsError={resultsError}
           handleRegister={handleRegister}
-          handleUnregister={handleUnregister}
+          handleUnregisterActivity={(id) => {
+            handleUnregister(id);
+            setRegisterKey((prev) => prev + 1);
+          }}
           isFull={isFull}
           isHistory={currentView === "registered" ? true : false}
           isCancelled={activityResults?.isCancelled}
+          registerKey={registerKey}
         />
       )}
     </div>
