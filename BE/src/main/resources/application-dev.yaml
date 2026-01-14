@@ -61,4 +61,4 @@ cloudinary:
 
 app:
   scheduler:
-    annual-monthly-reward: "0 * * * * ?"
+    annual-monthly-reward: "0 0 0 1 1 ?" # At 00:00 on January 1st
