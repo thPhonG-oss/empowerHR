@@ -158,7 +158,7 @@ function ManagerEmployeeList() {
                     Danh sách nhân viên
                   </h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {totalItems} nhân viên thuộc {myDepartment}
+                    {totalItems - 1} nhân viên thuộc {myDepartment}
                   </p>
                 </div>
               </div>

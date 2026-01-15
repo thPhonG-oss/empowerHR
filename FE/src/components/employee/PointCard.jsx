@@ -55,7 +55,7 @@ function PointCard({ redeemKey, onRedeemSuccess }) {
           <button
             title="Quy đổi điểm"
             onClick={() => setOpenRedeem(true)}
-            className="flex-1 h-full bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition py-2 px-4  cursor-pointer"
+            className="flex-1 h-full bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 py-2 px-4 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
           >
             Đổi thưởng
           </button>
