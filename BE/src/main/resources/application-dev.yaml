@@ -45,8 +45,8 @@ security:
 
 jwt:
   secret:  ${SECRET_KEY}
-  access-token-validity-seconds: 3600
-  refresh-token-validity-seconds: 86400
+  access-token-validity-seconds: 36000
+  refresh-token-validity-seconds: 864000
 
 logging:
   level:
@@ -61,4 +61,4 @@ cloudinary:
 
 app:
   scheduler:
-    annual-monthly-reward: "0 * * * * ?"
+    annual-monthly-reward: "0 0 0 1 1 ?"

@@ -208,6 +208,7 @@ function Dashboard() {
             <AttendanceCard
               isDashboard={true}
               className="col-start-3 col-span-2"
+              onSuccess={fetchAttendanceData}
             />
           </div>
 

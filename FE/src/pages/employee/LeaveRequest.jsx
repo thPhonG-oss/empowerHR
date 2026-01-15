@@ -278,7 +278,7 @@ function LeaveRequest() {
     <main className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
       <Header title="Yêu cầu nghỉ phép" icon={FileText} />
 
-      <div className="mx-auto max-w-5xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Header Section */}
         <div className="mb-8 overflow-hidden rounded-2xl  shadow-2xl">
           <div className="rounded-2xl bg-white p-8 text-center">

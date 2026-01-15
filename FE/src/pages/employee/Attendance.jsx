@@ -48,34 +48,34 @@ function Attendance() {
     return "off";
   }
 
-  useEffect(() => {
-    async function fetchAttendance() {
-      try {
-        const res = await employeeApi.getMyAttendances();
-        const data = res.result || [];
+  async function fetchAttendance() {
+    try {
+      const res = await employeeApi.getMyAttendances();
+      const data = res.result || [];
 
-        const formatted = data.map((item) => ({
-          id: item.attendanceId,
-          dateRaw: item.attendanceDate,
-          date: formatDate(item.attendanceDate),
-          dayOfWeek: getDayOfWeek(item.attendanceDate),
-          checkIn: item.checkinTime ? item.checkinTime.slice(0, 5) : "--:--",
-          checkOut: item.checkoutTime ? item.checkoutTime.slice(0, 5) : "--:--",
-          workingHours:
-            item.workingHours === null ? "--" : `${item.workingHours}h`,
-          status: convertStatus(
-            item.checkinLocationStatus,
-            item.checkinTime,
-            item.checkoutTime
-          ),
-        }));
+      const formatted = data.map((item) => ({
+        id: item.attendanceId,
+        dateRaw: item.attendanceDate,
+        date: formatDate(item.attendanceDate),
+        dayOfWeek: getDayOfWeek(item.attendanceDate),
+        checkIn: item.checkinTime ? item.checkinTime.slice(0, 5) : "--:--",
+        checkOut: item.checkoutTime ? item.checkoutTime.slice(0, 5) : "--:--",
+        workingHours:
+          item.workingHours === null ? "--" : `${item.workingHours}h`,
+        status: convertStatus(
+          item.checkinLocationStatus,
+          item.checkinTime,
+          item.checkoutTime
+        ),
+      }));
 
-        setAttendances(formatted);
-      } catch (error) {
-        console.error("Failed to get attendances", error);
-      }
+      setAttendances(formatted);
+    } catch (error) {
+      console.error("Failed to get attendances", error);
     }
+  }
 
+  useEffect(() => {
     fetchAttendance();
   }, []);
 
@@ -97,7 +97,7 @@ function Attendance() {
         <Header title="Bảng chấm công" icon={CalendarClock} />
 
         <div className="flex flex-col gap-6 p-4">
-          <AttendanceCard />
+          <AttendanceCard onSuccess={fetchAttendance} />
 
           <div className="rounded-2xl bg-white shadow-sm border border-gray-100">
             {/* Header + Filter */}

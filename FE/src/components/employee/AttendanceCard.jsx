@@ -5,7 +5,7 @@ import employeeApi from "../../api/employeeApi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-function AttendanceCard({ isDashboard = false, className = "" }) {
+function AttendanceCard({ isDashboard = false, onSuccess, className = "" }) {
   const [checkInTime, setCheckInTime] = useState("--:--");
   const [checkOutTime, setCheckOutTime] = useState("--:--");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +76,7 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
       });
 
       toast.success("Check-in thành công");
-
+      onSuccess();
       await loadAttendance();
     } catch (error) {
       toast.error("Check-in thất bại");
@@ -101,7 +101,7 @@ function AttendanceCard({ isDashboard = false, className = "" }) {
       });
 
       toast.success("Check-out thành công");
-
+      onSuccess();
       await loadAttendance();
     } catch (error) {
       toast.error("Check-out thất bại");
