@@ -7,7 +7,7 @@ spring:
     name: hrm-backend
   datasource:
     url: ${DATABASE_URL}
-    username:  ${DB_USERNAME}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
@@ -44,7 +44,7 @@ security:
           user-name-attribute: id
 
 jwt:
-  secret:  ${SECRET_KEY}
+  secret: ${SECRET_KEY}
   access-token-validity-seconds: 36000
   refresh-token-validity-seconds: 864000
 
@@ -61,4 +61,4 @@ cloudinary:
 
 app:
   scheduler:
-    annual-monthly-reward: "0 0 0 1 1 ?"
+    annual-monthly-reward: "0 0 0 1 1 ?" # At 00:00 on January 1st
